@@ -1,5 +1,3 @@
-/* 
-
 VARIABLE DECLARATIONS AND NAMING CONVENTIONS: 
 
 string userInput = "";
@@ -8,10 +6,15 @@ int userInputNumber = 0;
 1. Declare variables with descriptive titles
 2. DON'T use single characters for var declarations
 
-COMMENTS: 
+COMMENTS:
 
 1. Comment every method
 2. Comment every section
 3. Explain shortly what you have created your logic
 
-*/
+GIT RULES:
+
+1. DONT FORCE PUSH TO MAIN.
+2. Code review before merging to Main
+3. When working in branches, push to branches 
+4. Always ask and tell what feature branch you're working to avoid merge conflicts
