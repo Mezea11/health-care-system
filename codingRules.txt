@@ -18,3 +18,4 @@ GIT RULES:
 2. Code review before merging to Main
 3. When working in branches, push to branches 
 4. Always ask and tell what feature branch you're working to avoid merge conflicts
+5. When creating a branch, naming convention is: feature/{feature}
