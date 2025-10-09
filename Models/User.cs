@@ -6,6 +6,8 @@ namespace App;
 class User : IUser
 {
     public string Username { get; private set; }
+
+    // SET PASSWORD TO PRIVATE
     public string Password { get; private set; }
     private Role role;
 

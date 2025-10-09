@@ -36,6 +36,8 @@ As a logged in user, I need to be able to view my schedule.
 */
 
 
+
+
 // ============================
 // Main program
 // ============================
@@ -97,15 +99,22 @@ class Program
 
                 switch (activeUser.GetRole())
                 {
+
+                    // ADMIN MENU
                     case Role.Admin:
                         AdminMenu(users);
                         break;
+
+                    // PERSONNEL MENU
                     case Role.Personnel:
                         PersonnelMenu();
                         break;
+
+                    // PATIENT MENU
                     case Role.Patient:
                         PatientMenu();
                         break;
+
                 }
 
                 Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
@@ -116,7 +125,7 @@ class Program
     }
 
     // ============================
-    // ADMIN MENU
+    // ADMIN MENU METHOD
     // ============================
     static void AdminMenu(List<IUser> users)
     {
@@ -154,7 +163,7 @@ class Program
     }
 
     // ============================
-    // PERSONNEL MENU
+    // PERSONNEL MENU METHOD
     // ============================
     static void PersonnelMenu()
     {
@@ -175,7 +184,7 @@ class Program
     }
 
     // ============================
-    // PATIENT MENU
+    // PATIENT MENU METHOD
     // ============================
     static void PatientMenu()
     {

@@ -1,0 +1,17 @@
+/* 
+
+VARIABLE DECLARATIONS AND NAMING CONVENTIONS: 
+
+string userInput = "";
+int userInputNumber = 0;
+
+1. Declare variables with descriptive titles
+2. DON'T use single characters for var declarations
+
+COMMENTS: 
+
+1. Comment every method
+2. Comment every section
+3. Explain shortly what you have created your logic
+
+*/
