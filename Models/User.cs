@@ -15,7 +15,7 @@ class User : IUser
     {
         Username = username;
         Password = password;
-        this.role = role;
+        this.rol e = role;
     }
 
     public Role GetRole() => role;

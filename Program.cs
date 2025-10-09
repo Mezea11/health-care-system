@@ -4,7 +4,7 @@
 -- SAVE AND MOCK DATA TO TEXT FILES --
 
 As a user, I need to be able to log in. CHECKED
-As a user, I need to be able to log out.
+As a user, I need to be able to log out. CHECKED
 As a user, I need to be able to request registration as a patient.
 
 
@@ -196,7 +196,7 @@ class Program
 
         if (input == "1")
         {
-            Console.WriteLine("Your journal: mock");
+            Console.WriteLine("Your journal: mock journal");
         }
         else if (input == "2")
         {
