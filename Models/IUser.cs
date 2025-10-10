@@ -27,6 +27,9 @@ namespace App
         Role GetRole();
         Registration GetRegistration();
         bool TryLogin(string username, string password);
+
+        void AcceptPending();
+        void DenyPending();
     }
 
 }

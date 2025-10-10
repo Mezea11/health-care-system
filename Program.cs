@@ -141,7 +141,7 @@ static void AdminMenu(List<IUser> users)
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
     Console.WriteLine("2. See list of all users");
-    Console.WriteLine("3. See pending patient request");
+    Console.WriteLine("5. See pending patient request");
 
     // Console.Write("Choice: ");
     // string choice = Console.ReadLine();
@@ -167,24 +167,27 @@ static void AdminMenu(List<IUser> users)
                 Console.WriteLine($"{u.Username} - {u.GetRole()} - {u.GetRegistration()}");
             }
             break;
-        case 3:
-            Console.WriteLine("\nAll patinets with pending request::");
+        case 5:
+            Console.WriteLine("\nAll patients with pending request::");
             foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
             {
                 Console.WriteLine($"{user.Username} - {user.GetRole()}");
             }
             // Work with string get name first and after we are done we are working with index. 
             string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-            IUser patientUser = users.Find(u => u.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+            IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
             if (patientUser != null)
             {
                 string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  ");
                 switch (acceptOrDeny)
                 {
                     case "y":
+                        patientUser.AcceptPending(); // <-- anropa metoden
                         Utils.DisplaySuccesText("Correct with accept");
                         break;
+
                     case "d":
+                        patientUser.DenyPending();   // <-- anropa metoden
                         Utils.DisplaySuccesText("Correct with deny");
                         break;
                     default:

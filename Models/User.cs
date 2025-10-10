@@ -26,5 +26,15 @@ class User : IUser
     {
         return Username == username && Password == password;
     }
+
+    public void AcceptPending()
+    {
+        RegistrationPending = Registration.Accept;
+    }
+
+    public void DenyPending()
+    {
+        RegistrationPending = Registration.Deny;
+    }
     public Registration GetRegistration() => RegistrationPending;
 }
