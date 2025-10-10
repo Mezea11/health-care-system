@@ -1,0 +1,40 @@
+namespace App;
+
+public class Appointment
+{
+  // Represents a single appointment in the Healtcare system.
+  // Each appointment belongs to one specific user (patient or staff),
+  // and contains details such as date, doctor, department and type.
+
+
+  public int UserId; // The ID of the user (e.g, patient) who owns this appointment.
+  public DateTime Date; // The date and time when the appointment takes place.
+  public string Doctor; // The name of the doctor responsible for the appointment
+  public string Department; // The department or medical unit where the appointment occurs.
+  public string Type; // The type of appointment (e.g, "Checkup", "Follow-up", "Consultation).
+
+  //Constructor used to create a new Appointment object with all necessary details.
+  //"userId" = The ID of the user who owns this appointment.
+  //"date" = The date and time of the appointment.
+  //"doctor" = The doctor's name.
+  //"department" = The medical department name.
+  //"type" = The type nof appoointment.
+  public Appointment(int userId, DateTime date, string doctor, string department, string type)
+  {
+    UserId = userId;
+    Date = date;
+    Doctor = doctor;
+    Department = department;
+    Type = type;
+  }
+
+  //Returns a clean, formatted string representation of the appointment.
+  //useful for displaying data in console output or text files. .
+
+  // "Returns" = A formatted text line containing the appointment's details.
+  public string Format()
+  {
+    //"-15" ensures the doctor and department colums are left-aligned and 15 characters wide.
+    return $"{Date:yyyy-MM-dd HH:mm} | {Doctor,-15} | {Department,-15} | {Type}";
+  }
+}
