@@ -41,166 +41,164 @@ As a logged in user, I need to be able to view my schedule.
 // ============================
 // Main program
 // ============================
-class Program
-{
-    static void Main()
-    {
-        // Lista med alla användare 
-        List<IUser> users = new List<IUser>()
+
+
+// Lista med alla användare 
+List<IUser> users = new List<IUser>()
             {
                 new User("patient", "123", Role.Patient),
                 new User("personell", "123", Role.Personnel),
                 new User("admin", "123", Role.Admin)
             };
 
-        IUser? activeUser = null;
-        bool running = true;
+IUser? activeUser = null;
+bool running = true;
 
-        // Main program loop
-        while (running)
+// Main program loop
+while (running)
+{
+    Console.Clear();
+
+    if (activeUser == null)
+    {
+        // ============================
+        // MENU: LOGIN
+        // ============================
+        Console.WriteLine("--- Health Care System ---");
+        Console.Write("Username: ");
+        string username = Console.ReadLine();
+        Console.Write("Password: ");
+        string password = Console.ReadLine();
+
+        // TryLogin method invoked
+        foreach (IUser user in users)
         {
-            Console.Clear();
-
-            if (activeUser == null)
+            if (user.TryLogin(username, password))
             {
-                // ============================
-                // MENU: LOGIN
-                // ============================
-                Console.WriteLine("--- Health Care System ---");
-                Console.Write("Username: ");
-                string username = Console.ReadLine();
-                Console.Write("Password: ");
-                string password = Console.ReadLine();
-
-                // TryLogin method invoked
-                foreach (IUser user in users)
-                {
-                    if (user.TryLogin(username, password))
-                    {
-                        activeUser = user;
-                        break;
-                    }
-                }
-
-                if (activeUser == null)
-                {
-                    Console.WriteLine("Wrong login credentials. Press enter to try again");
-                    Console.ReadLine();
-                }
+                activeUser = user;
+                break;
             }
-            else
-            {
-                // ============================
-                // MENU: LOGGED IN
-                // ============================
-                Console.Clear();
-                Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
-                Console.WriteLine("----------------------------------");
+        }
 
-                switch (activeUser.GetRole())
-                {
-
-                    // ADMIN MENU
-                    case Role.Admin:
-                        AdminMenu(users);
-                        break;
-
-                    // PERSONNEL MENU
-                    case Role.Personnel:
-                        PersonnelMenu();
-                        break;
-
-                    // PATIENT MENU
-                    case Role.Patient:
-                        PatientMenu();
-                        break;
-
-                }
-
-                Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-                string input = Console.ReadLine();
-                if (input == "logout") activeUser = null;
-            }
+        if (activeUser == null)
+        {
+            Console.WriteLine("Wrong login credentials. Press enter to try again");
+            Console.ReadLine();
         }
     }
-
-    // ============================
-    // ADMIN MENU METHOD
-    // ============================
-    static void AdminMenu(List<IUser> users)
+    else
     {
-        Console.WriteLine("\n(Admin) Alternativ:");
-        Console.WriteLine("1. Create account");
-        Console.WriteLine("2. See list of all users");
+        // ============================
+        // MENU: LOGGED IN
+        // ============================
+        Console.Clear();
+        Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
+        Console.WriteLine("----------------------------------");
 
-        Console.Write("Choice: ");
-        string choice = Console.ReadLine();
-
-        if (choice == "1")
+        switch (activeUser.GetRole())
         {
-            Console.Write("Insert username: ");
-            string newUser = Console.ReadLine();
-            Console.Write("Insert password: ");
-            string newPass = Console.ReadLine();
 
-            Console.WriteLine("Pick role: 1=Patient, 2=Personnel, 3=Admin");
-            string roleInput = Console.ReadLine();
-            Role role = Role.Patient;
-            if (roleInput == "2") role = Role.Personnel;
-            else if (roleInput == "3") role = Role.Admin;
+            // ADMIN MENU
+            case Role.Admin:
+                AdminMenu(users);
+                break;
 
-            users.Add(new User(newUser, newPass, role));
-            Console.WriteLine("New user created. ");
+            // PERSONNEL MENU
+            case Role.Personnel:
+                PersonnelMenu();
+                break;
+
+            // PATIENT MENU
+            case Role.Patient:
+                PatientMenu();
+                break;
+
         }
-        else if (choice == "2")
-        {
-            Console.WriteLine("\nAll users:");
-            foreach (var u in users)
-            {
-                Console.WriteLine($"{u.Username} - {u.GetRole()}");
-            }
-        }
-    }
 
-    // ============================
-    // PERSONNEL MENU METHOD
-    // ============================
-    static void PersonnelMenu()
-    {
-        Console.WriteLine("\n(Personnel) Menu Choices:");
-        Console.WriteLine("1. See schedule");
-        Console.WriteLine("2. Accept booking (mock)");
-        Console.Write("Val: ");
+        Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
         string input = Console.ReadLine();
-
-        if (input == "1")
-        {
-            Console.WriteLine("Schema visas (mock)...");
-        }
-        else if (input == "2")
-        {
-            Console.WriteLine("Bokningar godkända (mock)...");
-        }
+        if (input == "logout") activeUser = null;
     }
+}
 
-    // ============================
-    // PATIENT MENU METHOD
-    // ============================
-    static void PatientMenu()
+
+// ============================
+// ADMIN MENU METHOD
+// ============================
+static void AdminMenu(List<IUser> users)
+{
+    Console.WriteLine("\n(Admin) Alternativ:");
+    Console.WriteLine("1. Create account");
+    Console.WriteLine("2. See list of all users");
+
+    Console.Write("Choice: ");
+    string choice = Console.ReadLine();
+
+    if (choice == "1")
     {
-        Console.WriteLine("\n(Patient) Menu Choices:");
-        Console.WriteLine("1. See Journal (mock)");
-        Console.WriteLine("2. Book appointment (mock)");
-        Console.Write("Choice: ");
-        string input = Console.ReadLine();
+        Console.Write("Insert username: ");
+        string newUser = Console.ReadLine();
+        Console.Write("Insert password: ");
+        string newPass = Console.ReadLine();
 
-        if (input == "1")
+        Console.WriteLine("Pick role: 1=Patient, 2=Personnel, 3=Admin");
+        string roleInput = Console.ReadLine();
+        Role role = Role.Patient;
+        if (roleInput == "2") role = Role.Personnel;
+        else if (roleInput == "3") role = Role.Admin;
+
+        users.Add(new User(newUser, newPass, role));
+        Console.WriteLine("New user created. ");
+    }
+    else if (choice == "2")
+    {
+        Console.WriteLine("\nAll users:");
+        foreach (var u in users)
         {
-            Console.WriteLine("Your journal: mock journal");
-        }
-        else if (input == "2")
-        {
-            Console.WriteLine("Appointment created (mock)");
+            Console.WriteLine($"{u.Username} - {u.GetRole()}");
         }
     }
 }
+
+// ============================
+// PERSONNEL MENU METHOD
+// ============================
+static void PersonnelMenu()
+{
+    Console.WriteLine("\n(Personnel) Menu Choices:");
+    Console.WriteLine("1. See schedule");
+    Console.WriteLine("2. Accept booking (mock)");
+    Console.Write("Val: ");
+    string input = Console.ReadLine();
+
+    if (input == "1")
+    {
+        Console.WriteLine("Schema visas (mock)...");
+    }
+    else if (input == "2")
+    {
+        Console.WriteLine("Bokningar godkända (mock)...");
+    }
+}
+
+// ============================
+// PATIENT MENU METHOD
+// ============================
+static void PatientMenu()
+{
+    Console.WriteLine("\n(Patient) Menu Choices:");
+    Console.WriteLine("1. See Journal (mock)");
+    Console.WriteLine("2. Book appointment (mock)");
+    Console.Write("Choice: ");
+    string input = Console.ReadLine();
+
+    if (input == "1")
+    {
+        Console.WriteLine("Your journal: mock journal");
+    }
+    else if (input == "2")
+    {
+        Console.WriteLine("Appointment created (mock)");
+    }
+}
+
