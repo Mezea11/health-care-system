@@ -1,0 +1,38 @@
+
+
+main {
+
+    // MAIN PROGRAM LOOP
+    while (running) 
+    {
+        -- login code --
+            tryLogin();
+
+        -- logged in code --
+            activeUser.GetRole()
+                case Role.Admin = AdminMenu(users)
+                case Role.Personnel = PersonellMenu(users)
+                case Role.Patient = PatientMenu(users)
+
+    }       
+
+
+    static void PersonellMenu() {
+        1. See schedule
+        2. Confirm booking
+    }
+
+    static void AdminMenu() {
+        1. Create account
+        2. See list of all users
+    }
+
+    static void PatientMenu() {
+        1. See journal
+        2. Book appointment
+    }
+
+    static void SuperAdminMenu() {
+        
+    }
+}
