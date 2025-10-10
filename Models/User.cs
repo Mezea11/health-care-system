@@ -32,12 +32,12 @@ class User : IUser
 
     public void AcceptPending()
     {
-        RegistrationPending = Registration.Accept;
+        RegistrationPending = Registration.Accepted;
     }
 
     public void DenyPending()
     {
-        RegistrationPending = Registration.Deny;
+        RegistrationPending = Registration.Denied;
     }
     public Registration GetRegistration() => RegistrationPending;
 }

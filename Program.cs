@@ -1,4 +1,5 @@
-﻿using App;
+﻿using System.ComponentModel.DataAnnotations;
+using App;
 /* 
 
 -- SAVE AND MOCK DATA TO TEXT FILES --
@@ -54,55 +55,104 @@ List<IUser> users = new List<IUser>()
                 new User("patient", "123", Role.Patient),
                 new User("personell", "123", Role.Personnel),
                 new User("admin", "123", Role.Admin)
-            };
 
+            };
 IUser? activeUser = null;
 bool running = true;
 
-// Main program loop
-while (running)
+
+StartMenu(users);
+
+// ============================
+// START MENU METHOD
+// ============================
+
+// THIS METHOD ALLOWS USER TO EITHER LOGIN OR REGISTER
+void StartMenu(List<IUser> users)
 {
-    Console.Clear();
-
-    if (activeUser == null)
+    while (true)
     {
-        // ============================
-        // MENU: LOGIN
-        // ============================
-        Console.WriteLine("--- Health Care System ---");
-        Console.Write("Username: ");
-        string username = Utils.GetRequiredInput("Username: ");
-        Console.Write("Password: ");
-        string password = Utils.GetRequiredInput("Password: ");
 
-        // TryLogin method invoked
-        foreach (IUser user in users)
+        Console.WriteLine("Welcome");
+        Console.WriteLine("1. For sending request for registration as patient");
+        Console.WriteLine("2. Log In");
+        Console.Write("Choice: ");
+        string choice = Console.ReadLine();
+
+        switch (choice)
         {
-            if (user.TryLogin(username, password))
-            {
-                activeUser = user;
+            case "1":
+                // CREATE LOGIC IN HERE TO REGISTER A NEW USER
+                Console.WriteLine("Type in your username");// PROMPT USER TO INSERT USERNAME
+                string newUser = Console.ReadLine();
+                Console.Clear();
+
+                Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
+                string newPass = Console.ReadLine();
+                Console.Clear();
+
+                Console.WriteLine("Request Sent.");
+
+                users.Add(new User(newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
                 break;
-            }
+
+            case "2":
+                MainMenu();
+                break;
         }
+    }
+
+}
+
+void MainMenu()
+{
+
+    // Wrap main program in a function
+    // Main program loop
+    while (running)
+    {
+        Console.Clear();
+        // ============================
+        // MENU: Registration 
+        // ============================
 
         if (activeUser == null)
         {
-            Console.WriteLine("Wrong login credentials. Press enter to try again");
-            Console.ReadLine();
-        }
-    }
-    else
-    {
-        if (activeUser.GetRegistration() == Registration.Pending && activeUser.GetRole() == Role.Patient)
-        {
-            Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
-            Console.ReadKey();
-            activeUser = null;
+            // ============================
+            // MENU: LOGIN
+            // ============================
+            Console.WriteLine("--- Health Care System ---");
+            Console.Write("Username: ");
+            string username = Utils.GetRequiredInput("Username: ");
+            Console.Write("Password: ");
+            string password = Utils.GetRequiredInput("Password: ");
 
+            // TryLogin method invoked
+            foreach (IUser user in users)
+            {
+                if (user.TryLogin(username, password))
+                {
+                    activeUser = user;
+                    break;
+                }
+            }
+
+            if (activeUser == null)
+            {
+                Console.WriteLine("Wrong login credentials. Press enter to try again");
+                Console.ReadLine();
+            }
         }
+
         else
         {
-
+            // If user as a role as patient has a registratin not yet handled by admin. Will not be able to login. But it will have a active_user as not null
+            if (activeUser.GetRegistration() == Registration.Pending && activeUser.GetRole() == Role.Patient)
+            {
+                Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
+                Console.ReadKey();
+                activeUser = null;
+            }
             // ============================
             // MENU: LOGGED IN
             // ============================
@@ -138,6 +188,11 @@ while (running)
 }
 
 
+
+
+
+
+
 // ============================
 // ADMIN MENU METHOD
 // ============================
@@ -158,20 +213,19 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
             string newUser = Utils.GetRequiredInput("Insert username: ");
             Console.Write("Insert password: ");
             string newPass = Utils.GetRequiredInput("Insert password: ");
-            string roleInput = Utils.GetRequiredInput("Pick role: 1=Patient, 2=Personnel, 3=Admin");
+            int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
             Role role = Role.Patient;
-            if (roleInput == "2") role = Role.Personnel;
-            else if (roleInput == "3") role = Role.Admin;
+            if (roleInput == 2) role = Role.Personnel;
+            else if (roleInput == 3) role = Role.Admin;
 
             users.Add(new User(newUser, newPass, role));
             Console.WriteLine("New user created. ");
             break;
         case 2:
             Console.WriteLine("\nAll users:");
-            // Change the var to User and no oneletter variable
-            foreach (var u in users)
+            foreach (var user in users)
             {
-                Console.WriteLine($"{u.Username} - {u.GetRole()} - {u.GetRegistration()}");
+                Console.WriteLine($"{user.Username} - {user.GetRole()}");
             }
             break;
         case 3:
@@ -193,7 +247,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
             }
             break;
         case 5:
-            Console.WriteLine("\nAll patients with pending request::");
+            Console.WriteLine("\nAll patients with pending request:");
             foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
             {
                 Console.WriteLine($"{user.Username} - {user.GetRole()}");
@@ -226,6 +280,9 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
             }
             break;
 
+        default:
+            Console.WriteLine("Invalid input. Please try again.");
+            break;
     }
     //     if (choice == "1")
     //     {

@@ -7,15 +7,16 @@ namespace App
     {
         Patient,
         Personnel,
-        Admin
+        Admin,
+
+    }
+    enum Registration // Enum för början av registrerings processen
+    {
+        Accepted,
+        Pending,
+        Denied,
     }
 
-    enum Registration
-    {
-        Pending,
-        Accept,
-        Deny
-    }
 
     // ============================
     // Interface for all users
