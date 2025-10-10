@@ -1,13 +1,20 @@
 namespace App
 {
-    // ============================
-    // ENUM for roles
-    // ============================
+    // =================================
+    // ENUM for roles and registration
+    // =================================
     enum Role
     {
         Patient,
         Personnel,
         Admin
+    }
+
+    enum Registration
+    {
+        Pending,
+        Accept,
+        Deny
     }
 
     // ============================
@@ -18,6 +25,7 @@ namespace App
         string Username { get; }
         string Password { get; }
         Role GetRole();
+        Registration GetRegistration();
         bool TryLogin(string username, string password);
     }
 

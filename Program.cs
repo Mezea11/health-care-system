@@ -127,7 +127,7 @@ while (running)
 // ============================
 static void AdminMenu(List<IUser> users)
 {
-    Console.WriteLine("\n(Admin) Alternativ:");
+    Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
     Console.WriteLine("2. See list of all users");
     Console.WriteLine("3. See pending patient request");
@@ -137,9 +137,9 @@ static void AdminMenu(List<IUser> users)
     switch (Utils.GetIntegerInput("Choice:"))
     {
         case 1:
-            string newUser = Utils.GetRequiredInput("Insert username");
+            string newUser = Utils.GetRequiredInput("Insert username: ");
             Console.Write("Insert password: ");
-            string newPass = Utils.GetRequiredInput("Insert password:");
+            string newPass = Utils.GetRequiredInput("Insert password: ");
             string roleInput = Utils.GetRequiredInput("Pick role: 1=Patient, 2=Personnel, 3=Admin");
             Role role = Role.Patient;
             if (roleInput == "2") role = Role.Personnel;
@@ -153,15 +153,40 @@ static void AdminMenu(List<IUser> users)
             // Change the var to User and no oneletter variable
             foreach (var u in users)
             {
-                Console.WriteLine($"{u.Username} - {u.GetRole()}");
+                Console.WriteLine($"{u.Username} - {u.GetRole()} - {u.GetRegistration()}");
             }
             break;
         case 3:
-            // foreach (User user in users.Where())
-            // {
-            //     Console.WriteLine($"{user.Username} - {user.GetRole()}");
-            // }
+            Console.WriteLine("\nAll users:");
+            foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
+            {
+                Console.WriteLine($"{user.Username} - {user.GetRole()}");
+            }
+            // Work with string get name first and after we are done we are working with index. 
+            string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+            IUser patientUser = users.Find(u => u.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+            if (patientUser != null)
+            {
+                string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request");
+                switch (acceptOrDeny)
+                {
+                    case "y":
+                        Utils.DisplaySuccesText("Correct with accept");
+                        break;
+                    case "d":
+                        Utils.DisplaySuccesText("Correct with deny");
+                        break;
+                    default:
+                        Utils.DisplayAlertText("Only y or n is handled");
+                }
+            }
+            else
+            {
+                Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+            }
             break;
+
+
     }
     //     if (choice == "1")
     //     {
