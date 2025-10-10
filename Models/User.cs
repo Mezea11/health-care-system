@@ -9,20 +9,35 @@ class User : IUser
 
     // SET PASSWORD TO PRIVATE
     public string Password { get; private set; }
-    private Role role;
+
+    private Role Role;
+    public Registration RegistrationPending;
 
     public User(string username, string password, Role role)
     {
         Username = username;
         Password = password;
-        this.role = role;
+        Role = role;
+        RegistrationPending = Registration.Pending;
     }
 
-    public Role GetRole() => role;
+    public Role GetRole() => Role;
+    // public Registration GetRegistration => RegistrationPending;
 
     // Try login method
     public bool TryLogin(string username, string password)
     {
         return Username == username && Password == password;
     }
+
+    public void AcceptPending()
+    {
+        RegistrationPending = Registration.Accepted;
+    }
+
+    public void DenyPending()
+    {
+        RegistrationPending = Registration.Denied;
+    }
+    public Registration GetRegistration() => RegistrationPending;
 }
