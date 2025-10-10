@@ -17,9 +17,11 @@ As an admin with sufficient permissions, I need to be able to give admins the pe
 As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel.
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what.
 As an admin with sufficient permissions, I need to be able to add locations.
-As an admin with sufficient permissions, I need to be able to accept user registration as patients. 
-As an admin with sufficient permissions, I need to be able to deny user registration as patients. 
+
+As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- CHECKED
+As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- CHECKED
 As an admin with sufficient permissions, I need to be able to create accounts for personnel. CHECKED
+
 As an admin with sufficient permissions, I need to be able to view a list of who has permission to what.
 
 
@@ -70,6 +72,7 @@ void StartMenu(List<IUser> users)
 {
     while (true)
     {
+
         Console.WriteLine("Welcome");
         Console.WriteLine("1. For sending request for registration as patient");
         Console.WriteLine("2. Log In");
@@ -113,7 +116,6 @@ void MainMenu()
         // MENU: Registration 
         // ============================
 
-
         if (activeUser == null)
         {
             // ============================
@@ -121,9 +123,9 @@ void MainMenu()
             // ============================
             Console.WriteLine("--- Health Care System ---");
             Console.Write("Username: ");
-            string username = Console.ReadLine() ?? "".Trim();
+            string username = Utils.GetRequiredInput("Username: ");
             Console.Write("Password: ");
-            string password = Console.ReadLine();
+            string password = Utils.GetRequiredInput("Password: ");
 
             // TryLogin method invoked
             foreach (IUser user in users)
@@ -141,8 +143,16 @@ void MainMenu()
                 Console.ReadLine();
             }
         }
+
         else
         {
+            // If user as a role as patient has a registratin not yet handled by admin. Will not be able to login. But it will have a active_user as not null
+            if (activeUser.GetRegistration() == Registration.Pending && activeUser.GetRole() == Role.Patient)
+            {
+                Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
+                Console.ReadKey();
+                activeUser = null;
+            }
             // ============================
             // MENU: LOGGED IN
             // ============================
@@ -152,6 +162,7 @@ void MainMenu()
 
             switch (activeUser.GetRole())
             {
+
                 // ADMIN MENU
                 case Role.Admin:
                     AdminMenu(users, locations);
@@ -166,7 +177,6 @@ void MainMenu()
                 case Role.Patient:
                     PatientMenu();
                     break;
-
 
             }
 
@@ -188,42 +198,37 @@ void MainMenu()
 // ============================
 static void AdminMenu(List<IUser> users, List<Location> locations)
 {
-    Console.WriteLine("\n(Admin) Alternativ:");
+    Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
     Console.WriteLine("2. See list of all users");
     Console.WriteLine("3. Add location");
     Console.WriteLine("4. View all locations");
+    Console.WriteLine("5. See pending patient request");
 
-    Console.Write("Choice: ");
-    string choice = Console.ReadLine();
-
-    switch (choice)
+    // Console.Write("Choice: ");
+    // string choice = Console.ReadLine();
+    switch (Utils.GetIntegerInput("Choice:"))
     {
-        case "1":
-            Console.Write("Insert username: ");
-            string newUser = Console.ReadLine();
+        case 1:
+            string newUser = Utils.GetRequiredInput("Insert username: ");
             Console.Write("Insert password: ");
-            string newPass = Console.ReadLine();
-
-            Console.WriteLine("Pick role: 1=Patient, 2=Personnel, 3=Admin");
-            string roleInput = Console.ReadLine();
+            string newPass = Utils.GetRequiredInput("Insert password: ");
+            int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
             Role role = Role.Patient;
-            if (roleInput == "2") role = Role.Personnel;
-            else if (roleInput == "3") role = Role.Admin;
-
+            if (roleInput == 2) role = Role.Personnel;
+            else if (roleInput == 3) role = Role.Admin;
 
             users.Add(new User(newUser, newPass, role));
             Console.WriteLine("New user created. ");
             break;
-
-        case "2":
+        case 2:
             Console.WriteLine("\nAll users:");
             foreach (var user in users)
             {
                 Console.WriteLine($"{user.Username} - {user.GetRole()}");
             }
             break;
-        case "3":
+        case 3:
             Console.WriteLine("Please enter the region of the location you wish to add: ");
             string region = Console.ReadLine() ?? "".Trim();
 
@@ -234,19 +239,63 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
 
             break;
 
-        case "4":
+        case 4:
             Console.WriteLine("All locations currently in the system: \n");
             foreach (var location in locations)
             {
                 Console.WriteLine(location.ToString());
             }
             break;
+        case 5:
+            Console.WriteLine("\nAll patients with pending request:");
+            foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
+            {
+                Console.WriteLine($"{user.Username} - {user.GetRole()}");
+            }
+            // Work with string get name first and after we are done we are working with index. 
+            string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+            IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+            if (patientUser != null)
+            {
+                string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  ");
+                switch (acceptOrDeny)
+                {
+                    case "y":
+                        patientUser.AcceptPending(); // <-- anropa metoden
+                        Utils.DisplaySuccesText("Correct with accept");
+                        break;
+
+                    case "d":
+                        patientUser.DenyPending();   // <-- anropa metoden
+                        Utils.DisplaySuccesText("Correct with deny");
+                        break;
+                    default:
+                        Utils.DisplayAlertText("Only y or n is handled");
+                        break;
+                }
+            }
+            else
+            {
+                Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+            }
+            break;
 
         default:
             Console.WriteLine("Invalid input. Please try again.");
             break;
-
     }
+    //     if (choice == "1")
+    //     {
+    //  
+    //     }
+    //     else if (choice == "2")
+    //     {
+    //         Console.WriteLine("\nAll users:");
+    //         foreach (var u in users)
+    //         {
+    //             Console.WriteLine($"{u.Username} - {u.GetRole()}");
+    //         }
+    //     }
 }
 
 
@@ -291,4 +340,3 @@ static void PatientMenu()
         Console.WriteLine("Appointment created (mock)");
     }
 }
-
