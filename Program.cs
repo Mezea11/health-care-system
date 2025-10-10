@@ -5,7 +5,7 @@
 
 As a user, I need to be able to log in. CHECKED
 As a user, I need to be able to log out. CHECKED
-As a user, I need to be able to request registration as a patient.
+As a user, I need to be able to REQUEST registration as a patient.
 
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
@@ -16,9 +16,11 @@ As an admin with sufficient permissions, I need to be able to give admins the pe
 As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel.
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what.
 As an admin with sufficient permissions, I need to be able to add locations.
-As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- WIP
-As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- same... 
-As an admin with sufficient permissions, I need to be able to create accounts for personnel.
+
+As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- CHECKED
+As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- CHECKED
+As an admin with sufficient permissions, I need to be able to create accounts for personnel. CHECKED
+
 As an admin with sufficient permissions, I need to be able to view a list of who has permission to what.
 
 
@@ -41,7 +43,10 @@ As a logged in user, I need to be able to view my schedule.
 // ============================
 // Main program
 // ============================
+List<Location> locations = new List<Location>();
 
+locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
+locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
 List<IUser> users = new List<IUser>()
@@ -110,7 +115,7 @@ while (running)
 
                 // ADMIN MENU
                 case Role.Admin:
-                    AdminMenu(users);
+                    AdminMenu(users, locations);
                     break;
 
                 // PERSONNEL MENU
@@ -136,11 +141,13 @@ while (running)
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users)
+static void AdminMenu(List<IUser> users, List<Location> locations)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
     Console.WriteLine("2. See list of all users");
+    Console.WriteLine("3. Add location");
+    Console.WriteLine("4. View all locations");
     Console.WriteLine("5. See pending patient request");
 
     // Console.Write("Choice: ");
@@ -165,6 +172,24 @@ static void AdminMenu(List<IUser> users)
             foreach (var u in users)
             {
                 Console.WriteLine($"{u.Username} - {u.GetRole()} - {u.GetRegistration()}");
+            }
+            break;
+        case 3:
+            Console.WriteLine("Please enter the region of the location you wish to add: ");
+            string region = Console.ReadLine() ?? "".Trim();
+
+            Console.WriteLine("Please enter the name of the hospital you wish to add: ");
+            string hospital = Console.ReadLine() ?? "".Trim();
+
+            locations.Add(new Location(region, hospital));
+
+            break;
+
+        case 4:
+            Console.WriteLine("All locations currently in the system: \n");
+            foreach (var location in locations)
+            {
+                Console.WriteLine(location.ToString());
             }
             break;
         case 5:
@@ -201,7 +226,6 @@ static void AdminMenu(List<IUser> users)
             }
             break;
 
-
     }
     //     if (choice == "1")
     //     {
@@ -216,6 +240,7 @@ static void AdminMenu(List<IUser> users)
     //         }
     //     }
 }
+
 
 // ============================
 // PERSONNEL MENU METHOD

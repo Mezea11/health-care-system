@@ -9,8 +9,10 @@ class User : IUser
 
     // SET PASSWORD TO PRIVATE
     public string Password { get; private set; }
+
     private Role Role;
     public Registration RegistrationPending;
+
     public User(string username, string password, Role role)
     {
         Username = username;
@@ -21,6 +23,7 @@ class User : IUser
 
     public Role GetRole() => Role;
     // public Registration GetRegistration => RegistrationPending;
+
     // Try login method
     public bool TryLogin(string username, string password)
     {
