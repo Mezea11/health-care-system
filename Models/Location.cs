@@ -12,6 +12,6 @@ class Location
 
     public override string ToString()
     {
-        return $"{HospitalName} ({Region})";
+        return $"Hospital: {HospitalName} ({Region})";
     }
 }
