@@ -16,8 +16,8 @@ As an admin with sufficient permissions, I need to be able to give admins the pe
 As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel.
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what.
 As an admin with sufficient permissions, I need to be able to add locations.
-As an admin with sufficient permissions, I need to be able to accept user registration as patients.
-As an admin with sufficient permissions, I need to be able to deny user registration as patients.
+As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- WIP
+As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- same... 
 As an admin with sufficient permissions, I need to be able to create accounts for personnel.
 As an admin with sufficient permissions, I need to be able to view a list of who has permission to what.
 
@@ -130,34 +130,51 @@ static void AdminMenu(List<IUser> users)
     Console.WriteLine("\n(Admin) Alternativ:");
     Console.WriteLine("1. Create account");
     Console.WriteLine("2. See list of all users");
+    Console.WriteLine("3. See pending patient request");
 
-    Console.Write("Choice: ");
-    string choice = Console.ReadLine();
-
-    if (choice == "1")
+    // Console.Write("Choice: ");
+    // string choice = Console.ReadLine();
+    switch (Utils.GetIntegerInput("Choice:"))
     {
-        Console.Write("Insert username: ");
-        string newUser = Console.ReadLine();
-        Console.Write("Insert password: ");
-        string newPass = Console.ReadLine();
+        case 1:
+            string newUser = Utils.GetRequiredInput("Insert username");
+            Console.Write("Insert password: ");
+            string newPass = Utils.GetRequiredInput("Insert password:");
+            string roleInput = Utils.GetRequiredInput("Pick role: 1=Patient, 2=Personnel, 3=Admin");
+            Role role = Role.Patient;
+            if (roleInput == "2") role = Role.Personnel;
+            else if (roleInput == "3") role = Role.Admin;
 
-        Console.WriteLine("Pick role: 1=Patient, 2=Personnel, 3=Admin");
-        string roleInput = Console.ReadLine();
-        Role role = Role.Patient;
-        if (roleInput == "2") role = Role.Personnel;
-        else if (roleInput == "3") role = Role.Admin;
-
-        users.Add(new User(newUser, newPass, role));
-        Console.WriteLine("New user created. ");
+            users.Add(new User(newUser, newPass, role));
+            Console.WriteLine("New user created. ");
+            break;
+        case 2:
+            Console.WriteLine("\nAll users:");
+            // Change the var to User and no oneletter variable
+            foreach (var u in users)
+            {
+                Console.WriteLine($"{u.Username} - {u.GetRole()}");
+            }
+            break;
+        case 3:
+            // foreach (User user in users.Where())
+            // {
+            //     Console.WriteLine($"{user.Username} - {user.GetRole()}");
+            // }
+            break;
     }
-    else if (choice == "2")
-    {
-        Console.WriteLine("\nAll users:");
-        foreach (var u in users)
-        {
-            Console.WriteLine($"{u.Username} - {u.GetRole()}");
-        }
-    }
+    //     if (choice == "1")
+    //     {
+    //  
+    //     }
+    //     else if (choice == "2")
+    //     {
+    //         Console.WriteLine("\nAll users:");
+    //         foreach (var u in users)
+    //         {
+    //             Console.WriteLine($"{u.Username} - {u.GetRole()}");
+    //         }
+    //     }
 }
 
 // ============================
@@ -201,4 +218,3 @@ static void PatientMenu()
         Console.WriteLine("Appointment created (mock)");
     }
 }
-
