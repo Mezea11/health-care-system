@@ -5,7 +5,7 @@
 
 As a user, I need to be able to log in. CHECKED
 As a user, I need to be able to log out. CHECKED
-As a user, I need to be able to request registration as a patient.
+As a user, I need to be able to REQUEST registration as a patient.
 
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
@@ -16,9 +16,9 @@ As an admin with sufficient permissions, I need to be able to give admins the pe
 As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel.
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what.
 As an admin with sufficient permissions, I need to be able to add locations.
-As an admin with sufficient permissions, I need to be able to accept user registration as patients.
-As an admin with sufficient permissions, I need to be able to deny user registration as patients.
-As an admin with sufficient permissions, I need to be able to create accounts for personnel.
+As an admin with sufficient permissions, I need to be able to accept user registration as patients. 
+As an admin with sufficient permissions, I need to be able to deny user registration as patients. 
+As an admin with sufficient permissions, I need to be able to create accounts for personnel. CHECKED
 As an admin with sufficient permissions, I need to be able to view a list of who has permission to what.
 
 
@@ -147,6 +147,7 @@ static void AdminMenu(List<IUser> users)
         if (roleInput == "2") role = Role.Personnel;
         else if (roleInput == "3") role = Role.Admin;
 
+        
         users.Add(new User(newUser, newPass, role));
         Console.WriteLine("New user created. ");
     }
