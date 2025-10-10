@@ -41,7 +41,10 @@ As a logged in user, I need to be able to view my schedule.
 // ============================
 // Main program
 // ============================
+List<Location> locations = new List<Location>();
 
+locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
+locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
 List<IUser> users = new List<IUser>()
@@ -100,7 +103,7 @@ while (running)
 
             // ADMIN MENU
             case Role.Admin:
-                AdminMenu(users);
+                AdminMenu(users, locations);
                 break;
 
             // PERSONNEL MENU
@@ -125,41 +128,69 @@ while (running)
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users)
+static void AdminMenu(List<IUser> users, List<Location> locations)
 {
     Console.WriteLine("\n(Admin) Alternativ:");
     Console.WriteLine("1. Create account");
     Console.WriteLine("2. See list of all users");
+    Console.WriteLine("3. Add location");
+    Console.WriteLine("4. View all locations");
 
     Console.Write("Choice: ");
     string choice = Console.ReadLine();
 
-    if (choice == "1")
+    switch (choice)
     {
-        Console.Write("Insert username: ");
-        string newUser = Console.ReadLine();
-        Console.Write("Insert password: ");
-        string newPass = Console.ReadLine();
+        case "1":
+            Console.Write("Insert username: ");
+            string newUser = Console.ReadLine();
+            Console.Write("Insert password: ");
+            string newPass = Console.ReadLine();
 
-        Console.WriteLine("Pick role: 1=Patient, 2=Personnel, 3=Admin");
-        string roleInput = Console.ReadLine();
-        Role role = Role.Patient;
-        if (roleInput == "2") role = Role.Personnel;
-        else if (roleInput == "3") role = Role.Admin;
+            Console.WriteLine("Pick role: 1=Patient, 2=Personnel, 3=Admin");
+            string roleInput = Console.ReadLine();
+            Role role = Role.Patient;
+            if (roleInput == "2") role = Role.Personnel;
+            else if (roleInput == "3") role = Role.Admin;
 
+
+            users.Add(new User(newUser, newPass, role));
+            Console.WriteLine("New user created. ");
+            break;
+
+        case "2":
+            Console.WriteLine("\nAll users:");
+            foreach (var user in users)
+                {
+                    Console.WriteLine($"{user.Username} - {user.GetRole()}");
+                }
+            break;
+        case "3":
+            Console.WriteLine("Please enter the region of the location you wish to add: ");
+            string region = Console.ReadLine() ?? "".Trim();
+
+            Console.WriteLine("Please enter the name of the hospital you wish to add: ");
+            string hospital = Console.ReadLine() ?? "".Trim();
+
+            locations.Add(new Location(region, hospital));
+
+            break;
+
+        case "4":
+            Console.WriteLine("All locations currently in the system: \n");
+            foreach (var location in locations)
+            {
+                Console.WriteLine(location.ToString());
+            }
+            break;      
+
+        default:
+            Console.WriteLine("Invalid input. Please try again.");
+            break;
         
-        users.Add(new User(newUser, newPass, role));
-        Console.WriteLine("New user created. ");
-    }
-    else if (choice == "2")
-    {
-        Console.WriteLine("\nAll users:");
-        foreach (var u in users)
-        {
-            Console.WriteLine($"{u.Username} - {u.GetRole()}");
-        }
     }
 }
+  
 
 // ============================
 // PERSONNEL MENU METHOD
