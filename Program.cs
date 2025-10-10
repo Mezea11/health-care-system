@@ -1,4 +1,5 @@
-﻿using App;
+﻿using System.ComponentModel.DataAnnotations;
+using App;
 /* 
 
 -- SAVE AND MOCK DATA TO TEXT FILES --
@@ -49,77 +50,135 @@ List<IUser> users = new List<IUser>()
                 new User("patient", "123", Role.Patient),
                 new User("personell", "123", Role.Personnel),
                 new User("admin", "123", Role.Admin)
-            };
 
+            };
 IUser? activeUser = null;
 bool running = true;
 
-// Main program loop
-while (running)
+
+StartMenu(users);
+
+// ============================
+// START MENU METHOD
+// ============================
+
+// THIS METHOD ALLOWS USER TO EITHER LOGIN OR REGISTER
+void StartMenu(List<IUser> users)
 {
-    Console.Clear();
-
-    if (activeUser == null)
+    while (true)
     {
-        // ============================
-        // MENU: LOGIN
-        // ============================
-        Console.WriteLine("--- Health Care System ---");
-        Console.Write("Username: ");
-        string username = Console.ReadLine();
-        Console.Write("Password: ");
-        string password = Console.ReadLine();
+        Console.WriteLine("Welcome");
+        Console.WriteLine("1. For sending request for registration as patient");
+        Console.WriteLine("2. Log In");
+        Console.Write("Choice: ");
+        string choice = Console.ReadLine();
 
-        // TryLogin method invoked
-        foreach (IUser user in users)
+        switch (choice)
         {
-            if (user.TryLogin(username, password))
-            {
-                activeUser = user;
+            case "1":
+                // CREATE LOGIC IN HERE TO REGISTER A NEW USER
+                Console.WriteLine("Type in your username");// PROMPT USER TO INSERT USERNAME
+                string newUser = Console.ReadLine();
+                Console.Clear();
+
+                Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
+                string newPass = Console.ReadLine();
+                Console.Clear();
+
+                Console.WriteLine("Request Sent.");
+
+                users.Add(new User(newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
                 break;
-            }
+
+            case "2":
+                MainMenu();
+                break;
         }
+    }
+
+}
+
+void MainMenu()
+{
+
+    // Wrap main program in a function
+    // Main program loop
+    while (running)
+    {
+        Console.Clear();
+        // ============================
+        // MENU: Registration 
+        // ============================
+
 
         if (activeUser == null)
         {
-            Console.WriteLine("Wrong login credentials. Press enter to try again");
-            Console.ReadLine();
-        }
-    }
-    else
-    {
-        // ============================
-        // MENU: LOGGED IN
-        // ============================
-        Console.Clear();
-        Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
-        Console.WriteLine("----------------------------------");
+            // ============================
+            // MENU: LOGIN
+            // ============================
+            Console.WriteLine("--- Health Care System ---");
+            Console.Write("Username: ");
+            string username = Console.ReadLine() ?? "".Trim();
+            Console.Write("Password: ");
+            string password = Console.ReadLine();
 
-        switch (activeUser.GetRole())
+            // TryLogin method invoked
+            foreach (IUser user in users)
+            {
+                if (user.TryLogin(username, password))
+                {
+                    activeUser = user;
+                    break;
+                }
+            }
+
+            if (activeUser == null)
+            {
+                Console.WriteLine("Wrong login credentials. Press enter to try again");
+                Console.ReadLine();
+            }
+        }
+        else
         {
+            // ============================
+            // MENU: LOGGED IN
+            // ============================
+            Console.Clear();
+            Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
+            Console.WriteLine("----------------------------------");
 
-            // ADMIN MENU
-            case Role.Admin:
-                AdminMenu(users);
-                break;
+            switch (activeUser.GetRole())
+            {
 
-            // PERSONNEL MENU
-            case Role.Personnel:
-                PersonnelMenu();
-                break;
+                // ADMIN MENU
+                case Role.Admin:
+                    AdminMenu(users);
+                    break;
 
-            // PATIENT MENU
-            case Role.Patient:
-                PatientMenu();
-                break;
+                // PERSONNEL MENU
+                case Role.Personnel:
+                    PersonnelMenu();
+                    break;
 
+                // PATIENT MENU
+                case Role.Patient:
+                    PatientMenu();
+                    break;
+
+
+            }
+
+            Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
+            string input = Console.ReadLine();
+            if (input == "logout") activeUser = null;
         }
-
-        Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-        string input = Console.ReadLine();
-        if (input == "logout") activeUser = null;
     }
 }
+
+
+
+
+
 
 
 // ============================
