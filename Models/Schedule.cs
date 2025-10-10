@@ -18,7 +18,9 @@ public class Schedule
   }
 
   //Adds an appointment to the user's schedule.
-  //Only adds the appointment if it belongs to the correct user
+  //Only adds the appointment if it belongs to the correct user (matching UserId).
+
+  //"appointment" = The appointment to add.
   public void AddAppointment(Appointment appointment)
   {
     if (appointment.UserId == UserId)
@@ -26,8 +28,14 @@ public class Schedule
       Appointments.Add(appointment);
     }
   }
+
+  //Retrieves all appointments for a specific week, based on a given start date.
+
+  //"weekStart" = The fist day of the week (e.g, Monday).
+  //A sorted list of appointments within that week.
   public List<Appointment> GetAppointmentsForWeek(DateTime weekStart)
   {
+    //Filter appointments that occur between weekStart (inclusive) and weekEnd (exclusive).
     DateTime weekEnd = weekStart.AddDays(7);
     return Appointments
     .Where(a => a.Date >= weekStart && a.Date < weekEnd)
@@ -35,6 +43,8 @@ public class Schedule
     .ToList();
   }
 
+  // Prints the user's entrie schedule to the console in a readable format.
+  //Mainly used for debugging or test-based testing.
   public void PrintSchedule()
   {
     Console.WriteLine($"Schedule for user #{UserId}:");
