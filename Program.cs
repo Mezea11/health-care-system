@@ -66,9 +66,9 @@ while (running)
         // ============================
         Console.WriteLine("--- Health Care System ---");
         Console.Write("Username: ");
-        string username = Console.ReadLine();
+        string username = Utils.GetRequiredInput("Username: ");
         Console.Write("Password: ");
-        string password = Console.ReadLine();
+        string password = Utils.GetRequiredInput("Password: ");
 
         // TryLogin method invoked
         foreach (IUser user in users)
@@ -88,36 +88,47 @@ while (running)
     }
     else
     {
-        // ============================
-        // MENU: LOGGED IN
-        // ============================
-        Console.Clear();
-        Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
-        Console.WriteLine("----------------------------------");
-
-        switch (activeUser.GetRole())
+        if (activeUser.GetRegistration() == Registration.Pending && activeUser.GetRole() == Role.Patient)
         {
-
-            // ADMIN MENU
-            case Role.Admin:
-                AdminMenu(users);
-                break;
-
-            // PERSONNEL MENU
-            case Role.Personnel:
-                PersonnelMenu();
-                break;
-
-            // PATIENT MENU
-            case Role.Patient:
-                PatientMenu();
-                break;
+            Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
+            Console.ReadKey();
+            activeUser = null;
 
         }
+        else
+        {
 
-        Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-        string input = Console.ReadLine();
-        if (input == "logout") activeUser = null;
+            // ============================
+            // MENU: LOGGED IN
+            // ============================
+            Console.Clear();
+            Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
+            Console.WriteLine("----------------------------------");
+
+            switch (activeUser.GetRole())
+            {
+
+                // ADMIN MENU
+                case Role.Admin:
+                    AdminMenu(users);
+                    break;
+
+                // PERSONNEL MENU
+                case Role.Personnel:
+                    PersonnelMenu();
+                    break;
+
+                // PATIENT MENU
+                case Role.Patient:
+                    PatientMenu();
+                    break;
+
+            }
+
+            Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
+            string input = Console.ReadLine();
+            if (input == "logout") activeUser = null;
+        }
     }
 }
 
@@ -157,7 +168,7 @@ static void AdminMenu(List<IUser> users)
             }
             break;
         case 3:
-            Console.WriteLine("\nAll users:");
+            Console.WriteLine("\nAll patinets with pending request::");
             foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
             {
                 Console.WriteLine($"{user.Username} - {user.GetRole()}");
@@ -167,7 +178,7 @@ static void AdminMenu(List<IUser> users)
             IUser patientUser = users.Find(u => u.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
             if (patientUser != null)
             {
-                string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request");
+                string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  ");
                 switch (acceptOrDeny)
                 {
                     case "y":
@@ -178,6 +189,7 @@ static void AdminMenu(List<IUser> users)
                         break;
                     default:
                         Utils.DisplayAlertText("Only y or n is handled");
+                        break;
                 }
             }
             else
