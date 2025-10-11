@@ -52,5 +52,13 @@ public class ScheduleService
     //Return the schedule with all appointments sorted by date
     return schedule;
   }
+  //Daves a new appointment to the the schedule file (simulating a database insert).
+
+  /// <param name="appointment">The appointment to save.</param>
+  public void SaveAppointment(Appointment appointment)
+  {
+    string line = $"{appointment.UserId};{appointment.Date:yyyy-MM-dd HH:mm};{appointment.Department};{appointment.Type}";
+    File.AppendAllText(_filePath, line + Environment.NewLine);
+  }
 
 }
