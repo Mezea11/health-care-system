@@ -459,6 +459,36 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.WriteLine("Press Enter to continue.");
                 Console.ReadLine();
                 break;
+
+            case 4:
+                Console.WriteLine("\n--- Cancel an appointment ---");
+                if (!schedule.Appointments.Any())
+                {
+                    Console.WriteLine("You have no appointments to cancel. Press Enter to continue.");
+                    Console.ReadLine();
+                    break;
+                }
+                for (int i = 0; i < schedule.Appointments.Count; i++)
+                    Console.WriteLine($"{i + 1}. {schedule.Appointments[i].Format()}");
+
+                int choice = Utils.GetIntegerInput("Enter the number of the appointment to cancel: ");
+                if (choice > 0 && choice <= schedule.Appointments.Count)
+                {
+                    schedule.Appointments.RemoveAt(choice - 1);
+
+                    //Rewrite all appointments to file
+                    File.WriteAllText("Data/schedule.txt", ""); //Clear file
+                    foreach (var app in schedule.Appointments)
+                        scheduleService.SaveAppointment(app);
+
+                    Console.WriteLine("Appointment canceled. Press Enter to continue.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid selection. Press Enter to continue.");
+                }
+                Console.ReadLine();
+                break;
         }
 
     }
