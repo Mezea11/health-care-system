@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 using App;
 /* 
 
@@ -340,11 +341,21 @@ static void PatientMenu()
     }
     else if (input == 2)
     {
-        Console.WriteLine("Appointment created (mock)");
+        Console.WriteLine("Appointment request = created (mock)");
+        string name = Utils.GetRequiredInput("Name: ");
+        string type = Utils.GetRequiredInput("What are you searching for?: ");
+        string doctor = Utils.GetRequiredInput("Whitch doctor do you want to see?: ");
+        string location = Utils.GetRequiredInput("Whitch location do you want to see?: ");
+        string dateforappointment = Utils.GetRequiredInput("What date do you want to be there(format: year-month-day-time)?: ");
+        DateTime myDate = DateTime.ParseExact(dateforappointment, "yyyy-MM-dd HH:mm", null);
+
+        // Name, What for, Location, With whom = Doctor = personnel. Date
+
     }
     else if (input == 3)
     {
         Console.WriteLine("See my appointments");
+        //return $"{Date:yyyy-MM-dd HH:mm} | {Doctor,-15} | {Department,-15} | {Type}";
     }
     else if (input == 4)
     {

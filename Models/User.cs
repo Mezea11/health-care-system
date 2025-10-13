@@ -6,6 +6,7 @@ namespace App;
 class User : IUser
 {
     public string Username { get; private set; }
+    public int id { get; private set; }
 
     // SET PASSWORD TO PRIVATE
     public string Password { get; private set; }
@@ -13,12 +14,15 @@ class User : IUser
     private Role Role;
     public Registration RegistrationPending;
 
-    public User(string username, string password, Role role)
+    public User(int Id, string username, string password, Role role)
     {
+        id = Id;
         Username = username;
         Password = password;
         Role = role;
-        RegistrationPending = Registration.Pending;
+        RegistrationPending = Registration.Accepted;
+
+
     }
 
     public Role GetRole() => Role;
