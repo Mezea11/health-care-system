@@ -12,6 +12,7 @@ public class Appointment
   public string Doctor; // The name of the doctor responsible for the appointment
   public string Department; // The department or medical unit where the appointment occurs.
   public string Type; // The type of appointment (e.g, "Checkup", "Follow-up", "Consultation).
+  public Registration RegistrationPending;
 
   //Constructor used to create a new Appointment object with all necessary details.
   //"userId" = The ID of the user who owns this appointment.
@@ -26,6 +27,7 @@ public class Appointment
     Doctor = doctor;
     Department = department;
     Type = type;
+    RegistrationPending = Registration.Pending;
   }
 
   //Returns a clean, formatted string representation of the appointment.
@@ -35,6 +37,6 @@ public class Appointment
   public string Format()
   {
     //"-15" ensures the doctor and department colums are left-aligned and 15 characters wide.
-    return $"{Date:yyyy-MM-dd HH:mm} | {Doctor,-15} | {Department,-15} | {Type}";
+    return $"Date: {Date:yyyy-MM-dd HH:mm} | Doctor: {Doctor,-15} | Location: {Department,-15} | For What: {Type}";
   }
 }

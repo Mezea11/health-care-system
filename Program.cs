@@ -46,7 +46,7 @@ As a logged in user, I need to be able to view my schedule.
 // Main program
 // ============================
 List<Location> locations = new List<Location>();
-
+List<Appointment> appointments = new List<Appointment>();
 locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
@@ -174,7 +174,7 @@ void MainMenu()
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu();
+                    PatientMenu(activeUser, appointments);
                     break;
 
             }
@@ -324,7 +324,7 @@ static void PersonnelMenu()
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu()
+static void PatientMenu(IUser activeUser, List<Appointment> appointments)
 {
     Console.WriteLine("\n(Patient) Menu Choices:");
     Console.WriteLine("1. See Journal (mock)");
@@ -343,19 +343,25 @@ static void PatientMenu()
     else if (input == 2)
     {
         Console.WriteLine("Appointment request = created (mock)");
+        int userId = activeUser.Id;
         string name = Utils.GetRequiredInput("Name: ");
         string type = Utils.GetRequiredInput("What are you searching for?: ");
         string doctor = Utils.GetRequiredInput("Whitch doctor do you want to see?: ");
         string location = Utils.GetRequiredInput("Whitch location do you want to see?: ");
         string dateforappointment = Utils.GetRequiredInput("What date do you want to be there(format: year-month-day-time)?: ");
         DateTime myDate = DateTime.ParseExact(dateforappointment, "yyyy-MM-dd HH:mm", null);
-
+        // int userId, DateTime date, string doctor, string department, string type
+        appointments.Add(new Appointment(userId, myDate, doctor, location, type));
 
 
     }
     else if (input == 3)
     {
         Console.WriteLine("See my appointments");
+        foreach (Appointment app in appointments.Where(appointment => appointment.UserId == activeUser.Id))
+        {
+            Console.WriteLine($"{app.Format()}");
+        }
         //return $"{Date:yyyy-MM-dd HH:mm} | {Doctor,-15} | {Department,-15} | {Type}";
     }
     else if (input == 4)

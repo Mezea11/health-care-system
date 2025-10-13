@@ -10,7 +10,7 @@ namespace App
         Admin,
 
     }
-    enum Registration // Enum för början av registrerings processen
+    public enum Registration // Enum för början av registrerings processen
     {
         Accepted,
         Pending,
