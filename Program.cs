@@ -6,7 +6,7 @@ using App;
 
 As a user, I need to be able to log in. CHECKED
 As a user, I need to be able to log out. CHECKED
-As a user, I need to be able to REQUEST registration as a patient.
+As a user, I need to be able to REQUEST registration as a patient. CHECKED 
 
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
@@ -56,7 +56,6 @@ List<IUser> users = new List<IUser>()
                 new User("personell", "123", Role.Personnel),
                 new User("admin", "123", Role.Admin),
                 new User("superadmin", "123", Role.SuperAdmin)
-
             };
 IUser? activeUser = null;
 bool running = true;
@@ -77,12 +76,12 @@ void StartMenu(List<IUser> users)
         Console.WriteLine("Welcome");
         Console.WriteLine("1. For sending request for registration as patient");
         Console.WriteLine("2. Log In");
-        Console.Write("Choice: ");
-        string choice = Console.ReadLine();
+        // Console.Write("Choice: ");
+        // string choice = Console.ReadLine();
 
-        switch (choice)
+        switch (Utils.GetIntegerInput("Choice a number: "))
         {
-            case "1":
+            case 1:
                 // CREATE LOGIC IN HERE TO REGISTER A NEW USER
                 Console.WriteLine("Type in your username");// PROMPT USER TO INSERT USERNAME
                 string newUser = Console.ReadLine();
@@ -97,7 +96,7 @@ void StartMenu(List<IUser> users)
                 users.Add(new User(newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
                 break;
 
-            case "2":
+            case 2:
                 MainMenu();
                 break;
         }
@@ -153,6 +152,7 @@ void MainMenu()
                 Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
                 Console.ReadKey();
                 activeUser = null;
+                break;
             }
             // ============================
             // MENU: LOGGED IN
@@ -276,7 +276,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser? active
             else if (roleInput == 3) role = Role.Admin;
 
             users.Add(new User(newUser, newPass, role));
-            Console.WriteLine("New user created. ");
+            Utils.DisplaySuccesText("New user created. ");
             break;
         case 2:
             Console.WriteLine("\nAll users:");
@@ -346,9 +346,9 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser? active
             break;
 
         case 6:
+            Console.WriteLine("Logging out...");
             activeUser = null;
             break;
-
 
         default:
             Console.WriteLine("Invalid input. Please try again.");
@@ -377,8 +377,7 @@ static void PersonnelMenu()
     Console.WriteLine("\n(Personnel) Menu Choices:");
     Console.WriteLine("1. See schedule");
     Console.WriteLine("2. Accept booking (mock)");
-    Console.Write("Val: ");
-    string input = Console.ReadLine();
+    string input = Utils.GetRequiredInput("Choice: ");
 
     if (input == "1")
     {
@@ -398,8 +397,7 @@ static void PatientMenu()
     Console.WriteLine("\n(Patient) Menu Choices:");
     Console.WriteLine("1. See Journal (mock)");
     Console.WriteLine("2. Book appointment (mock)");
-    Console.Write("Choice: ");
-    string input = Console.ReadLine();
+    string input = Utils.GetRequiredInput("Choice: ");
 
     if (input == "1")
     {
