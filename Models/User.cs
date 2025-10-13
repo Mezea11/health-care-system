@@ -19,6 +19,7 @@ class User : IUser
         Password = password;
         Role = role;
         RegistrationPending = Registration.Pending;
+        
     }
 
     public Role GetRole() => Role;

@@ -165,7 +165,7 @@ void MainMenu()
 
                 // ADMIN MENU
                 case Role.Admin:
-                    AdminMenu(users, locations);
+                    AdminMenu(users, locations, activeUser);
                     break;
 
                 // PERSONNEL MENU
@@ -196,7 +196,7 @@ void MainMenu()
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users, List<Location> locations)
+static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -204,6 +204,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
     Console.WriteLine("3. Add location");
     Console.WriteLine("4. View all locations");
     Console.WriteLine("5. See pending patient request");
+    Console.WriteLine($"6. Logout");
 
     // Console.Write("Choice: ");
     // string choice = Console.ReadLine();
@@ -278,6 +279,11 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
             {
                 Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
             }
+            break;
+
+        case 6: 
+            Console.WriteLine("Logging out...");
+            activeUser = null;
             break;
 
         default:
