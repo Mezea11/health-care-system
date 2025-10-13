@@ -396,14 +396,18 @@ static void PersonnelMenu()
 // ============================
 static void PatientMenu(IUser activeUser, List<Appointment> appointments)
 {
-    //Create ScheduleService and load the patient's schedule.
+    //Initialize services
+
+    //ScheduleSevice: handles reading and saving patient appointments.
     ScheduleService scheduleService = new ScheduleService();
     Schedule schedule = scheduleService.LoadSchedule(activeUser.Id);
 
-    //Create JournalService (for reading journal entries).
+    //JournalService: handels reading/writting patient's journal entires.
     JournalService journalService = new JournalService();
 
     bool running = true;
+
+    //Main menu loop
 
     while (running)
     {
@@ -420,8 +424,11 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
 
         switch (input)
         {
+            //1. View Journal
             case 1:
                 Console.WriteLine("\n--- Your Journal ---");
+
+                //Load all journal entries for this patient.
                 var entries = journalService.LoadJournal(activeUser.Id);
                 if (!entries.Any())
                     Console.WriteLine("No journal entrie found.");
@@ -432,7 +439,10 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.ReadLine();
                 break;
 
+            //2. Book a new appointment.
+
             case 2:
+                //Promt user for appointment details.
                 Console.WriteLine("\n--- Book a new appointment ---");
                 string type = Utils.GetRequiredInput("What kind of appointment?: ");
                 string doctor = Utils.GetRequiredInput("Which doctor do you want to see?: ");
@@ -440,9 +450,10 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 string dateInput = Utils.GetRequiredInput("Enter date (yyyy-MM-dd HH:mm): ");
                 DateTime date = DateTime.ParseExact(dateInput, "yyyy-MM-dd HH:mm", null);
 
+                // Create a new Appointment object.
                 Appointment newApp = new Appointment(activeUser.Id, date, doctor, location, type);
 
-                //Add to schedule and save to file.
+                //Add appointment to schedule and persist it to file.
                 schedule.AddAppointment(newApp);
                 scheduleService.SaveAppointment(newApp);
 
@@ -450,8 +461,12 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.ReadLine();
                 break;
 
+            //3. See all appointments
+
             case 3:
                 Console.WriteLine("\n--- Your Appointments ---");
+
+                //Print all appointmenys for this patient.
                 if (!schedule.Appointments.Any())
                     Console.WriteLine("No appointments found.");
                 else
@@ -459,6 +474,8 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.WriteLine("Press Enter to continue.");
                 Console.ReadLine();
                 break;
+
+            //4. Cancel an appointment.
 
             case 4:
                 Console.WriteLine("\n--- Cancel an appointment ---");
@@ -468,6 +485,8 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                     Console.ReadLine();
                     break;
                 }
+
+                //Ask user which appointment to cancel.
                 for (int i = 0; i < schedule.Appointments.Count; i++)
                     Console.WriteLine($"{i + 1}. {schedule.Appointments[i].Format()}");
 
@@ -476,8 +495,8 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 {
                     schedule.Appointments.RemoveAt(choice - 1);
 
-                    //Rewrite all appointments to file
-                    File.WriteAllText("Data/schedule.txt", ""); //Clear file
+                    //Rewrite all appointments to file to persist changes.
+                    File.WriteAllText("Data/schedule.txt", ""); //Clear existing file.
                     foreach (var app in schedule.Appointments)
                         scheduleService.SaveAppointment(app);
 
@@ -490,8 +509,12 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.ReadLine();
                 break;
 
+            // 5. View unique doctors.
+
             case 5:
                 Console.WriteLine("\n--- Your Doctors ---");
+
+                //Select distinct doctors from appointments.
                 var doctors = schedule.Appointments.Select(a => a.Doctor).Distinct();
                 if (!doctors.Any())
                     Console.WriteLine("No doctors found.");
@@ -502,10 +525,14 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.ReadLine();
                 break;
 
+            //6. Logout.
+
             case 6:
                 Console.WriteLine("Logging out...");
                 running = false;
                 break;
+
+            //Invalid input.
 
             default:
                 Console.WriteLine("Inavlid input. Press Enter to try again.");
