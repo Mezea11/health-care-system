@@ -451,6 +451,14 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 break;
 
             case 3:
+                Console.WriteLine("\n--- Your Appointments ---");
+                if (!schedule.Appointments.Any())
+                    Console.WriteLine("No appointments found.");
+                else
+                    schedule.PrintSchedule();
+                Console.WriteLine("Press Enter to continue.");
+                Console.ReadLine();
+                break;
         }
 
     }
