@@ -39,4 +39,22 @@ public class Appointment
     //"-15" ensures the doctor and department colums are left-aligned and 15 characters wide.
     return $"Date: {Date:yyyy-MM-dd HH:mm} | Doctor: {Doctor,-15} | Location: {Department,-15} | For What: {Type}";
   }
+  public string ToFileString()
+  {
+    return $"{UserId};{Date:yyyy-MM-dd HH:mm};{Doctor};{Department};{Type}";
+  }
+  //Creates an Appointment object from a line of text read from a file..
+  public static Appointment FromFileString(string line)
+  {
+    string[] parts = line.Split(';');
+    if (parts.Length < 5) return null;
+
+    int userId = int.Parse(parts[0]);
+    DateTime date = DateTime.Parse(parts[1]);
+    string doctor = parts[2];
+    string department = parts[3];
+    string type = parts[4];
+
+    return new Appointment(userId, date, doctor, department, type);
+  }
 }
