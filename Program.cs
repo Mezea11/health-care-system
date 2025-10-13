@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using App;
 /* 
 
@@ -202,6 +203,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
+    Console.WriteLine("2. Overview of permissions");
 
     string input = Console.ReadLine() ?? "".Trim();
 
@@ -244,6 +246,14 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
             }
             break;
 
+        case "2":
+            Console.WriteLine("Overview regarding the permissions for all users");
+
+            foreach (var user in users)
+            {
+                Console.WriteLine(user.Username + " | Role: " + user.GetRole() + " | Registration: " + user.GetRegistration() + " | Permission: " + user.GetPermissions);
+            }
+            break;
     }
 }
 
