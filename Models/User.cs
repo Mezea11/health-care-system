@@ -42,6 +42,16 @@ class User : IUser
         RegistrationPending = Registration.Denied;
     }
 
+    public void AcceptAddLocationPermission()
+    {
+        PermissionPending = Permissions.AddLocation;
+    }
+
+    public void DenyAddLocationPermission()
+    {
+        PermissionPending = Permissions.None;
+    }
+
     public override string ToString()
     {
         return "Username: " + Username;

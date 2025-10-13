@@ -216,8 +216,34 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
                 // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
                 Console.WriteLine($"{user.ToString()} | {user.GetPermissions()}");
             }
+            // Work with string get name first and after we are done we are working with index. 
+            string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
+            IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+            if (adminUser != null)
+            {
+                string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
+                switch (acceptOrDeny)
+                {
+                    case "y":
+                        adminUser.AcceptAddLocationPermission(); // <-- anropa metoden
+                        Utils.DisplaySuccesText("Correct with accept");
+                        break;
 
+                    case "d":
+                        adminUser.DenyAddLocationPermission();   // <-- anropa metoden
+                        Utils.DisplaySuccesText("Correct with deny");
+                        break;
+                    default:
+                        Utils.DisplayAlertText("Only y or n is handled");
+                        break;
+                }
+            }
+            else
+            {
+                Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+            }
             break;
+
     }
 }
 

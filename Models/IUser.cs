@@ -39,6 +39,10 @@ namespace App
 
         void AcceptPending();
         void DenyPending();
+
+        void AcceptAddLocationPermission();
+
+        void DenyAddLocationPermission();
     }
 
 }
