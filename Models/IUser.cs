@@ -13,6 +13,7 @@ namespace App
     }
     enum Permissions
     {
+        AddRegistrations,
         AddLocation,
         None,
     }
@@ -36,7 +37,7 @@ namespace App
         Registration GetRegistration();
         Permissions GetPermissions();
         bool TryLogin(string username, string password);
-
+        List<Permissions> Permissions { get; }
         void AcceptPending();
         void DenyPending();
 

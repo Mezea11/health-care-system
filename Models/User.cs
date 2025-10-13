@@ -13,6 +13,7 @@ class User : IUser
     private Role Role;
     public Registration RegistrationPending;
     public Permissions PermissionPending;
+    public List<Permissions> PermissionList { get; private set; }
 
     public User(string username, string password, Role role)
     {
@@ -21,6 +22,7 @@ class User : IUser
         Role = role;
         RegistrationPending = Registration.Pending;
         PermissionPending = Permissions.None;
+        PermissionList = new List<Permissions> { Permissions.None };
     }
 
     public Role GetRole() => Role;
@@ -31,6 +33,38 @@ class User : IUser
     {
         return Username == username && Password == password;
     }
+
+    public void AcceptAddRegistrationsPermission()
+    {
+        if (!PermissionList.Contains(Permissions.AddRegistrations))
+            PermissionList.Add(Permissions.AddRegistrations);
+    }
+
+    public void DenyAddRegistrationsPermission()
+    {
+        PermissionList.Remove(Permissions.AddRegistrations);
+
+        // Om inga rättigheter finns kvar, sätt None
+        if (PermissionList.Count == 0)
+            PermissionList.Add(Permissions.None);
+    }
+
+
+    public void AcceptAddLocationPermission()
+    {
+        if (!PermissionList.Contains(Permissions.AddLocation))
+            PermissionList.Add(Permissions.AddLocation);
+    }
+
+    public void DenyAddLocationPermission()
+    {
+        PermissionList.Remove(Permissions.AddLocation);
+
+        // Om inga rättigheter finns kvar, sätt None
+        if (PermissionList.Count == 0)
+            PermissionList.Add(Permissions.None);
+    }
+
 
     public void AcceptPending()
     {
