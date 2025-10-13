@@ -327,14 +327,35 @@ static void PatientMenu()
     Console.WriteLine("\n(Patient) Menu Choices:");
     Console.WriteLine("1. See Journal (mock)");
     Console.WriteLine("2. Book appointment (mock)");
-    string input = Utils.GetRequiredInput("Choice: ");
+    Console.WriteLine("3. See my appointments");
+    Console.WriteLine("4. Cancel appointments");
+    Console.WriteLine("5. View my doctors");
+    Console.WriteLine("6. Logout");
+    // Console.Write("Choice: ");
+    int input = Utils.GetIntegerInput(" Choice: ");
 
-    if (input == "1")
+    if (input == 1)
     {
         Console.WriteLine("Your journal: mock journal");
     }
-    else if (input == "2")
+    else if (input == 2)
     {
         Console.WriteLine("Appointment created (mock)");
+    }
+    else if (input == 3)
+    {
+        Console.WriteLine("See my appointments");
+    }
+    else if (input == 4)
+    {
+        Console.WriteLine("Cancel appointments");
+    }
+    else if (input == 5)
+    {
+        Console.WriteLine("View my doctors");
+    }
+    else if (input == 6)
+    {
+        Console.WriteLine("Logout...");
     }
 }
