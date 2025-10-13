@@ -489,59 +489,30 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 }
                 Console.ReadLine();
                 break;
+
+            case 5:
+                Console.WriteLine("\n--- Your Doctors ---");
+                var doctors = schedule.Appointments.Select(a => a.Doctor).Distinct();
+                if (!doctors.Any())
+                    Console.WriteLine("No doctors found.");
+                else
+                    foreach (var doc in doctors)
+                        Console.WriteLine(doc);
+                Console.WriteLine("Press Enter to continue.");
+                Console.ReadLine();
+                break;
+
+            case 6:
+                Console.WriteLine("Logging out...");
+                running = false;
+                break;
+
+            default:
+                Console.WriteLine("Inavlid input. Press Enter to try again.");
+                Console.ReadLine();
+                break;
         }
 
     }
-    Console.WriteLine("\n(Patient) Menu Choices:");
-    Console.WriteLine("1. See Journal");
-    Console.WriteLine("2. Book appointment");
-    Console.WriteLine("3. See my appointments");
-    Console.WriteLine("4. Cancel appointments");
-    Console.WriteLine("5. View my doctors");
-    Console.WriteLine("6. Logout");
-    // Console.Write("Choice: ");
-    int input = Utils.GetIntegerInput(" Choice: ");
 
-    if (input == 1)
-    {
-        Console.WriteLine("Your journal: mock journal");
-    }
-    else if (input == 2)
-    {
-        Console.WriteLine("\n--- Book a new appointment ---");
-        string type = Utils.GetRequiredInput("Waht kind of appointment?: ");
-        string doctor = Utils.GetRequiredInput("Which doctor do you want to see?: ");
-        string location = Utils.GetRequiredInput("Which location do you want to see?: ");
-        string dateInput = DateTime.ParseExact(dateInput, "yyyy-MM-dd HH:mm" null);
-
-        Appointment newApp = new Appointment(activeUser.Id, date, doctor, location, type);
-
-        Schedule.AddAppointment(newApp);
-        scheduleservice.SaveAppointment(newApp);
-        Console.WriteLine("Appointment successfully booked!");
-
-
-
-    }
-    else if (input == 3)
-    {
-        Console.WriteLine("See my appointments");
-        foreach (Appointment app in appointments.Where(appointment => appointment.UserId == activeUser.Id))
-        {
-            Console.WriteLine($"{app.Format()}");
-        }
-        //return $"{Date:yyyy-MM-dd HH:mm} | {Doctor,-15} | {Department,-15} | {Type}";
-    }
-    else if (input == 4)
-    {
-        Console.WriteLine("Cancel appointments");
-    }
-    else if (input == 5)
-    {
-        Console.WriteLine("View my doctors");
-    }
-    else if (input == 6)
-    {
-        Console.WriteLine("Logout...");
-    }
 }
