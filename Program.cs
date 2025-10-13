@@ -54,7 +54,8 @@ List<IUser> users = new List<IUser>()
             {
                 new User("patient", "123", Role.Patient),
                 new User("personell", "123", Role.Personnel),
-                new User("admin", "123", Role.Admin)
+                new User("admin", "123", Role.Admin),
+                new User("superadmin", "123", Role.SuperAdmin)
 
             };
 IUser? activeUser = null;
@@ -178,6 +179,11 @@ void MainMenu()
                     PatientMenu();
                     break;
 
+                // SUPERADMIN MENU
+                case Role.SuperAdmin:
+                    SuperAdminMenu(users, locations);
+                    break;
+
             }
 
             Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
@@ -189,7 +195,31 @@ void MainMenu()
 
 
 
+// ============================
+// SUPERADMIN MENU METHOD
+// ============================
+static void SuperAdminMenu(List<IUser> users, List<Location> locations)
+{
+    Console.WriteLine("\n(SuperAdmin) Options:");
+    Console.WriteLine("1. Grant admin to add location");
 
+    string input = Console.ReadLine() ?? "".Trim();
+
+    switch (input)
+    {
+        case "1":
+            Console.WriteLine("A list of all admins");
+
+            foreach (var user in users)
+            {
+                if (user.GetRole() == Role.Admin)
+                {
+                    Console.WriteLine(user.ToString());
+                }
+            }
+            break;
+    }
+}
 
 
 

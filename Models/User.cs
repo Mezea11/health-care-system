@@ -39,5 +39,14 @@ class User : IUser
     {
         RegistrationPending = Registration.Denied;
     }
+
+    public override string ToString()
+    {
+        return $"Username: {Username}";
+    }
+
     public Registration GetRegistration() => RegistrationPending;
+
 }
+
+

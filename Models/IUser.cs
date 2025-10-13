@@ -8,8 +8,15 @@ namespace App
         Patient,
         Personnel,
         Admin,
+        SuperAdmin,
 
     }
+    enum Permissions
+    {
+        AddLocation,
+        None,
+    }
+
     enum Registration // Enum för början av registrerings processen
     {
         Accepted,
