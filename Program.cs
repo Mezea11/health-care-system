@@ -166,7 +166,7 @@ void MainMenu()
 
                 // ADMIN MENU
                 case Role.Admin:
-                    AdminMenu(users, locations);
+                    AdminMenu(users, locations, activeUser);
                     break;
 
                 // PERSONNEL MENU
@@ -221,17 +221,17 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
             IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
             if (adminUser != null)
             {
-                string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
+                string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?");
                 switch (acceptOrDeny)
                 {
                     case "y":
                         adminUser.AcceptAddLocationPermission(); // <-- anropa metoden
-                        Utils.DisplaySuccesText("Correct with accept");
+                        Utils.DisplaySuccesText("You have accepted the permission");
                         break;
 
                     case "d":
                         adminUser.DenyAddLocationPermission();   // <-- anropa metoden
-                        Utils.DisplaySuccesText("Correct with deny");
+                        Utils.DisplaySuccesText("You have denied the permission");
                         break;
                     default:
                         Utils.DisplayAlertText("Only y or n is handled");
@@ -252,7 +252,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users, List<Location> locations)
+static void AdminMenu(List<IUser> users, List<Location> locations, IUser? activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -260,6 +260,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
     Console.WriteLine("3. Add location");
     Console.WriteLine("4. View all locations");
     Console.WriteLine("5. See pending patient request");
+    Console.WriteLine("6. Logout");
 
     // Console.Write("Choice: ");
     // string choice = Console.ReadLine();
@@ -285,13 +286,21 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
             }
             break;
         case 3:
-            Console.WriteLine("Please enter the region of the location you wish to add: ");
-            string region = Console.ReadLine() ?? "".Trim();
+            if (activeUser.GetRole() == Role.Admin && activeUser.GetPermissions() == Permissions.AddLocation)
+            {
+                Console.WriteLine("Please enter the region of the location you wish to add: ");
+                string region = Console.ReadLine() ?? "".Trim();
 
-            Console.WriteLine("Please enter the name of the hospital you wish to add: ");
-            string hospital = Console.ReadLine() ?? "".Trim();
+                Console.WriteLine("Please enter the name of the hospital you wish to add: ");
+                string hospital = Console.ReadLine() ?? "".Trim();
 
-            locations.Add(new Location(region, hospital));
+                locations.Add(new Location(region, hospital));
+            }
+            else
+            {
+                System.Console.WriteLine("Access denied. Contact superadmin for permission");
+            }
+
 
             break;
 
@@ -335,6 +344,11 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
                 Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
             }
             break;
+
+        case 6:
+            activeUser = null;
+            break;
+
 
         default:
             Console.WriteLine("Invalid input. Please try again.");
