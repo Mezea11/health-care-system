@@ -396,9 +396,67 @@ static void PersonnelMenu()
 // ============================
 static void PatientMenu(IUser activeUser, List<Appointment> appointments)
 {
+    //Create ScheduleService and load the patient's schedule.
+    ScheduleService scheduleService = new ScheduleService();
+    Schedule schedule = scheduleService.LoadSchedule(activeUser.Id);
+
+    //Create JournalService (for reading journal entries).
+    JournalService journalService = new JournalService();
+
+    bool running = true;
+
+    while (running)
+    {
+        Console.Clear();
+        Console.WriteLine($"\n(Patient) Logged in as {activeUser.Username}");
+        Console.WriteLine("1. See Journal");
+        Console.WriteLine("2. Book appointment");
+        Console.WriteLine("3. See my appointment");
+        Console.WriteLine("4. Cancel appointments");
+        Console.WriteLine("5. View my doctors");
+        Console.WriteLine("6. Logout");
+
+        int input = Utils.GetIntegerInput("Choice: ");
+
+        switch (input)
+        {
+            case 1:
+                Console.WriteLine("\n--- Your Journal ---");
+                var entries = journalService.LoadJournal(activeUser.Id);
+                if (!entries.Any())
+                    Console.WriteLine("No journal entrie found.");
+                else
+                    foreach (var entry in entries)
+                        Console.WriteLine(entry);
+                Console.WriteLine("Press Enter to continue.");
+                Console.ReadLine();
+                break;
+
+            case 2:
+                Console.WriteLine("\n--- Book a new appointment ---");
+                string type = Utils.GetRequiredInput("What kind of appointment?: ");
+                string doctor = Utils.GetRequiredInput("Which doctor do you want to see?: ");
+                string location = Utils.GetRequiredInput("Which location do you want to see?: ");
+                string dateInput = Utils.GetRequiredInput("Enter date (yyyy-MM-dd HH:mm): ");
+                DateTime date = DateTime.ParseExact(dateInput, "yyyy-MM-dd HH:mm", null);
+
+                Appointment newApp = new Appointment(activeUser.Id, date, doctor, location, type);
+
+                //Add to schedule and save to file.
+                schedule.AddAppointment(newApp);
+                scheduleService.SaveAppointment(newApp);
+
+                Console.WriteLine("Appointment successfully booked! Press enter to continue.");
+                Console.ReadLine();
+                break;
+
+            case 3:
+        }
+
+    }
     Console.WriteLine("\n(Patient) Menu Choices:");
-    Console.WriteLine("1. See Journal (mock)");
-    Console.WriteLine("2. Book appointment (mock)");
+    Console.WriteLine("1. See Journal");
+    Console.WriteLine("2. Book appointment");
     Console.WriteLine("3. See my appointments");
     Console.WriteLine("4. Cancel appointments");
     Console.WriteLine("5. View my doctors");
@@ -412,16 +470,18 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
     }
     else if (input == 2)
     {
-        Console.WriteLine("Appointment request = created (mock)");
-        int userId = activeUser.Id;
-        string name = Utils.GetRequiredInput("Name: ");
-        string type = Utils.GetRequiredInput("What are you searching for?: ");
-        string doctor = Utils.GetRequiredInput("Whitch doctor do you want to see?: ");
-        string location = Utils.GetRequiredInput("Whitch location do you want to see?: ");
-        string dateforappointment = Utils.GetRequiredInput("What date do you want to be there(format: year-month-day-time)?: ");
-        DateTime myDate = DateTime.ParseExact(dateforappointment, "yyyy-MM-dd HH:mm", null);
-        // int userId, DateTime date, string doctor, string department, string type
-        appointments.Add(new Appointment(userId, myDate, doctor, location, type));
+        Console.WriteLine("\n--- Book a new appointment ---");
+        string type = Utils.GetRequiredInput("Waht kind of appointment?: ");
+        string doctor = Utils.GetRequiredInput("Which doctor do you want to see?: ");
+        string location = Utils.GetRequiredInput("Which location do you want to see?: ");
+        string dateInput = DateTime.ParseExact(dateInput, "yyyy-MM-dd HH:mm" null);
+
+        Appointment newApp = new Appointment(activeUser.Id, date, doctor, location, type);
+
+        Schedule.AddAppointment(newApp);
+        scheduleservice.SaveAppointment(newApp);
+        Console.WriteLine("Appointment successfully booked!");
+
 
 
     }
