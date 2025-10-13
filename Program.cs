@@ -210,13 +210,13 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
         case "1":
             Console.WriteLine("A list of all admins");
 
-            foreach (var user in users)
+            foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
+            // foreach(User user in users)
             {
-                if (user.GetRole() == Role.Admin)
-                {
-                    Console.WriteLine(user.ToString());
-                }
+                // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
+                Console.WriteLine($"{user.ToString()} | {user.GetPermissions()}");
             }
+
             break;
     }
 }

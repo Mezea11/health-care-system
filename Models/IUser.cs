@@ -34,6 +34,7 @@ namespace App
         string Password { get; }
         Role GetRole();
         Registration GetRegistration();
+        Permissions GetPermissions();
         bool TryLogin(string username, string password);
 
         void AcceptPending();

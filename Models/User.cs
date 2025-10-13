@@ -12,6 +12,7 @@ class User : IUser
 
     private Role Role;
     public Registration RegistrationPending;
+    public Permissions PermissionPending;
 
     public User(string username, string password, Role role)
     {
@@ -19,6 +20,7 @@ class User : IUser
         Password = password;
         Role = role;
         RegistrationPending = Registration.Pending;
+        PermissionPending = Permissions.None;
     }
 
     public Role GetRole() => Role;
@@ -42,8 +44,10 @@ class User : IUser
 
     public override string ToString()
     {
-        return $"Username: {Username}";
+        return "Username: " + Username;
     }
+
+    public Permissions GetPermissions() => PermissionPending;
 
     public Registration GetRegistration() => RegistrationPending;
 
