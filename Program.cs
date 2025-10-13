@@ -54,7 +54,8 @@ List<IUser> users = new List<IUser>()
             {
                 new User("patient", "123", Role.Patient),
                 new User("personell", "123", Role.Personnel),
-                new User("admin", "123", Role.Admin)
+                new User("admin", "123", Role.Admin),
+                new User("superadmin", "123", Role.SuperAdmin)
             };
 IUser? activeUser = null;
 bool running = true;
@@ -178,6 +179,11 @@ void MainMenu()
                     PatientMenu();
                     break;
 
+                // SUPERADMIN MENU
+                case Role.SuperAdmin:
+                    SuperAdminMenu(users, locations);
+                    break;
+
             }
 
             Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
@@ -189,14 +195,64 @@ void MainMenu()
 
 
 
+// ============================
+// SUPERADMIN MENU METHOD
+// ============================
+static void SuperAdminMenu(List<IUser> users, List<Location> locations)
+{
+    Console.WriteLine("\n(SuperAdmin) Options:");
+    Console.WriteLine("1. Grant admin to add location");
 
+    string input = Console.ReadLine() ?? "".Trim();
+
+    switch (input)
+    {
+        case "1":
+            Console.WriteLine("A list of all admins");
+
+            foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
+            // foreach(User user in users)
+            {
+                // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
+                Console.WriteLine($"{user.ToString()} | {user.GetPermissions()}");
+            }
+            // Work with string get name first and after we are done we are working with index. 
+            string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
+            IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+            if (adminUser != null)
+            {
+                string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?");
+                switch (acceptOrDeny)
+                {
+                    case "y":
+                        adminUser.AcceptAddLocationPermission(); // <-- anropa metoden
+                        Utils.DisplaySuccesText("You have accepted the permission");
+                        break;
+
+                    case "d":
+                        adminUser.DenyAddLocationPermission();   // <-- anropa metoden
+                        Utils.DisplaySuccesText("You have denied the permission");
+                        break;
+                    default:
+                        Utils.DisplayAlertText("Only y or n is handled");
+                        break;
+                }
+            }
+            else
+            {
+                Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+            }
+            break;
+
+    }
+}
 
 
 
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
+static void AdminMenu(List<IUser> users, List<Location> locations, IUser? activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -204,7 +260,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     Console.WriteLine("3. Add location");
     Console.WriteLine("4. View all locations");
     Console.WriteLine("5. See pending patient request");
-    Console.WriteLine($"6. Logout");
+    Console.WriteLine("6. Logout");
 
     // Console.Write("Choice: ");
     // string choice = Console.ReadLine();
@@ -230,13 +286,21 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             }
             break;
         case 3:
-            Console.WriteLine("Please enter the region of the location you wish to add: ");
-            string region = Console.ReadLine() ?? "".Trim();
+            if (activeUser.GetRole() == Role.Admin && activeUser.GetPermissions() == Permissions.AddLocation)
+            {
+                Console.WriteLine("Please enter the region of the location you wish to add: ");
+                string region = Console.ReadLine() ?? "".Trim();
 
-            Console.WriteLine("Please enter the name of the hospital you wish to add: ");
-            string hospital = Console.ReadLine() ?? "".Trim();
+                Console.WriteLine("Please enter the name of the hospital you wish to add: ");
+                string hospital = Console.ReadLine() ?? "".Trim();
 
-            locations.Add(new Location(region, hospital));
+                locations.Add(new Location(region, hospital));
+            }
+            else
+            {
+                System.Console.WriteLine("Access denied. Contact superadmin for permission");
+            }
+
 
             break;
 
@@ -281,7 +345,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             }
             break;
 
-        case 6: 
+        case 6:
             Console.WriteLine("Logging out...");
             activeUser = null;
             break;

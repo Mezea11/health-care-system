@@ -8,8 +8,15 @@ namespace App
         Patient,
         Personnel,
         Admin,
+        SuperAdmin,
 
     }
+    enum Permissions
+    {
+        AddLocation,
+        None,
+    }
+
     enum Registration // Enum för början av registrerings processen
     {
         Accepted,
@@ -27,10 +34,15 @@ namespace App
         string Password { get; }
         Role GetRole();
         Registration GetRegistration();
+        Permissions GetPermissions();
         bool TryLogin(string username, string password);
 
         void AcceptPending();
         void DenyPending();
+
+        void AcceptAddLocationPermission();
+
+        void DenyAddLocationPermission();
     }
 
 }
