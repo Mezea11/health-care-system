@@ -219,7 +219,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
             else if (roleInput == 3) role = Role.Admin;
 
             users.Add(new User(newUser, newPass, role));
-            Console.WriteLine("New user created. ");
+            Utils.DisplaySuccesText("New user created. ");
             break;
         case 2:
             Console.WriteLine("\nAll users:");
@@ -307,8 +307,7 @@ static void PersonnelMenu()
     Console.WriteLine("\n(Personnel) Menu Choices:");
     Console.WriteLine("1. See schedule");
     Console.WriteLine("2. Accept booking (mock)");
-    Console.Write("Val: ");
-    string input = Console.ReadLine();
+    string input = Utils.GetRequiredInput("Choice: ");
 
     if (input == "1")
     {
@@ -328,8 +327,7 @@ static void PatientMenu()
     Console.WriteLine("\n(Patient) Menu Choices:");
     Console.WriteLine("1. See Journal (mock)");
     Console.WriteLine("2. Book appointment (mock)");
-    Console.Write("Choice: ");
-    string input = Console.ReadLine();
+    string input = Utils.GetRequiredInput("Choice: ");
 
     if (input == "1")
     {
