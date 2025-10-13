@@ -51,12 +51,11 @@ locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
-List<IUser> users = new List<IUser>()
-            {
-                new User("patient", "123", Role.Patient),
-                new User("personell", "123", Role.Personnel),
-                new User("admin", "123", Role.Admin)
-            };
+List<IUser> users = new List<IUser>();
+
+users.Add(new User(0, "patient", "123", Role.Patient));
+users.Add(new User(1, "personell", "123", Role.Personnel));
+users.Add(new User(2, "admin", "123", Role.Admin));
 IUser? activeUser = null;
 bool running = true;
 
@@ -92,8 +91,7 @@ void StartMenu(List<IUser> users)
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-
-                users.Add(new User(newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
+                users.Add(new User(GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
                 break;
 
             case 2:
@@ -219,7 +217,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
             if (roleInput == 2) role = Role.Personnel;
             else if (roleInput == 3) role = Role.Admin;
 
-            users.Add(new User(newUser, newPass, role));
+            users.Add(new User(GetIndexAddOne(users), newUser, newPass, role));
             Utils.DisplaySuccesText("New user created. ");
             break;
         case 2:
@@ -299,7 +297,10 @@ static void AdminMenu(List<IUser> users, List<Location> locations)
     //     }
 }
 
-
+static int GetIndexAddOne(List<IUser> users)
+{
+    return users.Count() + 1;
+}
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
@@ -349,7 +350,7 @@ static void PatientMenu()
         string dateforappointment = Utils.GetRequiredInput("What date do you want to be there(format: year-month-day-time)?: ");
         DateTime myDate = DateTime.ParseExact(dateforappointment, "yyyy-MM-dd HH:mm", null);
 
-        // Name, What for, Location, With whom = Doctor = personnel. Date
+
 
     }
     else if (input == 3)
