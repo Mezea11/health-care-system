@@ -249,7 +249,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
         case "2":
             Console.WriteLine("Overview regarding the permissions for all users");
 
-            foreach (var user in users)
+            foreach (IUser user in users)
             {
                 Console.WriteLine(user.Username + " | Role: " + user.GetRole() + " | Registration: " + user.GetRegistration() + " | Permission: " + user.GetPermissions);
             }
