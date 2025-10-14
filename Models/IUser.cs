@@ -49,6 +49,8 @@ namespace App
         void AcceptAddPersonellPermission();
         void DenyAddPersonellPermission();
         bool HasPermission(string permissionName);
+        void AssignRegion(string regionName);
+        string GetAssignedRegion();
     }
 
 }

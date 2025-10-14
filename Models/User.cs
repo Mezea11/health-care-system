@@ -7,6 +7,7 @@ namespace App
         public int Id { get; private set; }
         private Role role;
         private Registration registration;
+        private string assignedRegion = "";
 
         public List<Permissions> PermissionList { get; private set; }
 
@@ -23,6 +24,7 @@ namespace App
 
         public Role GetRole() => role;
         public Registration GetRegistration() => registration;
+
 
         public bool TryLogin(string username, string password)
             => Username == username && Password == password;
@@ -75,6 +77,14 @@ namespace App
                 return PermissionList.Contains(perm);
 
             return false;
+        }
+        public void AssignRegion(string regionName)
+        {
+            assignedRegion = regionName;
+        }
+        public string GetAssignedRegion()
+        {
+            return assignedRegion;
         }
 
         public override string ToString()
