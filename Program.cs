@@ -551,7 +551,7 @@ static void PatientMenu(IUser activeUser)
     {
         Console.Clear();
         Console.WriteLine("\n(Patient) Menu Choices:");
-        Console.WriteLine("1. See Journal (mock)");
+        Console.WriteLine("1. See Journal");
         Console.WriteLine("2. Book appointment");
         Console.WriteLine("3. See my appointments");
         Console.WriteLine("4. Cancel appointment");
@@ -567,17 +567,18 @@ static void PatientMenu(IUser activeUser)
             // ==========================================
             case 1:
                 Console.Clear();
-                Console.WriteLine("\n--- Your Journal ---\n");
+                Console.WriteLine($"--- Patient Journal for {activeUser.Username} ---\n");
 
-                //make JournalService
-                JournalService journalService = new JournalService();
+                //Create JournalService instance 
+                var journalService = new JournalService();
 
-                //Get all entries for the logged in patient.
-                List<JournalEntry> entries = journalService.GetJournalEntries(activeUser.Id);
+                //Load journal entries for this patient
+                var entries = journalService.GetJournalEntries(activeUser.Id);
 
+                //Display entries
                 if (entries.Count == 0)
                 {
-                    Utils.DisplayAlertText("You have no journal entries yet.");
+                    Console.WriteLine("(No journal entries found)");
                 }
                 else
                 {
@@ -586,8 +587,8 @@ static void PatientMenu(IUser activeUser)
                         Console.WriteLine(entry.Format());
                     }
                 }
-                Console.WriteLine("\nPress ENTER to return to menu...");
-                Console.ReadLine();
+                Console.WriteLine("\nPress any key to return to menu...");
+                Console.ReadKey();
                 break;
 
 
