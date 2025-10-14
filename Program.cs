@@ -242,7 +242,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
                 }
                 else
                 {
-                    Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+                    Utils.DisplayAlertText("No patient with this number is found.");
                 }
             }
             break;
