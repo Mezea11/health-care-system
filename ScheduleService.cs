@@ -1,83 +1,127 @@
-namespace App;
 
-/// <summary>
-/// Service class responsible for loading and saving schedules from a text file.
-/// This simulates a database by storing appointments in a plain text format.
-/// </summary>
-public class ScheduleService
+using System.Text.Json;
+
+
+namespace App
 {
-  // Path to the text file that acts as the mock database.
-  private readonly string _filePath = "Data/schedule.txt";
-
-  /// <summary>
-  /// Loads a user's schedule by reading all appointments that belong to a given user ID.
-  /// Only appointments that match the provided userId will be included.
-  /// </summary>
-  /// <param name="userId">The ID of the user whose schedule should be loaded.</param>
-  /// <returns>A Schedule object containing all appointments for that user.</returns>
-  public Schedule LoadSchedule(int userId)
+  // ==========================================
+  // ScheduleService (JSON version)
+  // ------------------------------------------
+  // Responsible for loading and saving user schedules
+  // to and from a JSON file.
+  //
+  // File format: Data/schedules.json
+  // [
+  //   { "UserId": 1, "Date": "2025-10-14T08:00:00", "Doctor": "Dr. Smith", "Department": "Cardiology", "Type": "Checkup" },
+  //   { "UserId": 2, "Date": "2025-10-15T10:00:00", "Doctor": "Dr. Brown", "Department": "Neurology", "Type": "Consultation" }
+  // ]
+  // ==========================================
+  public class ScheduleService
   {
-    // Create a new empty schedule for the user.
-    Schedule schedule = new Schedule(userId);
+    private readonly string _filePath = "Data/schedules.json";
 
-    // If no schedule file exists yet, simply return the empty schedule.
-    if (!File.Exists(_filePath))
-      return schedule;
-
-    // Read all lines (appointments) from the file.
-    string[] lines = File.ReadAllLines(_filePath);
-
-    // Loop through each line and attempt to parse it into an Appointment object.
-    foreach (string line in lines)
+    // ==========================================
+    // Loads a full schedule for a specific user.
+    //
+    // Parameters:
+    //   userId - The ID of the user whose schedule should be loaded.
+    //
+    // Returns:
+    //   A Schedule object containing all appointments for the user.
+    // ==========================================
+    public Schedule LoadSchedule(int userId)
     {
-      // Each line should be in the format:
-      // userId;date;doctor;department;type
-      string[] parts = line.Split(';');
+      // Ensure directory exists
+      if (!Directory.Exists("Data"))
+        Directory.CreateDirectory("Data");
 
-      // Skip malformed lines that don't have enough data.
-      if (parts.Length < 5)
-        continue;
+      // Create an empty schedule by default
+      Schedule schedule = new Schedule(userId);
 
-      // Try to parse the userId from the file line.
-      if (!int.TryParse(parts[0], out int fileUserId))
-        continue;
+      // If no JSON file exists, return an empty schedule
+      if (!File.Exists(_filePath))
+        return schedule;
 
-      // Only include appointments that belong to the requested user.
-      if (fileUserId != userId)
-        continue;
+      // Read file contents
+      string json = File.ReadAllText(_filePath);
 
-      // Parse the rest of the data fields.
-      DateTime date = DateTime.Parse(parts[1]);
-      string doctor = parts[2];
-      string department = parts[3];
-      string type = parts[4];
+      // Deserialize JSON into a list of appointments
+      List<Appointment>? allAppointments =
+          JsonSerializer.Deserialize<List<Appointment>>(json) ?? new List<Appointment>();
 
-      // Create a new Appointment instance and add it to the user's schedule.
-      Appointment appointment = new Appointment(fileUserId, date, doctor, department, type);
-      schedule.AddAppointment(appointment);
+      // Filter appointments that belong to this user
+      var userAppointments = allAppointments
+          .Where(a => a.UserId == userId)
+          .OrderBy(a => a.Date)
+          .ToList();
+
+      // Add appointments to the user's schedule
+      foreach (var app in userAppointments)
+      {
+        schedule.AddAppointment(app);
+      }
+
+      return schedule;
     }
 
-    // Return the completed schedule, now containing all relevant appointments.
-    return schedule;
-  }
+    // ==========================================
+    // Saves (or appends) a new appointment to the JSON file.
+    //
+    // If the file does not exist, it creates it.
+    // ==========================================
+    public void SaveAppointment(Appointment appointment)
+    {
+      // Ensure directory exists
+      if (!Directory.Exists("Data"))
+        Directory.CreateDirectory("Data");
 
-  /// <summary>
-  /// Saves a new appointment by appending it to the schedule text file.
-  /// This acts as inserting a new record into the mock database.
-  /// </summary>
-  /// <param name="appointment">The appointment to save.</param>
-  public void SaveAppointment(Appointment appointment)
-  {
-    // Ensure that the directory exists to prevent file errors.
-    string? directory = Path.GetDirectoryName(_filePath);
-    if (!string.IsNullOrEmpty(directory))
-      Directory.CreateDirectory(directory);
+      List<Appointment> allAppointments = new();
 
-    // Convert the appointment to a text line in this order:
-    // userId;date;doctor;department;type
-    string line = $"{appointment.UserId};{appointment.Date:yyyy-MM-dd HH:mm};{appointment.Doctor};{appointment.Department};{appointment.Type}";
+      // Load existing data if available
+      if (File.Exists(_filePath))
+      {
+        string existingJson = File.ReadAllText(_filePath);
+        allAppointments = JsonSerializer.Deserialize<List<Appointment>>(existingJson)
+                          ?? new List<Appointment>();
+      }
 
-    // Append the new appointment to the file.
-    File.AppendAllText(_filePath, line + Environment.NewLine);
+      // Add the new appointment
+      allAppointments.Add(appointment);
+
+      // Serialize and overwrite the file
+      string newJson = JsonSerializer.Serialize(allAppointments, new JsonSerializerOptions
+      {
+        WriteIndented = true
+      });
+
+      File.WriteAllText(_filePath, newJson);
+    }
+
+    // ==========================================
+    // Removes an appointment by userId and date.
+    //
+    // Used for cancellation functionality.
+    // ==========================================
+    public void RemoveAppointment(int userId, DateTime date)
+    {
+      if (!File.Exists(_filePath))
+        return;
+
+      string json = File.ReadAllText(_filePath);
+
+      List<Appointment>? allAppointments =
+          JsonSerializer.Deserialize<List<Appointment>>(json) ?? new List<Appointment>();
+
+      // Remove the specific appointment
+      allAppointments.RemoveAll(a => a.UserId == userId && a.Date == date);
+
+      // Save back to file
+      string updatedJson = JsonSerializer.Serialize(allAppointments, new JsonSerializerOptions
+      {
+        WriteIndented = true
+      });
+
+      File.WriteAllText(_filePath, updatedJson);
+    }
   }
 }
