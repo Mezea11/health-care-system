@@ -175,7 +175,7 @@ void MainMenu()
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu(activeUser, appointments);
+                    PatientMenu(activeUser);
                     break;
 
                 // SUPERADMIN MENU
@@ -394,152 +394,143 @@ static void PersonnelMenu()
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu(IUser activeUser, List<Appointment> appointments)
+static void PatientMenu(IUser activeUser)
 {
-    //Initialize services
-
-    //ScheduleSevice: handles reading and saving patient appointments.
+    // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
-    Schedule schedule = scheduleService.LoadSchedule(activeUser.Id);
 
-    //JournalService: handels reading/writting patient's journal entires.
-    //JournalService journalService = new JournalService(); fixing 2025-10-14
+    bool inMenu = true;
 
-    bool running = true;
-
-    //Main menu loop
-
-    while (running)
+    while (inMenu)
     {
         Console.Clear();
-        Console.WriteLine($"\n(Patient) Logged in as {activeUser.Username}");
-        Console.WriteLine("1. See Journal");
+        Console.WriteLine("\n(Patient) Menu Choices:");
+        Console.WriteLine("1. See Journal (mock)");
         Console.WriteLine("2. Book appointment");
-        Console.WriteLine("3. See my appointment");
-        Console.WriteLine("4. Cancel appointments");
-        Console.WriteLine("5. View my doctors");
+        Console.WriteLine("3. See my appointments");
+        Console.WriteLine("4. Cancel appointment");
+        Console.WriteLine("5. View my doctors (mock)");
         Console.WriteLine("6. Logout");
 
-        int input = Utils.GetIntegerInput("Choice: ");
+        int input = Utils.GetIntegerInput("\nChoice: ");
 
         switch (input)
         {
-            //1. View Journal
+            // ==========================================
+            // CASE 1 — View journal (placeholder)
+            // ==========================================
             case 1:
-                Console.WriteLine("\n--- Your Journal ---");
-
-                //Load all journal entries for this patient.
-                var entries = journalService.LoadJournal(activeUser.Id); // fixing 2025-10-14
-                if (!entries.Any())
-                    Console.WriteLine("No journal entrie found.");
-                else
-                    foreach (var entry in entries)
-                        Console.WriteLine(entry);
-                Console.WriteLine("Press Enter to continue.");
+                Console.WriteLine("\nYour journal (mock):");
+                Console.WriteLine("No journal data implemented yet.");
+                Utils.DisplaySuccesText("Press ENTER to return to menu...");
                 Console.ReadLine();
                 break;
 
-            //2. Book a new appointment.
-
+            // ==========================================
+            // CASE 2 — Book a new appointment
+            // ==========================================
             case 2:
-                //Promt user for appointment details.
-                Console.WriteLine("\n--- Book a new appointment ---");
-                string type = Utils.GetRequiredInput("What kind of appointment?: ");
-                string doctor = Utils.GetRequiredInput("Which doctor do you want to see?: ");
-                string location = Utils.GetRequiredInput("Which location do you want to visit?: ");
-                string dateInput = Utils.GetRequiredInput("Enter date (yyyy-MM-dd HH:mm): ");
-                DateTime date = DateTime.ParseExact(dateInput, "yyyy-MM-dd HH:mm", null);
+                Console.WriteLine("\n--- Create New Appointment ---");
 
-                // Create a new Appointment object.
-                Appointment newApp = new Appointment(activeUser.Id, date, doctor, location, type);
+                string doctor = Utils.GetRequiredInput("Doctor's name: ");
+                string department = Utils.GetRequiredInput("Department / Location: ");
+                string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
+                string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
 
-                //Add appointment to schedule and persist it to file.
-                schedule.AddAppointment(newApp);
-                scheduleService.SaveAppointment(newApp);
-
-                Console.WriteLine("Appointment successfully booked! Press enter to continue.");
-                Console.ReadLine();
-                break;
-
-            //3. See all appointments
-
-            case 3:
-                Console.WriteLine("\n--- Your Appointments ---");
-
-                //Print all appointmenys for this patient.
-                if (!schedule.Appointments.Any())
-                    Console.WriteLine("No appointments found.");
-                else
-                    schedule.PrintSchedule();
-                Console.WriteLine("Press Enter to continue.");
-                Console.ReadLine();
-                break;
-
-            //4. Cancel an appointment.
-
-            case 4:
-                Console.WriteLine("\n--- Cancel an appointment ---");
-                if (!schedule.Appointments.Any())
+                // Validate date input
+                if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
+                    System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
                 {
-                    Console.WriteLine("You have no appointments to cancel. Press Enter to continue.");
-                    Console.ReadLine();
+                    Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                    Console.ReadKey();
                     break;
                 }
 
-                //Ask user which appointment to cancel.
-                for (int i = 0; i < schedule.Appointments.Count; i++)
-                    Console.WriteLine($"{i + 1}. {schedule.Appointments[i].Format()}");
+                // Create and save new appointment
+                Appointment newAppointment = new Appointment(activeUser.Id, appointmentDate, doctor, department, type);
+                scheduleService.SaveAppointment(newAppointment);
 
-                int choice = Utils.GetIntegerInput("Enter the number of the appointment to cancel: ");
-                if (choice > 0 && choice <= schedule.Appointments.Count)
+                Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+                Console.ReadKey();
+                break;
+
+            // ==========================================
+            // CASE 3 — View all appointments
+            // ==========================================
+            case 3:
+                Console.WriteLine("\n--- Your Appointments ---");
+
+                // Load schedule from JSON
+                Schedule mySchedule = scheduleService.LoadSchedule(activeUser.Id);
+
+                if (mySchedule.Appointments.Count == 0)
                 {
-                    schedule.Appointments.RemoveAt(choice - 1);
-
-                    //Rewrite all appointments to file to persist changes.
-                    File.WriteAllText("Data/schedule.txt", ""); //Clear existing file.
-                    foreach (var app in schedule.Appointments)
-                        scheduleService.SaveAppointment(app);
-
-                    Console.WriteLine("Appointment canceled. Press Enter to continue.");
+                    Utils.DisplayAlertText("You have no upcoming appointments.");
                 }
                 else
                 {
-                    Console.WriteLine("Invalid selection. Press Enter to continue.");
+                    mySchedule.PrintSchedule();
                 }
+
+                Console.WriteLine("\nPress ENTER to return to menu...");
                 Console.ReadLine();
                 break;
 
-            // 5. View unique doctors.
+            // ==========================================
+            // CASE 4 — Cancel an existing appointment
+            // ==========================================
+            case 4:
+                Console.WriteLine("\n--- Cancel Appointment ---");
 
+                Schedule cancelSchedule = scheduleService.LoadSchedule(activeUser.Id);
+                if (cancelSchedule.Appointments.Count == 0)
+                {
+                    Utils.DisplayAlertText("You have no appointments to cancel.");
+                    Console.ReadKey();
+                    break;
+                }
+
+                cancelSchedule.PrintSchedule();
+
+                string cancelInput = Utils.GetRequiredInput("\nEnter the exact date and time of the appointment to cancel (yyyy-MM-dd HH:mm): ");
+
+                if (!DateTime.TryParseExact(cancelInput, "yyyy-MM-dd HH:mm", null,
+                    System.Globalization.DateTimeStyles.None, out DateTime cancelDate))
+                {
+                    Utils.DisplayAlertText("Invalid date format.");
+                    Console.ReadKey();
+                    break;
+                }
+
+                // Attempt to remove the appointment from JSON
+                scheduleService.RemoveAppointment(activeUser.Id, cancelDate);
+                Utils.DisplaySuccesText("Appointment canceled (if it existed).");
+                Console.ReadKey();
+                break;
+
+            // ==========================================
+            // CASE 5 — Mock doctors list
+            // ==========================================
             case 5:
                 Console.WriteLine("\n--- Your Doctors ---");
-
-                //Select distinct doctors from appointments.
-                var doctors = schedule.Appointments.Select(a => a.Doctor).Distinct();
-                if (!doctors.Any())
-                    Console.WriteLine("No doctors found.");
-                else
-                    foreach (var doc in doctors)
-                        Console.WriteLine(doc);
-                Console.WriteLine("Press Enter to continue.");
+                Console.WriteLine("Dr. Smith - Cardiology");
+                Console.WriteLine("Dr. Lewis - Orthopedics");
+                Console.WriteLine("Dr. Andersson - General Medicine");
+                Console.WriteLine("\nPress ENTER to return...");
                 Console.ReadLine();
                 break;
 
-            //6. Logout.
-
+            // ==========================================
+            // CASE 6 — Logout
+            // ==========================================
             case 6:
                 Console.WriteLine("Logging out...");
-                running = false;
+                inMenu = false;
                 break;
-
-            //Invalid input.
 
             default:
-                Console.WriteLine("Inavlid input. Press Enter to try again.");
-                Console.ReadLine();
+                Utils.DisplayAlertText("Invalid option, please try again.");
                 break;
         }
-
     }
-
 }
