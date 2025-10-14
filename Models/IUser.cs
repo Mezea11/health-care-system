@@ -1,7 +1,7 @@
 namespace App
 {
     // =================================
-    // ENUM for roles and registration
+    // ENUM for roles and registration and permissions
     // =================================
     enum Role
     {
@@ -11,13 +11,14 @@ namespace App
         SuperAdmin,
 
     }
-    enum Permissions
+    public enum Permissions
     {
-        AddLocation,
         None,
+        AddRegistrations,
+        AddLocation,
     }
 
-    enum Registration // Enum för början av registrerings processen
+    public enum Registration // Enum för början av registrerings processen
     {
         Accepted,
         Pending,
@@ -34,15 +35,15 @@ namespace App
         string Password { get; }
         Role GetRole();
         Registration GetRegistration();
-        Permissions GetPermissions();
+        List<Permissions> PermissionList { get; }
         bool TryLogin(string username, string password);
-
         void AcceptPending();
         void DenyPending();
-
         void AcceptAddLocationPermission();
-
         void DenyAddLocationPermission();
+        void AcceptAddRegistrationsPermission();
+        void DenyAddRegistrationsPermission();
+        bool HasPermission(string permissionName);
     }
 
 }

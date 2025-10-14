@@ -55,6 +55,8 @@ List<IUser> users = new List<IUser>()
                 new User("patient", "123", Role.Patient),
                 new User("personell", "123", Role.Personnel),
                 new User("admin", "123", Role.Admin),
+                new User("admin2", "123", Role.Admin),
+                new User("admin3", "123", Role.Admin),
                 new User("superadmin", "123", Role.SuperAdmin)
             };
 IUser? activeUser = null;
@@ -83,8 +85,7 @@ void StartMenu(List<IUser> users)
         {
             case 1:
                 // CREATE LOGIC IN HERE TO REGISTER A NEW USER
-                Console.WriteLine("Type in your username");// PROMPT USER TO INSERT USERNAME
-                string newUser = Console.ReadLine();
+                string newUser = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
                 Console.Clear();
 
                 Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
@@ -185,9 +186,8 @@ void MainMenu()
                     break;
 
             }
-
             Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-            string input = Console.ReadLine();
+            string input = Console.ReadLine() ?? "".Trim();
             if (input == "logout") activeUser = null;
         }
     }
@@ -202,45 +202,86 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
+    Console.WriteLine("2. Grant admin to handle registrations");
 
-    string input = Console.ReadLine() ?? "".Trim();
+    int input = Utils.GetIntegerInput("Chose a number: ");
 
     switch (input)
     {
-        case "1":
-            Console.WriteLine("A list of all admins");
+        case 1:
+            {
+                Console.WriteLine("A list of all admins");
 
-            foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
-            // foreach(User user in users)
-            {
-                // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
-                Console.WriteLine($"{user.ToString()} | {user.GetPermissions()}");
-            }
-            // Work with string get name first and after we are done we are working with index. 
-            string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-            IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
-            if (adminUser != null)
-            {
-                string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?");
-                switch (acceptOrDeny)
+                foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
+                // foreach(User user in users)
                 {
-                    case "y":
-                        adminUser.AcceptAddLocationPermission(); // <-- anropa metoden
-                        Utils.DisplaySuccesText("You have accepted the permission");
-                        break;
+                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
+                    Console.WriteLine($"{user.ToString()}");
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
+                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (adminUser != null)
+                {
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?");
+                    switch (acceptOrDeny)
+                    {
+                        case "y":
+                            adminUser.AcceptAddLocationPermission(); // <-- anropa metoden
+                            Utils.DisplaySuccesText($"You have accepted the permission add a location to admin user: {adminName}");
+                            break;
 
-                    case "d":
-                        adminUser.DenyAddLocationPermission();   // <-- anropa metoden
-                        Utils.DisplaySuccesText("You have denied the permission");
-                        break;
-                    default:
-                        Utils.DisplayAlertText("Only y or n is handled");
-                        break;
+                        case "d":
+                            adminUser.DenyAddLocationPermission();   // <-- anropa metoden
+                            Utils.DisplaySuccesText("You have denied the permission");
+                            break;
+                        default:
+                            Utils.DisplayAlertText("Only y or n is handled");
+                            break;
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
                 }
             }
-            else
+            break;
+        case 2:
             {
-                Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+                Console.WriteLine("A list of all admins");
+
+                foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
+                // foreach(User user in users)
+                {
+                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
+                    Console.WriteLine($"{user.ToString()}");
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
+                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (adminUser != null)
+                {
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
+                    switch (acceptOrDeny)
+                    {
+                        case "y":
+                            adminUser.AcceptAddRegistrationsPermission(); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            Utils.DisplaySuccesText($"You have accepted the permission handle registrations for admin: {adminName} ");
+                            break;
+
+                        case "d":
+                            adminUser.DenyAddRegistrationsPermission();   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            Utils.DisplaySuccesText($"You have denied permission handle registrations for user: {adminName} ");
+                            break;
+                        default:
+                            Utils.DisplayAlertText("Only y or n is handled");
+                            break;
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+                }
             }
             break;
 
@@ -252,7 +293,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users, List<Location> locations, IUser? activeUser)
+static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -262,8 +303,6 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser? active
     Console.WriteLine("5. See pending patient request");
     Console.WriteLine("6. Logout");
 
-    // Console.Write("Choice: ");
-    // string choice = Console.ReadLine();
     switch (Utils.GetIntegerInput("Choice:"))
     {
         case 1:
@@ -286,7 +325,8 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser? active
             }
             break;
         case 3:
-            if (activeUser.GetRole() == Role.Admin && activeUser.GetPermissions() == Permissions.AddLocation)
+
+            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission("AddLocation"))
             {
                 Console.WriteLine("Please enter the region of the location you wish to add: ");
                 string region = Console.ReadLine() ?? "".Trim();
@@ -312,36 +352,47 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser? active
             }
             break;
         case 5:
-            Console.WriteLine("\nAll patients with pending request:");
-            foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
+            // bool found = activeUser
+            // if(activeUser.GetPermission("addLoc"))
+            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission("AddRegistrations"))
             {
-                Console.WriteLine($"{user.Username} - {user.GetRole()}");
-            }
-            // Work with string get name first and after we are done we are working with index. 
-            string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-            IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
-            if (patientUser != null)
-            {
-                string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  ");
-                switch (acceptOrDeny)
-                {
-                    case "y":
-                        patientUser.AcceptPending(); // <-- anropa metoden
-                        Utils.DisplaySuccesText("Correct with accept");
-                        break;
 
-                    case "d":
-                        patientUser.DenyPending();   // <-- anropa metoden
-                        Utils.DisplaySuccesText("Correct with deny");
-                        break;
-                    default:
-                        Utils.DisplayAlertText("Only y or n is handled");
-                        break;
+
+                Console.WriteLine("\nAll patients with pending request:");
+                foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
+                {
+                    Console.WriteLine($"{user.ToString}");
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (patientUser != null)
+                {
+                    string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  ");
+                    switch (acceptOrDeny)
+                    {
+                        case "y":
+                            patientUser.AcceptPending(); // <-- anropa metoden
+                            Utils.DisplaySuccesText("Correct with accept");
+                            break;
+
+                        case "d":
+                            patientUser.DenyPending();   // <-- anropa metoden
+                            Utils.DisplaySuccesText("Correct with deny");
+                            break;
+                        default:
+                            Utils.DisplayAlertText("Only y or n is handled");
+                            break;
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText("No patient by that name has been found");
                 }
             }
             else
             {
-                Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+                Utils.DisplayAlertText("You dont have the right permission. ");
             }
             break;
 
