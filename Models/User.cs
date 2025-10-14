@@ -7,7 +7,7 @@ namespace App
         private Role role;
         private Registration registration;
 
-        public List<Permissions> GrantedPermissions { get; private set; }
+        public List<Permissions> PermissionList { get; private set; }
 
         public User(string username, string password, Role role)
         {
@@ -15,7 +15,7 @@ namespace App
             Password = password;
             this.role = role;
             registration = Registration.Pending;
-            GrantedPermissions = new List<Permissions> { Permissions.None };
+            PermissionList = new List<Permissions> { Permissions.None };
         }
 
 
