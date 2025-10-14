@@ -48,6 +48,9 @@ namespace App
         void DenyAddRegistrationsPermission();
         void AcceptAddPersonellPermission();
         void DenyAddPersonellPermission();
+
+        void AcceptAddAdminlPermission();
+        void DenyAddAdminlPermission();
         bool HasPermission(string permissionName);
     }
 

@@ -56,6 +56,18 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
+        public void AcceptAddAdminlPermission()
+        {
+            if (!PermissionList.Contains(Permissions.AddAdmin))
+                PermissionList.Add(Permissions.AddAdmin);
+        }
+
+        public void DenyAddAdminlPermission()
+        {
+            PermissionList.Remove(Permissions.AddAdmin);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
         public void AcceptAddPersonellPermission()
         {
             if (!PermissionList.Contains(Permissions.AddPersonell))
