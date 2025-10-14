@@ -403,7 +403,7 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
     Schedule schedule = scheduleService.LoadSchedule(activeUser.Id);
 
     //JournalService: handels reading/writting patient's journal entires.
-    JournalService journalService = new JournalService();
+    //JournalService journalService = new JournalService(); fixing 2025-10-14
 
     bool running = true;
 
@@ -429,7 +429,7 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.WriteLine("\n--- Your Journal ---");
 
                 //Load all journal entries for this patient.
-                var entries = journalService.LoadJournal(activeUser.Id);
+                var entries = journalService.LoadJournal(activeUser.Id); // fixing 2025-10-14
                 if (!entries.Any())
                     Console.WriteLine("No journal entrie found.");
                 else
