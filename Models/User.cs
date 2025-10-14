@@ -14,10 +14,10 @@ namespace App
             Username = username;
             Password = password;
             this.role = role;
-            registration = Registration.Pending;
+
+            registration = role == Role.Patient ? Registration.Pending : Registration.Accepted;
             PermissionList = new List<Permissions> { Permissions.None };
         }
-
 
         public Role GetRole() => role;
         public Registration GetRegistration() => registration;
@@ -30,39 +30,39 @@ namespace App
 
         public void AcceptAddLocationPermission()
         {
-            if (!GrantedPermissions.Contains(Permissions.AddLocation))
-                GrantedPermissions.Add(Permissions.AddLocation);
+            if (!PermissionList.Contains(Permissions.AddLocation))
+                PermissionList.Add(Permissions.AddLocation);
         }
 
         public void DenyAddLocationPermission()
         {
-            GrantedPermissions.Remove(Permissions.AddLocation);
-            if (GrantedPermissions.Count == 0)
-                GrantedPermissions.Add(Permissions.None);
+            PermissionList.Remove(Permissions.AddLocation);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
         }
 
         public void AcceptAddRegistrationsPermission()
         {
-            if (!GrantedPermissions.Contains(Permissions.AddRegistrations))
-                GrantedPermissions.Add(Permissions.AddRegistrations);
+            if (!PermissionList.Contains(Permissions.AddRegistrations))
+                PermissionList.Add(Permissions.AddRegistrations);
         }
 
         public void DenyAddRegistrationsPermission()
         {
-            GrantedPermissions.Remove(Permissions.AddRegistrations);
-            if (GrantedPermissions.Count == 0)
-                GrantedPermissions.Add(Permissions.None);
+            PermissionList.Remove(Permissions.AddRegistrations);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
         }
 
         public bool HasPermission(string permissionName)
         {
             if (Enum.TryParse<Permissions>(permissionName, true, out var perm))
-                return GrantedPermissions.Contains(perm);
+                return PermissionList.Contains(perm);
 
             return false;
         }
 
         public override string ToString()
-            => $"Username: {Username}, Role: {role}, Registration: {registration}, Permissions: {string.Join(", ", GrantedPermissions)}";
+            => $"Username: {Username}, Role: {role}, Registration: {registration}, Permissions: {string.Join(", ", PermissionList)}";
     }
 }
