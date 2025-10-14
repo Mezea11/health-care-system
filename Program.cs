@@ -203,6 +203,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
     Console.WriteLine("1. Grant admin to add location");
     Console.WriteLine("2. Grant admin to handle registrations");
     Console.WriteLine("3. Grant admin to create personel");
+    Console.WriteLine("4. Grant admin to check list of user permissions");
 
     int input = Utils.GetIntegerInput("Chose a number: ");
 
@@ -322,6 +323,48 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
                 }
             }
             break;
+        case 4:
+            {
+                Console.WriteLine("A list of all admins");
+
+                foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
+                // foreach(User user in users)
+                {
+                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
+                    Console.WriteLine($"{user.ToString()}");
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
+                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (adminUser != null)
+                {
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for viewing all users permissions?");
+                    switch (acceptOrDeny)
+                    {
+                        case "y":
+                            adminUser.AcceptViewPermissions(); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            Utils.DisplaySuccesText($"You have accepted the permission to view all user permissions for admin: {adminName} ");
+                            break;
+
+                        case "d":
+                            adminUser.DenyViewPermissions();   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            Utils.DisplaySuccesText($"You have denied permission to view all user permissions for user: {adminName} ");
+                            break;
+                        default:
+                            Utils.DisplayAlertText("Only y or n is handled");
+                            break;
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText("No admin with that name found.");
+                }
+            }
+            break;
+
+        default:
+            Utils.DisplayAlertText("Invalid input. Please try again.");
+            break;
     }
 }
 
@@ -338,7 +381,8 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     Console.WriteLine("3. Add location");
     Console.WriteLine("4. View all locations");
     Console.WriteLine("5. See pending patient request");
-    Console.WriteLine("6. Logout");
+    Console.WriteLine($"6. See user permissions");
+    Console.WriteLine("7. Logout");
 
     switch (Utils.GetIntegerInput("Choice:"))
     {
@@ -471,8 +515,23 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                 System.Console.WriteLine("Access denied. Contact superadmin for permission");
             }
             break;
-
         case 6:
+            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission("ViewPermissions"))
+            {
+                Console.WriteLine($"\nAll users:");
+                foreach (var user in users)
+                {
+                    Console.WriteLine($"{user.Username} - {user.GetRole()} - Permissions: {string.Join(", ", user.PermissionList)}");
+                }
+            }
+            else
+            {
+                System.Console.WriteLine("Access denied. Contact superadmin for permission");
+            }
+           
+            break;
+
+        case 7:
             Console.WriteLine("Logging out...");
             activeUser = null;
             break;
@@ -481,18 +540,6 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             Console.WriteLine("Invalid input. Please try again.");
             break;
     }
-    //     if (choice == "1")
-    //     {
-    //  
-    //     }
-    //     else if (choice == "2")
-    //     {
-    //         Console.WriteLine("\nAll users:");
-    //         foreach (var u in users)
-    //         {
-    //             Console.WriteLine($"{u.Username} - {u.GetRole()}");
-    //         }
-    //     }
 }
 
 static int GetIndexAddOne(List<IUser> users)

@@ -18,6 +18,7 @@ namespace App
         AddPersonell,
         AddAdmin,
         AddLocation,
+        ViewPermissions
     }
 
     public enum Registration // Enum för början av registrerings processen
@@ -48,6 +49,9 @@ namespace App
         void DenyAddRegistrationsPermission();
         void AcceptAddPersonellPermission();
         void DenyAddPersonellPermission();
+
+        void AcceptViewPermissions();
+        void DenyViewPermissions();
         bool HasPermission(string permissionName);
     }
 

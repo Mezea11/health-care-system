@@ -69,6 +69,19 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
+           public void AcceptViewPermissions()
+        {
+            if (!PermissionList.Contains(Permissions.ViewPermissions))
+                PermissionList.Add(Permissions.ViewPermissions);
+        }
+
+        public void DenyViewPermissions()
+        {
+            PermissionList.Remove(Permissions.ViewPermissions);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
+
         public bool HasPermission(string permissionName)
         {
             if (Enum.TryParse<Permissions>(permissionName, true, out var perm))
