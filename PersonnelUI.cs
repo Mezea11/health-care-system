@@ -7,6 +7,70 @@ namespace App
   // UI logic for personnel
   public static class PersonnelUI
   {
+    public static void ModifyAppointment(List<IUser> users, IUser activeUser)
+    {
+      Console.Clear();
+      Console.WriteLine($"--- Modify Patient Appointment (Personnel: {activeUser.Username}) ---\n");
+
+      //Mock: Assigned patients
+      List<int> assignedPatients = new List<int> { 5, 6 };
+
+      Console.WriteLine("Assigned Patients: ");
+      foreach (int pid in assignedPatients)
+      {
+        var patient = users.FirstOrDefault(u => u.Id == pid);
+        if (patient != null)
+          Console.WriteLine($"- {patient.Username} (ID: {pid})");
+      }
+      int selectedPatientId = Utils.GetIntegerInput("\nEnter Patient ID to modify appointments: ");
+      if (!assignedPatients.Contains(selectedPatientId))
+      {
+        Utils.DisplayAlertText("You are not authorized to access this patient's schedule.");
+        return;
+      }
+      var scheduleService = new ScheduleService();
+      var schedule = scheduleService.LoadSchedule(selectedPatientId);
+
+      if (schedule.Appointments.Count == 0)
+      {
+        Utils.DisplayAlertText("No appointments found for this patient.");
+        return;
+      }
+      Console.WriteLine("\nPatient Appointments: ");
+      for (int i = 0; i < schedule.Appointments.Count; i++)
+      {
+        Console.WriteLine($"{i + 1}. {schedule.Appointments[i].Format()}");
+      }
+      int selectedIndex = Utils.GetIntegerInput("\nChoose appointment number to modify: ") - 1;
+
+      if (selectedIndex < 0 || selectedIndex >= schedule.Appointments.Count)
+      {
+        Utils.DisplayAlertText("Invalid selection.");
+        return;
+      }
+      var appointment = schedule.Appointments[selectedIndex];
+
+      //Update fields 
+      string newDoctor = Utils.GetRequiredInput($"Doctor ({appointment.Doctor}): ");
+      string newDepartment = Utils.GetRequiredInput($"Department ({appointment.Department}): ");
+      string newType = Utils.GetRequiredInput($"Type ({appointment.Type}): ");
+      string dateInput = Utils.GetRequiredInput($"Date & Time ({appointment.Date:yyyy-MM-dd HH:mm}): ");
+
+      if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime newDate))
+      {
+        Utils.DisplayAlertText("Invalid date format. Modification canceled.");
+        return;
+      }
+      appointment.Doctor = newDoctor;
+      appointment.Department = newDepartment;
+      appointment.Type = newType;
+      appointment.Date = newDate;
+
+      //Save updated appointment
+      scheduleService.SaveAppointment(appointment);
+
+      Utils.DisplaySuccesText("Appointment modified seccessfully!");
+    }
     // Mock dictionary of personnel assignments: personnel ID -> list of patient IDs
     static Dictionary<int, List<int>> AssignedPatients = new Dictionary<int, List<int>>()
         {

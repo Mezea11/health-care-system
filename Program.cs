@@ -507,7 +507,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.Clear();
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
-        Console.WriteLine("2. Logout");
+        Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
+        Console.WriteLine("3. Logout");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -519,6 +520,10 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 break;
 
             case 2:
+                PersonnelUI.ModifyAppointment(users, activeUser);
+                break;
+
+            case 3:
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 break;
