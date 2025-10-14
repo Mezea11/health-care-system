@@ -1,75 +1,69 @@
+using System.Text.Json;
+
 namespace App;
 
-//JournalService
+//JournalService 
 
-//This class is responsible for managing patient journal entires.
-//It simulates a database by storing each patient's journal
-//as a separate .txt file inside the "Data/" directory.
-
-//Each journal entry is stored as plain test, one line per entry.
-//Example file path: Data/Journal_3.txt (for patient with ID3)
+//Handles reading and writing of patient journals
+//to JSON files instead of plain text files.
+//Each user's journal is stored as an array of entires:
+//"Date": "2025-10-14T12:34:56", Text: "Blood pressure check-up."
 
 public class JournalService
 {
-  //Base directory for all journal files.
-  //If the directory does not exist, it will be created automatically.
   private readonly string _baseDir = "Data";
 
+  //Simple reacord to represent each jounral entry
+  public class JournalEntry
+  {
+    public DateTime Date { get; set; }
+    public string Text { get; set; }
+  }
+
   //Loads all journal entries for a specific user.
+  //Returns an empty list if file does not exist.
 
-  //Parameyers:
-  //userId - The ID of the user whose journal should be loaded.
-
-  //returns:
-  //A list of journal entries (strings), or an empty list if no file exists.
-
-  public List<string> LoadJournal(int userId)
+  public List<JournalEntry> LoadJournal(int userId)
   {
-    string filePath = Path.Combine(_baseDir, $"journal_{userId}.txt");
+    string filePath = Path.Combine(_baseDir, $"journal_{userId}.json");
 
-    //Ensure that the Data directory exists.
     if (!Directory.Exists(_baseDir))
       Directory.CreateDirectory(_baseDir);
 
-    //If no journal file exists yet, return an empty list.
     if (!File.Exists(filePath))
-      return new List<string>();
+      return new List<JournalEntry>();
 
-    //Read all lines and return them as a list
-    return File.ReadAllLines(filePath).ToList();
+    string json = File.ReadAllText(filePath);
+
+    return JsonSerializer.Deserialize<List<JournalEntry>>(json)
+    ?? new List<JournalEntry>();
   }
 
-  // Saves a new entry to the user's journal file.
-  // Parameters:
-  //   userId - The ID of the user whose journal to update.
-  //   entry  - The journal text to append (one entry = one line).
-  //
-  // Each entry is timestamped for traceability.
-  // Example:
-  //   [2025-10-14 13:45] Blood pressure check-up completed.
-  public void SaveJournalEntry(int userId, string entry)
+  //Saves a new journal entry (adds to existing list)
+  //and writes ti back to the user's JSON file.
+
+  public void SaveJournalEntry(int userId, string text)
   {
-    string filePath = Path.Combine(_baseDir, $"journal_{userId}.txt");
+    string filePath = Path.Combine(_baseDir, $"journal_{userId}.json");
 
-    // Ensure directory exists
-    if (!Directory.Exists(_baseDir))
-      Directory.CreateDirectory(_baseDir);
-
-    // Add timestamp to each entry
-    string timestampedEntry = $"[{DateTime.Now:yyyy-MM-dd HH:mm}] {entry}";
-
-    // Append the entry to the journal file
-    File.AppendAllText(filePath, timestampedEntry + Environment.NewLine);
+    var entires = LoadJournal(userId);
+    entires.Add(new JournalEntry
+    {
+      Date = DateTime.Now,
+      Text = text
+    });
+    string json = JsonSerializer.Serialize(entires, new JsonSerializerOptions
+    {
+      WriteIndented = true
+    });
+    File.WriteAllText(filePath, json);
   }
 
-  // ==========================================
-  // Deletes all journal entries for a given user.
-  //
-  // Used only in cases where an account or data reset is required.
-  // ==========================================
+  //Clears all journal entries for a given user.
+
   public void ClearJournal(int userId)
   {
-    string filePath = Path.Combine(_baseDir, $"journal_{userId}.txt");
+    string filePath = Path.Combine(_baseDir, $"journal_{userId}.json");
 
     if (File.Exists(filePath))
       File.Delete(filePath);

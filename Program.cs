@@ -446,7 +446,7 @@ static void PatientMenu(IUser activeUser, List<Appointment> appointments)
                 Console.WriteLine("\n--- Book a new appointment ---");
                 string type = Utils.GetRequiredInput("What kind of appointment?: ");
                 string doctor = Utils.GetRequiredInput("Which doctor do you want to see?: ");
-                string location = Utils.GetRequiredInput("Which location do you want to see?: ");
+                string location = Utils.GetRequiredInput("Which location do you want to visit?: ");
                 string dateInput = Utils.GetRequiredInput("Enter date (yyyy-MM-dd HH:mm): ");
                 DateTime date = DateTime.ParseExact(dateInput, "yyyy-MM-dd HH:mm", null);
 
