@@ -18,7 +18,7 @@ class Utils
             if (string.IsNullOrWhiteSpace(input))
             {
                 // Använder din befintliga felmeddelande-funktion
-                DisplayAlertText("The input could not be empthy. Try again");
+                DisplayAlertText("The input can't be empty. Please try again");
                 // Thread.Sleep(1000); // Kort paus innan frågan ställs igen
             }
         }
@@ -62,7 +62,7 @@ class Utils
             }
             else
             {
-                DisplayAlertText("Not accepteble input. User only numbers.Try again: ");
+                DisplayAlertText("Invalid input. Only use numbers. Please try again: ");
                 // WaitForInput();
             }
         }

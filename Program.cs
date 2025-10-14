@@ -76,12 +76,13 @@ void StartMenu(List<IUser> users)
     {
 
         Console.WriteLine("Welcome");
-        Console.WriteLine("1. For sending request for registration as patient");
-        Console.WriteLine("2. Log In");
+        Console.WriteLine("1. Request Registration (Patient)");
+        Console.WriteLine($"2. Request Registration (Admin)");
+        Console.WriteLine("3. Log In");
         // Console.Write("Choice: ");
         // string choice = Console.ReadLine();
 
-        switch (Utils.GetIntegerInput("Choice a number: "))
+        switch (Utils.GetIntegerInput("Pick a number: "))
         {
             case 1:
                 // CREATE LOGIC IN HERE TO REGISTER A NEW USER
@@ -95,8 +96,19 @@ void StartMenu(List<IUser> users)
                 Console.WriteLine("Request Sent.");
                 users.Add(new User(GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
                 break;
-
             case 2:
+                string newAdmin = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
+                Console.Clear();
+
+                Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
+                string newAdminPass = Console.ReadLine() ?? "".Trim();
+                Console.Clear();
+
+                Console.WriteLine("Request Sent.");
+                users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin)); 
+                break;
+
+            case 3:
                 MainMenu();
                 break;
         }
@@ -122,9 +134,7 @@ void MainMenu()
             // MENU: LOGIN
             // ============================
             Console.WriteLine("--- Health Care System ---");
-            Console.Write("Username: ");
             string username = Utils.GetRequiredInput("Username: ");
-            Console.Write("Password: ");
             string password = Utils.GetRequiredInput("Password: ");
 
             // TryLogin method invoked
@@ -139,15 +149,16 @@ void MainMenu()
 
             if (activeUser == null)
             {
-                Console.WriteLine("Wrong login credentials. Press enter to try again");
+                Console.WriteLine("Wrong login credentials. Press enter to try again.");
                 Console.ReadLine();
             }
+            
         }
 
         else
         {
             // If user as a role as patient has a registratin not yet handled by admin. Will not be able to login. But it will have a active_user as not null
-            if (activeUser.GetRegistration() == Registration.Pending && activeUser.GetRole() == Role.Patient)
+            if (activeUser.GetRegistration() != Registration.Accepted)
             {
                 Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
                 Console.ReadKey();
@@ -181,7 +192,7 @@ void MainMenu()
 
                 // SUPERADMIN MENU
                 case Role.SuperAdmin:
-                    SuperAdminMenu(users, locations);
+                    SuperAdminMenu(users, locations, activeUser);
                     break;
 
             }
@@ -197,13 +208,15 @@ void MainMenu()
 // ============================
 // SUPERADMIN MENU METHOD
 // ============================
-static void SuperAdminMenu(List<IUser> users, List<Location> locations)
+static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
     Console.WriteLine("2. Grant admin to handle registrations");
     Console.WriteLine("3. Grant admin to create personel");
     Console.WriteLine("4. Grant admin to check list of user permissions");
+    Console.WriteLine($"5. See pending admin registration requests");
+    Console.WriteLine($"6. Logout");
 
     int input = Utils.GetIntegerInput("Chose a number: ");
 
@@ -362,6 +375,54 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
             }
             break;
 
+        case 5:
+            {
+                
+            if (activeUser.GetRole() == Role.SuperAdmin)
+            {
+                Console.WriteLine("\nAll admins with pending request:");
+                foreach (User user in users.Where(user => user.GetRole() == Role.Admin && user.GetRegistration() == Registration.Pending))
+                {
+                    Console.WriteLine($"{user.ToString()}");
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string adminHandling = Utils.GetRequiredInput("Pick admin username you want to handle:  ");
+                IUser? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (adminUser != null)
+                {
+                    string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
+                    switch (acceptOrDeny)
+                    {
+                        case "y":
+                            adminUser.AcceptPending(); // <-- anropa metoden
+                            Utils.DisplaySuccesText("Admin registration accepted");
+                            break;
+
+                        case "d":
+                            adminUser.DenyPending();   // <-- anropa metoden
+                            Utils.DisplaySuccesText("Admin registration denied");
+                            break;
+                        default:
+                            Utils.DisplayAlertText("Only y or n is handled");
+                            break;
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText("No admin by that name has been found");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please try again.");
+            }
+            break;
+            }
+
+        case 6:
+            Console.WriteLine("Logging out...");
+            activeUser = null;
+            break;
         default:
             Utils.DisplayAlertText("Invalid input. Please try again.");
             break;

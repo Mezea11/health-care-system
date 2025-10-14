@@ -16,8 +16,9 @@ namespace App
             Password = password;
             this.role = role;
             Id = id;
+            
+            registration = (role == Role.Patient || role == Role.Admin)? Registration.Pending: Registration.Accepted;
 
-            registration = role == Role.Patient ? Registration.Pending : Registration.Accepted;
             PermissionList = new List<Permissions> { Permissions.None };
         }
 
