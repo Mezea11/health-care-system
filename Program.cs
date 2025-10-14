@@ -205,6 +205,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations) // creat
     Console.WriteLine("2. Overview of permissions");
     Console.WriteLine("3. Grant admin to handle registrations");
     Console.WriteLine("4. Grant admin to create personel");
+    Console.WriteLine("5. ");
 
     int input = Utils.GetIntegerInput("Chose a number: ");
 
