@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 using App;
 /* 
 
@@ -45,20 +46,19 @@ As a logged in user, I need to be able to view my schedule.
 // Main program
 // ============================
 List<Location> locations = new List<Location>();
-
+List<Appointment> appointments = new List<Appointment>();
 locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
-List<IUser> users = new List<IUser>()
-            {
-                new User("patient", "123", Role.Patient),
-                new User("personell", "123", Role.Personnel),
-                new User("admin", "123", Role.Admin),
-                new User("admin2", "123", Role.Admin),
-                new User("admin3", "123", Role.Admin),
-                new User("superadmin", "123", Role.SuperAdmin)
-            };
+List<IUser> users = new List<IUser>();
+
+users.Add(new User(0, "patient", "123", Role.Patient));
+users.Add(new User(1, "personell", "123", Role.Personnel));
+users.Add(new User(2, "admin", "123", Role.Admin));
+users.Add(new User(3, "admin1", "123", Role.Admin));
+users.Add(new User(4, "admin2", "123", Role.Admin));
+users.Add(new User(5, "superadmin", "123", Role.SuperAdmin));
 IUser? activeUser = null;
 bool running = true;
 
@@ -93,8 +93,7 @@ void StartMenu(List<IUser> users)
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-
-                users.Add(new User(newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
+                users.Add(new User(GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
                 break;
 
             case 2:
@@ -177,7 +176,7 @@ void MainMenu()
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu();
+                    PatientMenu(activeUser);
                     break;
 
                 // SUPERADMIN MENU
@@ -365,7 +364,16 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        string newUser = Utils.GetRequiredInput("Insert username: ");
+                        Console.Write("Insert password: ");
+                        string newPass = Utils.GetRequiredInput("Insert password: ");
+                        int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
+                        Role role = Role.Patient;
+                        if (roleInput == 2) role = Role.Personnel;
+                        else if (roleInput == 3) role = Role.Admin;
 
+                        users.Add(new User(GetIndexAddOne(users), newUser, newPass, role));
+                        Utils.DisplaySuccesText("New user created. ");
                     }
                     break;
                 case 2:
@@ -383,16 +391,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     break;
 
             }
-            // string newUser = Utils.GetRequiredInput("Insert username: ");
-            // Console.Write("Insert password: ");
-            // string newPass = Utils.GetRequiredInput("Insert password: ");
-            // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
-            // Role role = Role.Patient;
-            // if (roleInput == 2) role = Role.Personnel;
-            // else if (roleInput == 3) role = Role.Admin;
 
-            // users.Add(new User(newUser, newPass, role));
-            // Utils.DisplaySuccesText("New user created. ");
             break;
         case 2:
             Console.WriteLine("\nAll users:");
@@ -496,7 +495,10 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     //     }
 }
 
-
+static int GetIndexAddOne(List<IUser> users)
+{
+    return users.Count() + 1;
+}
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
@@ -520,19 +522,143 @@ static void PersonnelMenu()
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu()
+static void PatientMenu(IUser activeUser)
 {
-    Console.WriteLine("\n(Patient) Menu Choices:");
-    Console.WriteLine("1. See Journal (mock)");
-    Console.WriteLine("2. Book appointment (mock)");
-    string input = Utils.GetRequiredInput("Choice: ");
+    // Initialize ScheduleService (handles JSON read/write)
+    ScheduleService scheduleService = new ScheduleService();
 
-    if (input == "1")
+    bool inMenu = true;
+
+    while (inMenu)
     {
-        Console.WriteLine("Your journal: mock journal");
-    }
-    else if (input == "2")
-    {
-        Console.WriteLine("Appointment created (mock)");
+        Console.Clear();
+        Console.WriteLine("\n(Patient) Menu Choices:");
+        Console.WriteLine("1. See Journal (mock)");
+        Console.WriteLine("2. Book appointment");
+        Console.WriteLine("3. See my appointments");
+        Console.WriteLine("4. Cancel appointment");
+        Console.WriteLine("5. View my doctors (mock)");
+        Console.WriteLine("6. Logout");
+
+        int input = Utils.GetIntegerInput("\nChoice: ");
+
+        switch (input)
+        {
+            // ==========================================
+            // CASE 1 — View journal (placeholder)
+            // ==========================================
+            case 1:
+                Console.WriteLine("\nYour journal (mock):");
+                Console.WriteLine("No journal data implemented yet.");
+                Utils.DisplaySuccesText("Press ENTER to return to menu...");
+                Console.ReadLine();
+                break;
+
+            // ==========================================
+            // CASE 2 — Book a new appointment
+            // ==========================================
+            case 2:
+                Console.WriteLine("\n--- Create New Appointment ---");
+
+                string doctor = Utils.GetRequiredInput("Doctor's name: ");
+                string department = Utils.GetRequiredInput("Department / Location: ");
+                string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
+                string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
+
+                // Validate date input
+                if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
+                    System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                {
+                    Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                    Console.ReadKey();
+                    break;
+                }
+
+                // Create and save new appointment
+                Appointment newAppointment = new Appointment(activeUser.Id, appointmentDate, doctor, department, type);
+                scheduleService.SaveAppointment(newAppointment);
+
+                Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+                Console.ReadKey();
+                break;
+
+            // ==========================================
+            // CASE 3 — View all appointments
+            // ==========================================
+            case 3:
+                Console.WriteLine("\n--- Your Appointments ---");
+
+                // Load schedule from JSON
+                Schedule mySchedule = scheduleService.LoadSchedule(activeUser.Id);
+
+                if (mySchedule.Appointments.Count == 0)
+                {
+                    Utils.DisplayAlertText("You have no upcoming appointments.");
+                }
+                else
+                {
+                    mySchedule.PrintSchedule();
+                }
+
+                Console.WriteLine("\nPress ENTER to return to menu...");
+                Console.ReadLine();
+                break;
+
+            // ==========================================
+            // CASE 4 — Cancel an existing appointment
+            // ==========================================
+            case 4:
+                Console.WriteLine("\n--- Cancel Appointment ---");
+
+                Schedule cancelSchedule = scheduleService.LoadSchedule(activeUser.Id);
+                if (cancelSchedule.Appointments.Count == 0)
+                {
+                    Utils.DisplayAlertText("You have no appointments to cancel.");
+                    Console.ReadKey();
+                    break;
+                }
+
+                cancelSchedule.PrintSchedule();
+
+                string cancelInput = Utils.GetRequiredInput("\nEnter the exact date and time of the appointment to cancel (yyyy-MM-dd HH:mm): ");
+
+                if (!DateTime.TryParseExact(cancelInput, "yyyy-MM-dd HH:mm", null,
+                    System.Globalization.DateTimeStyles.None, out DateTime cancelDate))
+                {
+                    Utils.DisplayAlertText("Invalid date format.");
+                    Console.ReadKey();
+                    break;
+                }
+
+                // Attempt to remove the appointment from JSON
+                scheduleService.RemoveAppointment(activeUser.Id, cancelDate);
+                Utils.DisplaySuccesText("Appointment canceled (if it existed).");
+                Console.ReadKey();
+                break;
+
+            // ==========================================
+            // CASE 5 — Mock doctors list
+            // ==========================================
+            case 5:
+                Console.WriteLine("\n--- Your Doctors ---");
+                Console.WriteLine("Dr. Smith - Cardiology");
+                Console.WriteLine("Dr. Lewis - Orthopedics");
+                Console.WriteLine("Dr. Andersson - General Medicine");
+                Console.WriteLine("\nPress ENTER to return...");
+                Console.ReadLine();
+                break;
+
+            // ==========================================
+            // CASE 6 — Logout
+            // ==========================================
+            case 6:
+                Console.WriteLine("Logging out...");
+                inMenu = false;
+                break;
+
+            default:
+                Utils.DisplayAlertText("Invalid option, please try again.");
+                break;
+        }
     }
 }

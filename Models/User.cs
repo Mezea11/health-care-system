@@ -4,16 +4,18 @@ namespace App
     {
         public string Username { get; private set; }
         public string Password { get; private set; }
+        public int Id { get; private set; }
         private Role role;
         private Registration registration;
 
         public List<Permissions> PermissionList { get; private set; }
 
-        public User(string username, string password, Role role)
+        public User(int id, string username, string password, Role role)
         {
             Username = username;
             Password = password;
             this.role = role;
+            Id = id;
 
             registration = role == Role.Patient ? Registration.Pending : Registration.Accepted;
             PermissionList = new List<Permissions> { Permissions.None };

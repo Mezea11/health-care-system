@@ -33,6 +33,7 @@ namespace App
     // ============================
     interface IUser
     {
+        int Id { get; }
         string Username { get; }
         string Password { get; }
         Role GetRole();
