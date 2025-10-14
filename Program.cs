@@ -171,7 +171,7 @@ void MainMenu()
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu();
+                    PersonnelUI.PersonnelMenu(users, activeUser);
                     break;
 
                 // PATIENT MENU
@@ -495,27 +495,36 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     //     }
 }
 
-static int GetIndexAddOne(List<IUser> users)
+static void PersonnelMenu(List<IUser> users, IUser activeUser)
 {
-    return users.Count() + 1;
-}
-// ============================
-// PERSONNEL MENU METHOD
-// ============================
-static void PersonnelMenu()
-{
-    Console.WriteLine("\n(Personnel) Menu Choices:");
-    Console.WriteLine("1. See schedule");
-    Console.WriteLine("2. Accept booking (mock)");
-    string input = Utils.GetRequiredInput("Choice: ");
+    bool inMenu = true;
 
-    if (input == "1")
+    while (inMenu)
     {
-        Console.WriteLine("Schema visas (mock)...");
-    }
-    else if (input == "2")
-    {
-        Console.WriteLine("Bokningar godkända (mock)...");
+        Console.Clear();
+        Console.WriteLine($"\n(Personnel) Menu - Logged is as {activeUser.Username}");
+        Console.WriteLine("1. Open assigned patient journal");
+        Console.WriteLine("2. Logout");
+
+        int input = Utils.GetIntegerInput("\nChoice: ");
+
+        switch (input)
+        {
+            case 1:
+                // Calls the PersonnelUI-function
+                PersonnelUI.OpenJournal(users, activeUser);
+                break;
+
+            case 2:
+                Console.WriteLine("Logging out...");
+                inMenu = false;
+                break;
+
+            default:
+                Utils.DisplayAlertText("Invalid option. Please try again.");
+                break;
+
+        }
     }
 }
 

@@ -4,68 +4,89 @@ namespace App;
 
 //JournalService 
 
-//Handles reading and writing of patient journals
-//to JSON files instead of plain text files.
-//Each user's journal is stored as an array of entires:
-//"Date": "2025-10-14T12:34:56", Text: "Blood pressure check-up."
+//Service: Handles saving/loading of patient journals.
+//Each journal is tied to a specific patient (userID).
+//Personnel can only access journals for patients assiigned to them.
+
+//Represents one single journal entry.
+
+public class JournalEntry
+{
+  public DateTime Date { get; set; }
+  public string Author { get; set; } = "";
+  public string Text { get; set; } = "";
+  public JournalEntry() { }
+  public JournalEntry(string author, string text)
+  {
+    Date = DateTime.Now;
+    Author = author;
+    Text = text;
+  }
+  public string Format()
+  {
+    return $"{Date:yyyy-MM-dd HH:mm} - {Author}: {Text}";
+  }
+}
+
+//Represents a patient's journal containing muliple entires.
+
+public class PatientJournal
+{
+  public int PatientId { get; set; }
+  public List<JournalEntry> Entries { get; set; } = new();
+  public PatientJournal() { }
+  public PatientJournal(int patientId)
+  {
+    PatientId = patientId;
+  }
+}
+
+//JournalService - manages saving/loading journals
 
 public class JournalService
 {
-  private readonly string _baseDir = "Data";
+  private string _filePath = "Date/journals.json";
+  private List<PatientJournal> _journals = new List<PatientJournal>();
 
-  //Simple reacord to represent each jounral entry
-  public class JournalEntry
+  public JournalService()
   {
-    public DateTime Date { get; set; }
-    public string Text { get; set; }
+    LoadJournals();
   }
-
-  //Loads all journal entries for a specific user.
-  //Returns an empty list if file does not exist.
-
-  public List<JournalEntry> LoadJournal(int userId)
+  //Load all journals from JSON
+  private void LoadJournals()
   {
-    string filePath = Path.Combine(_baseDir, $"journal_{userId}.json");
-
-    if (!Directory.Exists(_baseDir))
-      Directory.CreateDirectory(_baseDir);
-
-    if (!File.Exists(filePath))
-      return new List<JournalEntry>();
-
-    string json = File.ReadAllText(filePath);
-
-    return JsonSerializer.Deserialize<List<JournalEntry>>(json)
-    ?? new List<JournalEntry>();
-  }
-
-  //Saves a new journal entry (adds to existing list)
-  //and writes ti back to the user's JSON file.
-
-  public void SaveJournalEntry(int userId, string text)
-  {
-    string filePath = Path.Combine(_baseDir, $"journal_{userId}.json");
-
-    var entires = LoadJournal(userId);
-    entires.Add(new JournalEntry
+    if (!File.Exists(_filePath))
     {
-      Date = DateTime.Now,
-      Text = text
-    });
-    string json = JsonSerializer.Serialize(entires, new JsonSerializerOptions
-    {
-      WriteIndented = true
-    });
-    File.WriteAllText(filePath, json);
+      _journals = new List<PatientJournal>();
+      return;
+    }
+    string json = File.ReadAllText(_filePath);
+    _journals = JsonSerializer.Deserialize<List<PatientJournal>>(json) ?? new List<PatientJournal>();
   }
-
-  //Clears all journal entries for a given user.
-
-  public void ClearJournal(int userId)
+  //Save all journals to JSON
+  private void SaveJournals()
   {
-    string filePath = Path.Combine(_baseDir, $"journal_{userId}.json");
+    string json = JsonSerializer.Serialize(_journals, new JsonSerializerOptions { WriteIndented = true });
+    File.WriteAllText(_filePath, json);
+  }
+  //Get all entries for a specific patient
+  public List<JournalEntry> GetJournalEntries(int patientId)
+  {
+    var journal = _journals.FirstOrDefault(j => j.PatientId == patientId);
+    return journal?.Entries ?? new List<JournalEntry>();
+  }
+  //Add a new entry to a patient's journal
+  public void AddEntry(int patientId, string author, string text)
+  {
+    var journal = _journals.FirstOrDefault(j => j.PatientId == patientId);
 
-    if (File.Exists(filePath))
-      File.Delete(filePath);
+    if (journal == null)
+    {
+      journal = new PatientJournal(patientId);
+      _journals.Add(journal);
+    }
+
+    journal.Entries.Add(new JournalEntry(author, text));
+    SaveJournals();
   }
 }
