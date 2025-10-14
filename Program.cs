@@ -11,18 +11,18 @@ As a user, I need to be able to REQUEST registration as a patient. CHECKED
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
 As an admin with sufficient permissions, I need to be able to assign admins to certain regions.
-As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations.
-As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations.
-As an admin with sufficient permissions, I need to be able to give admins the permission to add locations.
-As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel.
-As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what.
+As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. ??? Doubles ?? 
+As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
+As an admin with sufficient permissions, I need to be able to give admins the permission to add locations. CHECKED
+As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel. WIP
+As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what. 
 As an admin with sufficient permissions, I need to be able to add locations.
 
 As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- CHECKED
 As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- CHECKED
 As an admin with sufficient permissions, I need to be able to create accounts for personnel. CHECKED
 
-As an admin with sufficient permissions, I need to be able to view a list of who has permission to what.
+As an admin with sufficient permissions, I need to be able to view a list of who has permission to what. 
 
 
 As personnel with sufficient permissions, I need to be able to view a patients journal entries.
@@ -203,6 +203,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
     Console.WriteLine("2. Grant admin to handle registrations");
+    Console.WriteLine("3. Grant admin to create personel");
 
     int input = Utils.GetIntegerInput("Chose a number: ");
 
@@ -242,7 +243,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
                 }
                 else
                 {
-                    Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+                    Utils.DisplayAlertText("No admin with that name.");
                 }
             }
             break;
@@ -280,11 +281,48 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
                 }
                 else
                 {
-                    Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+                    Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
             break;
+        case 3:
+            {
+                Console.WriteLine("A list of all admins");
 
+                foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
+                // foreach(User user in users)
+                {
+                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
+                    Console.WriteLine($"{user.ToString()}");
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
+                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (adminUser != null)
+                {
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
+                    switch (acceptOrDeny)
+                    {
+                        case "y":
+                            adminUser.AcceptAddPersonellPermission(); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            Utils.DisplaySuccesText($"You have accepted the permission to create personel for admin: {adminName} ");
+                            break;
+
+                        case "d":
+                            adminUser.DenyAddPersonellPermission();   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            Utils.DisplaySuccesText($"You have denied permission create personel for user: {adminName} ");
+                            break;
+                        default:
+                            Utils.DisplayAlertText("Only y or n is handled");
+                            break;
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText(".");
+                }
+            }
+            break;
     }
 }
 
@@ -306,16 +344,55 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     switch (Utils.GetIntegerInput("Choice:"))
     {
         case 1:
-            string newUser = Utils.GetRequiredInput("Insert username: ");
-            Console.Write("Insert password: ");
-            string newPass = Utils.GetRequiredInput("Insert password: ");
-            int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
-            Role role = Role.Patient;
-            if (roleInput == 2) role = Role.Personnel;
-            else if (roleInput == 3) role = Role.Admin;
+            Console.WriteLine("Create account for personel and admin");
+            if (activeUser.HasPermission("AddPersonell"))
+            {
+                Console.WriteLine("(1). Create account for Personell");
+            }
+            if (activeUser.HasPermission("AddAdmin"))
+            {
+                Console.WriteLine("(2). Create account for Admin");
+            }
+            Console.WriteLine("(3). Go up");
+            // Console.WriteLine("(3) Go up");
+            switch (Utils.GetIntegerInput("Choose a number: "))
+            {
+                case 1:
+                    if (!activeUser.HasPermission("AddPersonell"))
+                    {
+                        Utils.DisplayAlertText("You cant do that.");
+                        break;
+                    }
+                    else
+                    {
 
-            users.Add(new User(newUser, newPass, role));
-            Utils.DisplaySuccesText("New user created. ");
+                    }
+                    break;
+                case 2:
+                    if (!activeUser.HasPermission("AddAdmin"))
+                    {
+                        Utils.DisplayAlertText("You cant do that.");
+                        break;
+                    }
+                    else
+                    {
+
+                    }
+                    break;
+                case 3:
+                    break;
+
+            }
+            // string newUser = Utils.GetRequiredInput("Insert username: ");
+            // Console.Write("Insert password: ");
+            // string newPass = Utils.GetRequiredInput("Insert password: ");
+            // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
+            // Role role = Role.Patient;
+            // if (roleInput == 2) role = Role.Personnel;
+            // else if (roleInput == 3) role = Role.Admin;
+
+            // users.Add(new User(newUser, newPass, role));
+            // Utils.DisplaySuccesText("New user created. ");
             break;
         case 2:
             Console.WriteLine("\nAll users:");
@@ -392,7 +469,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             }
             else
             {
-                Utils.DisplayAlertText("You dont have the right permission. ");
+                System.Console.WriteLine("Access denied. Contact superadmin for permission");
             }
             break;
 
