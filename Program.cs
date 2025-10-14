@@ -172,7 +172,7 @@ void MainMenu()
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu();
+                    PersonnelMenu(activeUser, users);
                     break;
 
                 // PATIENT MENU
@@ -423,11 +423,12 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
-static void PersonnelMenu()
+static void PersonnelMenu(IUser active_user, List<IUser> users)
 {
     Console.WriteLine("\n(Personnel) Menu Choices:");
     Console.WriteLine("1. See schedule");
     Console.WriteLine("2. Accept booking (mock)");
+    Console.WriteLine("3. View Patient journal entries"); /////////
     string input = Utils.GetRequiredInput("Choice: ");
 
     if (input == "1")
@@ -438,7 +439,29 @@ static void PersonnelMenu()
     {
         Console.WriteLine("Bokningar godkända (mock)...");
     }
+    else if (input == "3") ////////
+
+        if (active_user.GetRole() == Role.Patient) //////////
+
+        {
+            foreach (User user in users.Where(user => user.GetRole() == Role.Patient)) // Loopar igenom varje User i Users hittar
+            {
+                Console.WriteLine($"Journal Entries for {Role.Patient}");///////
+                // Skicka in user ID till appointment check eller något?""
+                // När jag får ut alla appointments gör en foreach på varje appointment
+                //
+                /*foreach (Appointment in PatientMenu) *
+
+                {
+                    Console.WriteLine(Appointment)
+                }*/
+
+            }
+        }
 }
+
+
+
 
 // ============================
 // PATIENT MENU METHOD
