@@ -15,6 +15,8 @@ namespace App
     {
         None,
         AddRegistrations,
+        AddPersonell,
+        AddAdmin,
         AddLocation,
     }
 
