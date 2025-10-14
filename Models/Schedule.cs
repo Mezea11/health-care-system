@@ -23,7 +23,7 @@ public class Schedule
   //"appointment" = The appointment to add.
   public void AddAppointment(Appointment appointment)
   {
-    if (appointment.UserId == UserId)
+    if (appointment != null && appointment.UserId == UserId) // Added null part
     {
       Appointments.Add(appointment);
     }
@@ -31,8 +31,7 @@ public class Schedule
 
   //Retrieves all appointments for a specific week, based on a given start date.
 
-  //"weekStart" = The fist day of the week (e.g, Monday).
-  //A sorted list of appointments within that week.
+  //Retrives all appointments for a given week
   public List<Appointment> GetAppointmentsForWeek(DateTime weekStart)
   {
     //Filter appointments that occur between weekStart (inclusive) and weekEnd (exclusive).
@@ -47,7 +46,12 @@ public class Schedule
   //Mainly used for debugging or test-based testing.
   public void PrintSchedule()
   {
-    Console.WriteLine($"Schedule for user #{UserId}:");
+    Console.WriteLine($"\n--- Schedule for user #{UserId} ---:");
+    if (!Appointments.Any())
+    {
+      Console.WriteLine("No appointments found."); // Added no appointments found.
+      return;
+    }
     foreach (var a in Appointments.OrderBy(a => a.Date))
     {
       Console.WriteLine(a.Format());
