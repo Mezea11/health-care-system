@@ -41,7 +41,10 @@ As a logged in user, I need to be able to view my schedule.
 
 
 
-
+static int GetIndexAddOne(List<IUser> users)
+{
+    return users.Count + 1;
+}
 // ============================
 // Main program
 // ============================
@@ -171,7 +174,7 @@ void MainMenu()
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelUI.PersonnelMenu(users, activeUser);
+                    PersonnelMenu(users, activeUser);
                     break;
 
                 // PATIENT MENU
@@ -502,7 +505,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
     while (inMenu)
     {
         Console.Clear();
-        Console.WriteLine($"\n(Personnel) Menu - Logged is as {activeUser.Username}");
+        Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Logout");
 
@@ -526,6 +529,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
 
         }
     }
+
 }
 
 // ============================

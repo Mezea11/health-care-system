@@ -12,13 +12,13 @@ namespace App;
 
 public class JournalEntry
 {
-  public DateTime Date { get; set; }
-  public string Author { get; set; } = "";
-  public string Text { get; set; } = "";
+  public DateTime Timestamp { get; set; }
+  public string Author { get; set; }
+  public string Text { get; set; }
   public JournalEntry() { }
   public JournalEntry(string author, string text)
   {
-    Date = DateTime.Now;
+    Timestamp = DateTime.Now;
     Author = author;
     Text = text;
   }
