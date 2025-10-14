@@ -54,6 +54,19 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
+        public void AcceptAddPersonellPermission()
+        {
+            if (!PermissionList.Contains(Permissions.AddPersonell))
+                PermissionList.Add(Permissions.AddPersonell);
+        }
+
+        public void DenyAddPersonellPermission()
+        {
+            PermissionList.Remove(Permissions.AddPersonell);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
+
         public bool HasPermission(string permissionName)
         {
             if (Enum.TryParse<Permissions>(permissionName, true, out var perm))

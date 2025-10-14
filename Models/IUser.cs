@@ -45,6 +45,8 @@ namespace App
         void DenyAddLocationPermission();
         void AcceptAddRegistrationsPermission();
         void DenyAddRegistrationsPermission();
+        void AcceptAddPersonellPermission();
+        void DenyAddPersonellPermission();
         bool HasPermission(string permissionName);
     }
 

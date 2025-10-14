@@ -203,6 +203,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
     Console.WriteLine("2. Grant admin to handle registrations");
+    Console.WriteLine("3. Grant admin to create personel");
 
     int input = Utils.GetIntegerInput("Chose a number: ");
 
@@ -242,7 +243,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
                 }
                 else
                 {
-                    Utils.DisplayAlertText("No patient with this number is found.");
+                    Utils.DisplayAlertText("No admin with that name.");
                 }
             }
             break;
@@ -280,11 +281,48 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
                 }
                 else
                 {
-                    Utils.DisplayAlertText("Ingen patient med det namnet hittades.");
+                    Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
             break;
+        case 3:
+            {
+                Console.WriteLine("A list of all admins");
 
+                foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
+                // foreach(User user in users)
+                {
+                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
+                    Console.WriteLine($"{user.ToString()}");
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
+                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (adminUser != null)
+                {
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
+                    switch (acceptOrDeny)
+                    {
+                        case "y":
+                            adminUser.AcceptAddPersonellPermission(); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            Utils.DisplaySuccesText($"You have accepted the permission to create personel for admin: {adminName} ");
+                            break;
+
+                        case "d":
+                            adminUser.DenyAddPersonellPermission();   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            Utils.DisplaySuccesText($"You have denied permission create personel for user: {adminName} ");
+                            break;
+                        default:
+                            Utils.DisplayAlertText("Only y or n is handled");
+                            break;
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText(".");
+                }
+            }
+            break;
     }
 }
 
