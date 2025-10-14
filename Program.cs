@@ -26,7 +26,7 @@ As an admin with sufficient permissions, I need to be able to create accounts fo
 As an admin with sufficient permissions, I need to be able to view a list of who has permission to what. 
 
 
-As personnel with sufficient permissions, I need to be able to view a patients journal entries.
+As personnel with sufficient permissions, I need to be able to view a patients journal entries. CHECKED
 As personnel with sufficient permissions, I need to be able to mark journal entries with different levels of read permissions.
 As personnel with sufficient permissions, I need to be able to register appointments.
 As personnel with sufficient permissions, I need to be able to modify appointments.
@@ -34,8 +34,8 @@ As personnel with sufficient permissions, I need to be able to approve appointme
 As personnel with sufficient permissions, I need to be able to view the schedule of a location.
 
 
-As a patient, I need to be able to view my own journal.
-As a patient, I need to be able to request an appointment.
+As a patient, I need to be able to view my own journal. CHECKED
+As a patient, I need to be able to request an appointment. CHECKED
 As a logged in user, I need to be able to view my schedule.
 */
 
