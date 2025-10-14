@@ -561,11 +561,30 @@ static void PatientMenu(IUser activeUser)
             // CASE 1 — View journal (placeholder)
             // ==========================================
             case 1:
-                Console.WriteLine("\nYour journal (mock):");
-                Console.WriteLine("No journal data implemented yet.");
-                Utils.DisplaySuccesText("Press ENTER to return to menu...");
+                Console.Clear();
+                Console.WriteLine("\n--- Your Journal ---\n");
+
+                //make JournalService
+                JournalService journalService = new JournalService();
+
+                //Get all entries for the logged in patient.
+                List<JournalEntry> entries = journalService.GetJournalEntries(activeUser.Id);
+
+                if (entries.Count == 0)
+                {
+                    Utils.DisplayAlertText("You have no journal entries yet.");
+                }
+                else
+                {
+                    foreach (var entry in entries)
+                    {
+                        Console.WriteLine(entry.Format());
+                    }
+                }
+                Console.WriteLine("\nPress ENTER to return to menu...");
                 Console.ReadLine();
                 break;
+
 
             // ==========================================
             // CASE 2 — Book a new appointment

@@ -24,7 +24,7 @@ public class JournalEntry
   }
   public string Format()
   {
-    return $"{Date:yyyy-MM-dd HH:mm} - {Author}: {Text}";
+    return $"{Timestamp:yyyy-MM-dd HH:mm} - {Author}: {Text}";
   }
 }
 
