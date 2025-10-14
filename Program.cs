@@ -56,7 +56,7 @@ List<IUser> users = new List<IUser>()
                 new User("patient", "123", Role.Patient),
                 new User("personell", "123", Role.Personnel),
                 new User("admin", "123", Role.Admin),
-                new User("superadmin", "123", Role.SuperAdmin)
+                new User("superadmin", "123", Role.SuperAdmin) //hard coded a superadmin
             };
 IUser? activeUser = null;
 bool running = true;
@@ -199,7 +199,7 @@ void MainMenu()
 // ============================
 // SUPERADMIN MENU METHOD
 // ============================
-static void SuperAdminMenu(List<IUser> users, List<Location> locations)
+static void SuperAdminMenu(List<IUser> users, List<Location> locations) // creates a menu for superadmin with list of users and locations
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
@@ -212,11 +212,9 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations)
         case "1":
             Console.WriteLine("A list of all admins");
 
-            foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
-            // foreach(User user in users)
+            foreach (User user in users.Where(user => user.GetRole() == Role.Admin)) //this loop searches for all Admins in users-list
             {
-                // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
-                Console.WriteLine($"{user.ToString()} | {user.GetPermissions()}");
+                Console.WriteLine($"{user.ToString()} | {user.GetPermissions()}"); // giving us a list of all admins with their permissions
             }
             // Work with string get name first and after we are done we are working with index. 
             string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
