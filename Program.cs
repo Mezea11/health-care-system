@@ -367,10 +367,10 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                         string newUser = Utils.GetRequiredInput("Insert username: ");
                         Console.Write("Insert password: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
-                        int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
-                        Role role = Role.Patient;
-                        if (roleInput == 2) role = Role.Personnel;
-                        else if (roleInput == 3) role = Role.Admin;
+                        // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
+                        Role role = Role.Personnel;
+                        // if (roleInput == 2) role = Role.Personnel;
+                        // else if (roleInput == 3) role = Role.Admin;
 
                         users.Add(new User(GetIndexAddOne(users), newUser, newPass, role));
                         Utils.DisplaySuccesText("New user created. ");
@@ -384,7 +384,16 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        string newUser = Utils.GetRequiredInput("Insert username: ");
+                        Console.Write("Insert password: ");
+                        string newPass = Utils.GetRequiredInput("Insert password: ");
+                        // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
+                        Role role = Role.Admin;
+                        // if (roleInput == 2) role = Role.Personnel;
+                        // else if (roleInput == 3) role = Role.Admin;
 
+                        users.Add(new User(GetIndexAddOne(users), newUser, newPass, role));
+                        Utils.DisplaySuccesText("New user created. ");
                     }
                     break;
                 case 3:
