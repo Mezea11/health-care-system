@@ -7,11 +7,13 @@ public class Appointment
   // and contains details such as date, doctor, department and type.
 
 
-  public int UserId; // The ID of the user (e.g, patient) who owns this appointment.
-  public DateTime Date; // The date and time when the appointment takes place.
-  public string Doctor; // The name of the doctor responsible for the appointment
-  public string Department; // The department or medical unit where the appointment occurs.
-  public string Type; // The type of appointment (e.g, "Checkup", "Follow-up", "Consultation).
+  public int UserId { get; set; } // The ID of the user (e.g, patient) who owns this appointment.
+  public DateTime Date { get; set; } // The date and time when the appointment takes place.
+  public string Doctor { get; set; } // The name of the doctor responsible for the appointment
+  public string Department { get; set; } // The department or medical unit where the appointment occurs.
+  public string Type { get; set; } // The type of appointment (e.g, "Checkup", "Follow-up", "Consultation).
+
+  public Appointment() { }
   public Registration RegistrationPending;
 
   //Constructor used to create a new Appointment object with all necessary details.
@@ -34,11 +36,11 @@ public class Appointment
   //useful for displaying data in console output or text files. .
 
   // "Returns" = A formatted text line containing the appointment's details.
-  public string Format()
-  {
-    //"-15" ensures the doctor and department colums are left-aligned and 15 characters wide.
-    return $"Date: {Date:yyyy-MM-dd HH:mm} | Doctor: {Doctor,-15} | Location: {Department,-15} | For What: {Type}";
-  }
+  public string Format() => $"{Date:yyyy-MM-dd HH:mm} - {Doctor} ({Department}) - {Type}";
+  //{
+  //"-15" ensures the doctor and department colums are left-aligned and 15 characters wide.
+  //return $"Date: {Date:yyyy-MM-dd HH:mm} | Doctor: {Doctor,-15} | Location: {Department,-15} | For What: {Type}";
+  //}
   public string ToFileString()
   {
     return $"{UserId};{Date:yyyy-MM-dd HH:mm};{Doctor};{Department};{Type}";
