@@ -27,6 +27,14 @@ namespace App
         Denied,
     }
 
+    public enum Region
+    {
+        None,
+        Skåne,
+        Norrland,
+        Götaland,
+    }
+
 
     // ============================
     // Interface for all users

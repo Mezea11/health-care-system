@@ -357,10 +357,6 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations) // creat
                 break;
             }
 
-            IUser chosenAdmin = AdminList[chosenIndex];
-            string regionName = Utils.GetRequiredInput("Enther the name of the region to " + chosenAdmin.Username + ": "); //vald admin ska nu tilldelas en region
-            chosenAdmin.AssignRegion(regionName);
-            Utils.DisplaySuccesText(chosenAdmin.Username + "has been assigned to region: " + regionName); //här syns sedan vilken admin som fått vilken region tilldelad till sig
             break;
     }
 }
