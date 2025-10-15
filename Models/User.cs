@@ -78,6 +78,6 @@ namespace App
         }
 
         public override string ToString()
-            => $"Username: {Username}, Role: {role}, Registration: {registration}, Permissions: {string.Join(", ", PermissionList)}";
+            => $"ID: {Id} Username: {Username}, Role: {Role}, Registration: {registration}, Permissions: {string.Join(", ", PermissionList)}";
     }
 }

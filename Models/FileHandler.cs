@@ -11,7 +11,13 @@ class FileHandler
 
     public static void SaveUsersToCsv(List<IUser> users)
     {
-        List<string> PrintToUsers = new() { "id, username,password,Role,permissionList" };
+        List<string> PrintToUsers = new() { "id,username,password,Role,permissionList" };
+        // foreach (List<IUser> user in users)
+        // {
+        //     Console.WriteLine(user.ToString());
+        // }
+
+        Console.WriteLine(users.Count);
         try
         {
             File.WriteAllLines(UserCsvFileName, PrintToUsers, Encoding.UTF8);
