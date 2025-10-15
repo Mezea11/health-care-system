@@ -4,18 +4,21 @@ namespace App
     {
         public string Username { get; private set; }
         public string Password { get; private set; }
+        public int Id { get; private set; }
         private Role role;
         private Registration registration;
 
         public List<Permissions> PermissionList { get; private set; }
 
-        public User(string username, string password, Role role)
+        public User(int id, string username, string password, Role role)
         {
             Username = username;
             Password = password;
             this.role = role;
+            Id = id;
+            
+            registration = (role == Role.Patient || role == Role.Admin)? Registration.Pending: Registration.Accepted;
 
-            registration = role == Role.Patient ? Registration.Pending : Registration.Accepted;
             PermissionList = new List<Permissions> { Permissions.None };
         }
 
@@ -50,6 +53,32 @@ namespace App
         public void DenyAddRegistrationsPermission()
         {
             PermissionList.Remove(Permissions.AddRegistrations);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
+
+        public void AcceptAddPersonellPermission()
+        {
+            if (!PermissionList.Contains(Permissions.AddPersonell))
+                PermissionList.Add(Permissions.AddPersonell);
+        }
+
+        public void DenyAddPersonellPermission()
+        {
+            PermissionList.Remove(Permissions.AddPersonell);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
+
+           public void AcceptViewPermissions()
+        {
+            if (!PermissionList.Contains(Permissions.ViewPermissions))
+                PermissionList.Add(Permissions.ViewPermissions);
+        }
+
+        public void DenyViewPermissions()
+        {
+            PermissionList.Remove(Permissions.ViewPermissions);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }

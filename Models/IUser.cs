@@ -3,7 +3,7 @@ namespace App
     // =================================
     // ENUM for roles and registration and permissions
     // =================================
-    enum Role
+    public enum Role
     {
         Patient,
         Personnel,
@@ -15,9 +15,12 @@ namespace App
     {
         None,
         AddRegistrations,
+        AddPersonell,
+        AddAdmin,
         AddLocation,
         ViewPatientJournal,
         ViewAllJournals,
+        ViewPermissions
     }
 
     public enum Registration // Enum för början av registrerings processen
@@ -31,8 +34,9 @@ namespace App
     // ============================
     // Interface for all users
     // ============================
-    interface IUser
+    public interface IUser
     {
+        int Id { get; }
         string Username { get; }
         string Password { get; }
         Role GetRole();
@@ -45,6 +49,11 @@ namespace App
         void DenyAddLocationPermission();
         void AcceptAddRegistrationsPermission();
         void DenyAddRegistrationsPermission();
+        void AcceptAddPersonellPermission();
+        void DenyAddPersonellPermission();
+
+        void AcceptViewPermissions();
+        void DenyViewPermissions();
         bool HasPermission(string permissionName);
     }
 
