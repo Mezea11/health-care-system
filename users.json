@@ -1,0 +1,72 @@
+[
+  {
+    "Id": 0,
+    "Username": "patient",
+    "Password": "123",
+    "Role": "Patient",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 1,
+    "Username": "personell",
+    "Password": "123",
+    "Role": "Personnel",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 2,
+    "Username": "admin",
+    "Password": "123",
+    "Role": "Admin",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 3,
+    "Username": "admin1",
+    "Password": "123",
+    "Role": "Admin",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 4,
+    "Username": "admin2",
+    "Password": "123",
+    "Role": "Admin",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 5,
+    "Username": "superadmin",
+    "Password": "123",
+    "Role": "SuperAdmin",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 7,
+    "Username": "ssrina",
+    "Password": "2222",
+    "Role": "Admin",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  }
+]
