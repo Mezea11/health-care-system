@@ -54,14 +54,9 @@ locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
-List<IUser> users = new List<IUser>();
+List<IUser> users = FileHandler.LoadUsersFromJson();
 
-users.Add(new User(0, "patient", "123", Role.Patient));
-users.Add(new User(1, "personell", "123", Role.Personnel));
-users.Add(new User(2, "admin", "123", Role.Admin));
-users.Add(new User(3, "admin1", "123", Role.Admin));
-users.Add(new User(4, "admin2", "123", Role.Admin));
-users.Add(new User(5, "superadmin", "123", Role.SuperAdmin));
+
 IUser? activeUser = null;
 bool running = true;
 
@@ -98,7 +93,7 @@ void StartMenu(List<IUser> users)
 
                 Console.WriteLine("Request Sent.");
                 users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
-                FileHandler.SaveUsersToCsv(users);
+                FileHandler.SaveUsersToJson(users);
                 break;
             case 2:
                 string newAdmin = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
@@ -110,6 +105,7 @@ void StartMenu(List<IUser> users)
 
                 Console.WriteLine("Request Sent.");
                 users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
+                FileHandler.SaveUsersToJson(users);
                 break;
 
             case 3:
@@ -175,7 +171,7 @@ void MainMenu()
             Console.Clear();
             Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
             Console.WriteLine("----------------------------------");
-
+            Console.WriteLine(activeUser.GetRole());
             switch (activeUser.GetRole())
             {
 
@@ -263,6 +259,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name.");
                 }
             }
+            FileHandler.SaveUsersToJson(users);
             break;
         case 2:
             {
@@ -301,6 +298,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
+            FileHandler.SaveUsersToJson(users);
             break;
         case 3:
             {
@@ -339,6 +337,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText(".");
                 }
             }
+            FileHandler.SaveUsersToJson(users);
             break;
         case 4:
             {
@@ -377,8 +376,8 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
+            FileHandler.SaveUsersToJson(users);
             break;
-
         case 5:
             {
 
@@ -420,11 +419,13 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 {
                     Console.WriteLine("Invalid input. Please try again.");
                 }
+                FileHandler.SaveUsersToJson(users);
                 break;
             }
 
         case 6:
             Console.WriteLine("Logging out...");
+            FileHandler.SaveUsersToJson(users);
             activeUser = null;
             break;
         default:
@@ -482,7 +483,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                         else if (roleInput == 3) role = Role.Admin;
 
                         users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, role));
-                        FileHandler.SaveUsersToCsv(users);
+                        FileHandler.SaveUsersToJson(users);
                         Utils.DisplaySuccesText("New user created. ");
                     }
                     break;
