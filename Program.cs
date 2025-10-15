@@ -26,7 +26,7 @@ As an admin with sufficient permissions, I need to be able to create accounts fo
 As an admin with sufficient permissions, I need to be able to view a list of who has permission to what. 
 
 
-As personnel with sufficient permissions, I need to be able to view a patients journal entries.
+As personnel with sufficient permissions, I need to be able to view a patients journal entries. CHECKED
 As personnel with sufficient permissions, I need to be able to mark journal entries with different levels of read permissions.
 As personnel with sufficient permissions, I need to be able to register appointments.
 As personnel with sufficient permissions, I need to be able to modify appointments.
@@ -34,14 +34,17 @@ As personnel with sufficient permissions, I need to be able to approve appointme
 As personnel with sufficient permissions, I need to be able to view the schedule of a location.
 
 
-As a patient, I need to be able to view my own journal.
-As a patient, I need to be able to request an appointment.
+As a patient, I need to be able to view my own journal. CHECKED
+As a patient, I need to be able to request an appointment. CHECKED
 As a logged in user, I need to be able to view my schedule.
 */
 
 
 
-
+static int GetIndexAddOne(List<IUser> users)
+{
+    return users.Count + 1;
+}
 // ============================
 // Main program
 // ============================
@@ -182,7 +185,7 @@ void MainMenu()
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu();
+                    PersonnelMenu(users, activeUser);
                     break;
 
                 // PATIENT MENU
@@ -603,28 +606,43 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     }
 }
 
-static int GetIndexAddOne(List<IUser> users)
+static void PersonnelMenu(List<IUser> users, IUser activeUser)
 {
-    return users.Count() + 1;
-}
-// ============================
-// PERSONNEL MENU METHOD
-// ============================
-static void PersonnelMenu()
-{
-    Console.WriteLine("\n(Personnel) Menu Choices:");
-    Console.WriteLine("1. See schedule");
-    Console.WriteLine("2. Accept booking (mock)");
-    string input = Utils.GetRequiredInput("Choice: ");
+    bool inMenu = true;
 
-    if (input == "1")
+    while (inMenu)
     {
-        Console.WriteLine("Schema visas (mock)...");
+        Console.Clear();
+        Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
+        Console.WriteLine("1. Open assigned patient journal");
+        Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
+        Console.WriteLine("3. Logout");
+
+        int input = Utils.GetIntegerInput("\nChoice: ");
+
+        switch (input)
+        {
+            case 1:
+                // Calls the PersonnelUI-function
+                PersonnelUI.OpenJournal(users, activeUser);
+                break;
+
+            case 2:
+                PersonnelUI.ModifyAppointment(users, activeUser);
+                break;
+
+            case 3:
+                Console.WriteLine("Logging out...");
+                inMenu = false;
+                break;
+
+            default:
+                Utils.DisplayAlertText("Invalid option. Please try again.");
+                break;
+
+        }
     }
-    else if (input == "2")
-    {
-        Console.WriteLine("Bokningar godkända (mock)...");
-    }
+
 }
 
 // ============================
@@ -641,7 +659,7 @@ static void PatientMenu(IUser activeUser)
     {
         Console.Clear();
         Console.WriteLine("\n(Patient) Menu Choices:");
-        Console.WriteLine("1. See Journal (mock)");
+        Console.WriteLine("1. See Journal");
         Console.WriteLine("2. Book appointment");
         Console.WriteLine("3. See my appointments");
         Console.WriteLine("4. Cancel appointment");
@@ -656,11 +674,31 @@ static void PatientMenu(IUser activeUser)
             // CASE 1 — View journal (placeholder)
             // ==========================================
             case 1:
-                Console.WriteLine("\nYour journal (mock):");
-                Console.WriteLine("No journal data implemented yet.");
-                Utils.DisplaySuccesText("Press ENTER to return to menu...");
-                Console.ReadLine();
+                Console.Clear();
+                Console.WriteLine($"--- Patient Journal for {activeUser.Username} ---\n");
+
+                //Create JournalService instance 
+                var journalService = new JournalService();
+
+                //Load journal entries for this patient
+                var entries = journalService.GetJournalEntries(activeUser.Id);
+
+                //Display entries
+                if (entries.Count == 0)
+                {
+                    Console.WriteLine("(No journal entries found)");
+                }
+                else
+                {
+                    foreach (var entry in entries)
+                    {
+                        Console.WriteLine(entry.Format());
+                    }
+                }
+                Console.WriteLine("\nPress any key to return to menu...");
+                Console.ReadKey();
                 break;
+
 
             // ==========================================
             // CASE 2 — Book a new appointment

@@ -3,7 +3,7 @@ namespace App
     // =================================
     // ENUM for roles and registration and permissions
     // =================================
-    enum Role
+    public enum Role
     {
         Patient,
         Personnel,
@@ -32,7 +32,7 @@ namespace App
     // ============================
     // Interface for all users
     // ============================
-    interface IUser
+    public interface IUser
     {
         int Id { get; }
         string Username { get; }
