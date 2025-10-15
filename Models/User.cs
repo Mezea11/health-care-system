@@ -2,22 +2,21 @@ namespace App
 {
     public class User : IUser
     {
-        public int Id { get; private set; }
+        public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public string PasswordSalt { get; set; } = string.Empty;
         public Role Role { get; set; }
         public Registration Registration { get; set; }
+        public List<Permissions> PermissionList { get; set; } = new List<Permissions> { Permissions.None };
 
-        public List<Permissions> PermissionList { get; private set; } = new List<Permissions> { Permissions.None };
+        // Konstruktor för nya användare
         public User(int id, string username, string password, Role role)
         {
             Id = id;
             Username = username;
-            // Password = password;
             Role = role;
 
-            // Hash + salt the password
             var (hash, salt) = PasswordHelper.HashPassword(password);
             PasswordHash = hash;
             PasswordSalt = salt;
@@ -26,76 +25,44 @@ namespace App
                 ? Registration.Pending
                 : Registration.Accepted;
 
-            PermissionList = new List<Permissions> { Permissions.None };
+            ApplyRolePermissions();
         }
 
-        public User()
+        // Parameterlös konstruktor för JSON
+        public User() { }
+
+        // === Ny metod: tilldela rättigheter baserat på roll ===
+        public void ApplyRolePermissions()
         {
-            PermissionList = new List<Permissions> { Permissions.None };
+            if (RolePermissions.Map.TryGetValue(Role, out var perms))
+                PermissionList = new List<Permissions>(perms);
+            else
+                PermissionList = new List<Permissions> { Permissions.None };
         }
+
         // === Interface-krav ===
         public Role GetRole() => Role;
         public Registration GetRegistration() => Registration;
 
-        public void AcceptAddRegistrationsPermission()
-        {
-            if (!PermissionList.Contains(Permissions.AddRegistrations))
-                PermissionList.Add(Permissions.AddRegistrations);
-        }
-
-        public void DenyAddRegistrationsPermission()
-        {
-            PermissionList.Remove(Permissions.AddRegistrations);
-            if (PermissionList.Count == 0)
-                PermissionList.Add(Permissions.None);
-        }
-
-        public void AcceptAddLocationPermission()
-        {
-            if (!PermissionList.Contains(Permissions.AddLocation))
-                PermissionList.Add(Permissions.AddLocation);
-        }
-
-        public void DenyAddLocationPermission()
-        {
-            PermissionList.Remove(Permissions.AddLocation);
-            if (PermissionList.Count == 0)
-                PermissionList.Add(Permissions.None);
-        }
-
-        public void AcceptAddPersonellPermission()
-        {
-            if (!PermissionList.Contains(Permissions.AddPersonell))
-                PermissionList.Add(Permissions.AddPersonell);
-        }
-
-        public void DenyAddPersonellPermission()
-        {
-            PermissionList.Remove(Permissions.AddPersonell);
-            if (PermissionList.Count == 0)
-                PermissionList.Add(Permissions.None);
-        }
-
-        public void AcceptViewPermissions()
-        {
-            if (!PermissionList.Contains(Permissions.ViewPermissions))
-                PermissionList.Add(Permissions.ViewPermissions);
-        }
-
-        public void DenyViewPermissions()
-        {
-            PermissionList.Remove(Permissions.ViewPermissions);
-            if (PermissionList.Count == 0)
-                PermissionList.Add(Permissions.None);
-        }
-
-        // === Extra funktioner ===
         public bool TryLogin(string username, string password)
-    => Username == username &&
-       PasswordHelper.VerifyPassword(password, PasswordHash, PasswordSalt);
+            => Username == username &&
+               PasswordHelper.VerifyPassword(password, PasswordHash, PasswordSalt);
 
         public void AcceptPending() => Registration = Registration.Accepted;
         public void DenyPending() => Registration = Registration.Denied;
+
+        public void GrantPermission(Permissions perm)
+        {
+            if (!PermissionList.Contains(perm))
+                PermissionList.Add(perm);
+        }
+
+        public void RevokePermission(Permissions perm)
+        {
+            PermissionList.Remove(perm);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
 
         public bool HasPermission(string permissionName)
         {
@@ -104,6 +71,13 @@ namespace App
 
             return false;
         }
+
+        public bool HasPermission(Permissions permission)
+            => PermissionList.Contains(permission);
+
+        // public bool HasPermission(string permissionName)
+        //     => Enum.TryParse<Permissions>(permissionName, true, out var perm) &&
+        //        PermissionList.Contains(perm);
 
         public override string ToString()
             => $"ID: {Id}, Username: {Username}, Role: {Role}, Registration: {Registration}, Permissions: {string.Join(", ", PermissionList)}";
