@@ -3,20 +3,24 @@ namespace App
     public class User : IUser
     {
         public int Id { get; private set; }
-        public string Username { get; private set; }
-        public string Password { get; private set; }
-
+        public string Username { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
+        public string PasswordSalt { get; set; } = string.Empty;
         public Role Role { get; private set; }
         public Registration Registration { get; private set; }
 
-        public List<Permissions> PermissionList { get; private set; }
-
+        public List<Permissions> PermissionList { get; private set; } = new List<Permissions> { Permissions.None };
         public User(int id, string username, string password, Role role)
         {
             Id = id;
             Username = username;
-            Password = password;
+            // Password = password;
             Role = role;
+
+            // Hash + salt the password
+            var (hash, salt) = PasswordHelper.HashPassword(password);
+            PasswordHash = hash;
+            PasswordSalt = salt;
 
             Registration = (role == Role.Patient || role == Role.Admin)
                 ? Registration.Pending
@@ -25,12 +29,13 @@ namespace App
             PermissionList = new List<Permissions> { Permissions.None };
         }
 
+        public User()
+        {
+            PermissionList = new List<Permissions> { Permissions.None };
+        }
         // === Interface-krav ===
         public Role GetRole() => Role;
         public Registration GetRegistration() => Registration;
-
-        public string SaveData()
-            => $"ID: {Id}, Username: {Username}, Password: {Password}, Role: {Role}, Registration: {Registration}, Permissions: {string.Join(", ", PermissionList)}";
 
         public void AcceptAddRegistrationsPermission()
         {
@@ -86,7 +91,8 @@ namespace App
 
         // === Extra funktioner ===
         public bool TryLogin(string username, string password)
-            => Username == username && Password == password;
+    => Username == username &&
+       PasswordHelper.VerifyPassword(password, PasswordHash, PasswordSalt);
 
         public void AcceptPending() => Registration = Registration.Accepted;
         public void DenyPending() => Registration = Registration.Denied;

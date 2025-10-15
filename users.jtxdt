@@ -2,8 +2,7 @@
   {
     "Id": 0,
     "Username": "patient",
-    "PasswordHash": "W95\u002BXu4ukNTMiT5IZNHbcv94KngNZj/aQ3yIyFp6Uv4=",
-    "PasswordSalt": "Jiltee3Dbh1PpBz0JIS3lg==",
+    "Password": "123",
     "Role": "Patient",
     "Registration": "Pending",
     "PermissionList": [
@@ -13,8 +12,7 @@
   {
     "Id": 1,
     "Username": "personell",
-    "PasswordHash": "XkeKRXNC/N5x6AO/Zm/XseXwKs4KFS/RzTsFZzI/7MY=",
-    "PasswordSalt": "ssjvdOP2fU9CNnxx0MfxvA==",
+    "Password": "123",
     "Role": "Personnel",
     "Registration": "Accepted",
     "PermissionList": [
@@ -24,8 +22,7 @@
   {
     "Id": 2,
     "Username": "admin",
-    "PasswordHash": "Bs7xikBzb35NmxzgMfd7Z45NJq9qfHrlvve\u002BOjGTSlk=",
-    "PasswordSalt": "4OQu\u002BVh3mks3Z/LyKQBzSw==",
+    "Password": "123",
     "Role": "Admin",
     "Registration": "Pending",
     "PermissionList": [
@@ -35,8 +32,7 @@
   {
     "Id": 3,
     "Username": "admin1",
-    "PasswordHash": "Ahu98mmVDujSfsGtpvHMkuEwZfbszXonsgxJod9Ceh0=",
-    "PasswordSalt": "I3PlngyGhUV4SstMIVEIDA==",
+    "Password": "123",
     "Role": "Admin",
     "Registration": "Pending",
     "PermissionList": [
@@ -46,8 +42,7 @@
   {
     "Id": 4,
     "Username": "admin2",
-    "PasswordHash": "5sWR5qGbZtZWE\u002B2fTY6noj1A1LFH4tFs1TsXdkv4JRw=",
-    "PasswordSalt": "/2NRl\u002BWT59DxWj3p4WPzeQ==",
+    "Password": "123",
     "Role": "Admin",
     "Registration": "Pending",
     "PermissionList": [
@@ -57,8 +52,7 @@
   {
     "Id": 5,
     "Username": "superadmin",
-    "PasswordHash": "wXitsv8X9qBs2dWL0hHvJYTpBVI8f5Q\u002BrF8pPEtLwtw=",
-    "PasswordSalt": "D7q9g9GwO\u002B7qErZH8PA3CA==",
+    "Password": "123",
     "Role": "SuperAdmin",
     "Registration": "Accepted",
     "PermissionList": [
@@ -67,10 +61,9 @@
   },
   {
     "Id": 7,
-    "Username": "stinas_katt",
-    "PasswordHash": "JJFeG6iLZRRob0Si33MGeKNe5WojF3lhNN5gQFk6Wqo=",
-    "PasswordSalt": "YlNwXxCpd68iborBRqiyEw==",
-    "Role": "Patient",
+    "Username": "ssrina",
+    "Password": "2222",
+    "Role": "Admin",
     "Registration": "Pending",
     "PermissionList": [
       "None"

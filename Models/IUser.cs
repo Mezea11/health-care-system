@@ -37,11 +37,13 @@ namespace App
     {
         int Id { get; }
         string Username { get; }
-        string Password { get; }
+        // string Password { get; }
+        // Store hashed password and salt instead of plain text and remove password
+        string PasswordHash { get; }
+        string PasswordSalt { get; }
         Role GetRole();
         Registration GetRegistration();
         List<Permissions> PermissionList { get; }
-        string SaveData();
         bool TryLogin(string username, string password);
         void AcceptPending();
         void DenyPending();
