@@ -185,7 +185,7 @@ void MainMenu()
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu(users, activeUser);
+                    PersonnelMenu(users, activeUser, appointments);
                     break;
 
                 // PATIENT MENU
@@ -205,6 +205,8 @@ void MainMenu()
         }
     }
 }
+
+
 
 
 
@@ -606,7 +608,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     }
 }
 
-static void PersonnelMenu(List<IUser> users, IUser activeUser)
+static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
 {
     bool inMenu = true;
 
@@ -616,7 +618,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
-        Console.WriteLine("3. Logout");
+        Console.WriteLine("3. View patient journals");
+        Console.WriteLine("4. Logout");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -632,6 +635,36 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 break;
 
             case 3:
+                /* if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal"))
+                { */
+                foreach (User user in users)
+                {
+                    if (user.GetRole() == Role.Patient)
+                    {
+                        Console.WriteLine(user.Username);
+                    }
+                }
+
+                // Work with string get name first and after we are done we are working with index. 
+                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+                IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (patientUser != null)
+                {
+
+                    Console.WriteLine(users.Find);
+                    Console.ReadLine();
+                }
+                /*    else
+                   {
+                       Utils.DisplayAlertText("No patient by that name has been found");
+                   } */
+                /* } */
+                else
+                {
+                    Console.WriteLine("Access denied. Contact superadmin for permission");
+                }
+                break;
+            case 4:
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 break;
