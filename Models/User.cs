@@ -5,7 +5,7 @@ namespace App
         public string Username { get; private set; }
         public string Password { get; private set; }
         public int Id { get; private set; }
-        private Role role;
+        private Role Role;
         private Registration registration;
 
         public List<Permissions> PermissionList { get; private set; }
@@ -14,14 +14,14 @@ namespace App
         {
             Username = username;
             Password = password;
-            this.role = role;
+            Role = role;
             Id = id;
 
             registration = role == Role.Patient ? Registration.Pending : Registration.Accepted;
             PermissionList = new List<Permissions> { Permissions.None };
         }
 
-        public Role GetRole() => role;
+        public Role GetRole() => Role;
         public Registration GetRegistration() => registration;
 
         public bool TryLogin(string username, string password)

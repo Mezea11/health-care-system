@@ -93,7 +93,8 @@ void StartMenu(List<IUser> users)
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-                users.Add(new User(GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
+                users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
+                FileHandler.SaveUsersToCsv(users);
                 break;
 
             case 2:
@@ -372,7 +373,8 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                         if (roleInput == 2) role = Role.Personnel;
                         else if (roleInput == 3) role = Role.Admin;
 
-                        users.Add(new User(GetIndexAddOne(users), newUser, newPass, role));
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, role));
+                        FileHandler.SaveUsersToCsv(users);
                         Utils.DisplaySuccesText("New user created. ");
                     }
                     break;
@@ -481,24 +483,10 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             Console.WriteLine("Invalid input. Please try again.");
             break;
     }
-    //     if (choice == "1")
-    //     {
-    //  
-    //     }
-    //     else if (choice == "2")
-    //     {
-    //         Console.WriteLine("\nAll users:");
-    //         foreach (var u in users)
-    //         {
-    //             Console.WriteLine($"{u.Username} - {u.GetRole()}");
-    //         }
-    //     }
+
 }
 
-static int GetIndexAddOne(List<IUser> users)
-{
-    return users.Count() + 1;
-}
+
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
