@@ -25,13 +25,13 @@ class FileHandler
                 new User(5, "superadmin", "123", Role.SuperAdmin)
             };
 
-            // Tilldela permissions direkt
-            foreach (User user in testUsers.OfType<User>())
-            {
-                user.ApplyRolePermissions();
-            }
+            // Tilldela permissions direkt ska göras av administratörer
+            // foreach (User user in testUsers.OfType<User>())
+            // {
+            //     user.ApplyRolePermissions();
+            // }
 
-            return testUsers;
+            // return testUsers;
         }
 
         try
@@ -48,8 +48,8 @@ class FileHandler
             var result = users?.ConvertAll<IUser>(u => u) ?? new List<IUser>();
 
             // Säkerställ att alla användare får rätt permissions baserat på roll
-            foreach (var u in result.OfType<User>())
-                u.ApplyRolePermissions();
+            // foreach (var u in result.OfType<User>())
+            //     u.ApplyRolePermissions();
 
             return result;
         }

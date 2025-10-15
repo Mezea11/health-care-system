@@ -25,20 +25,20 @@ namespace App
                 ? Registration.Pending
                 : Registration.Accepted;
 
-            ApplyRolePermissions();
+            // ApplyRolePermissions();
         }
 
         // Parameterlös konstruktor för JSON
         public User() { }
 
         // === Ny metod: tilldela rättigheter baserat på roll ===
-        public void ApplyRolePermissions()
-        {
-            if (RolePermissions.Map.TryGetValue(Role, out var perms))
-                PermissionList = new List<Permissions>(perms);
-            else
-                PermissionList = new List<Permissions> { Permissions.None };
-        }
+        // public void ApplyRolePermissions()
+        // {
+        //     if (RolePermissions.Map.TryGetValue(Role, out var perms))
+        //         PermissionList = new List<Permissions>(perms);
+        //     else
+        //         PermissionList = new List<Permissions> { Permissions.None };
+        // }
 
         // === Interface-krav ===
         public Role GetRole() => Role;
