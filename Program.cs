@@ -48,6 +48,7 @@ As a logged in user, I need to be able to view my schedule.
 // ============================
 List<Location> locations = new List<Location>();
 List<Appointment> appointments = new List<Appointment>();
+List<AdminLocation> adminLocations = new List<AdminLocation>();
 locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
@@ -335,31 +336,31 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations) // creat
         case 5:
             Console.WriteLine("Assign admins to regions");
 
-            if (!users.Any(user => user.GetRole() == Role.Admin))
+            if (!users.Any(user => user.GetRole() == Role.Admin)) //loopar genom alla användare
             {
-                Utils.DisplayAlertText("No admins found");
+                Utils.DisplayAlertText("No admins found"); //om ingen admin hittas.
                 break;
             }
-            List<IUser> AdminList = new List<IUser>();
-            for (int i = 0; i < users.Count; ++i)
+            List<IUser> AdminList = new List<IUser>(); //annars skapas en ny lista med bara admins genom index 
+            for (int i = 0; i < users.Count; ++i) //för att det ska bli enklare för superadmin att välja genom siffror istället för text
             {
                 if (users[i].GetRole() == Role.Admin)
                 {
-                    AdminList.Add((IUser)users[i]);
+                    AdminList.Add((IUser)users[i]); //listan spottas ut för varje admin-användare
                     Console.WriteLine(AdminList.Count + ": " + users[i].Username);
                 }
             }
-            int chosenIndex = Utils.GetIntegerInput("Choose an admin by number: ") - 1;
+            int chosenIndex = Utils.GetIntegerInput("Choose an admin by number: ") - 1; //väljer den admin du vill tilldela en region genom en siffra
             if (chosenIndex < 0 || chosenIndex >= AdminList.Count)
             {
-                Utils.DisplayAlertText("Invalid number. No admin assigned.");
+                Utils.DisplayAlertText("Invalid number. No admin assigned."); //om du väljer en siffra som inte finns med på den utspottade listan
                 break;
             }
 
             IUser chosenAdmin = AdminList[chosenIndex];
-            string regionName = Utils.GetRequiredInput("Enther the name of the region to " + chosenAdmin.Username);
+            string regionName = Utils.GetRequiredInput("Enther the name of the region to " + chosenAdmin.Username + ": "); //vald admin ska nu tilldelas en region
             chosenAdmin.AssignRegion(regionName);
-            Utils.DisplaySuccesText(chosenAdmin.Username + "has been assigned to region: " + regionName);
+            Utils.DisplaySuccesText(chosenAdmin.Username + "has been assigned to region: " + regionName); //här syns sedan vilken admin som fått vilken region tilldelad till sig
             break;
     }
 }
