@@ -613,27 +613,9 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
-static void PersonnelMenu()
-{
-    Console.WriteLine("\n(Personnel) Menu Choices:");
-    Console.WriteLine("1. See schedule");
-    Console.WriteLine("2. Accept booking (mock)");
-    string input = Utils.GetRequiredInput("Choice: ");
-
-    if (input == "1")
-    {
-        Console.WriteLine("Schema visas (mock)...");
-    }
-    else if (input == "2")
-    {
-        Console.WriteLine("Bokningar godkända (mock)...");
-    }
-}
-
 static void PersonnelMenu(List<IUser> users, IUser activeUser)
 {
     bool inMenu = true;
-
     while (inMenu)
     {
         Console.Clear();

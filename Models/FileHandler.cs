@@ -12,10 +12,19 @@ class FileHandler
     public static void SaveUsersToCsv(List<IUser> users)
     {
         List<string> PrintToUsers = new() { "id,username,password,Role,permissionList" };
-        // foreach (List<IUser> user in users)
-        // {
-        //     Console.WriteLine(user.ToString());
-        // }
+        foreach (IUser user in users)
+        {
+            string userHandlingText = $"{user.ToString()}";
+            PrintToUsers.Add(userHandlingText);
+            // Console.WriteLine(user.ToString());
+        }
+
+        foreach (string muuu in PrintToUsers)
+        {
+            Console.WriteLine(muuu);
+        }
+
+
 
         Console.WriteLine(users.Count);
         try
