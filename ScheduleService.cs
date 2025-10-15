@@ -81,8 +81,9 @@ namespace App
       if (File.Exists(_filePath))
       {
         string existingJson = File.ReadAllText(_filePath);
-        allAppointments = JsonSerializer.Deserialize<List<Appointment>>(existingJson)
-                          ?? new List<Appointment>();
+        allAppointments = JsonSerializer.Deserialize<List<Appointment>>(existingJson) ??
+        new List<Appointment>();
+
       }
 
       // Add the new appointment
@@ -122,6 +123,40 @@ namespace App
       });
 
       File.WriteAllText(_filePath, updatedJson);
+    }
+    public List<Appointment> LoadAllAppointments()
+    {
+      if (!File.Exists(_filePath))
+        return new List<Appointment>();
+
+      var lines = File.ReadAllLines(_filePath);
+      var appointments = new List<Appointment>();
+
+      foreach (var line in lines)
+      {
+        var appt = Appointment.FromFileString(line);
+        if (appt != null)
+          appointments.Add(appt);
+      }
+      return appointments;
+    }
+    //Removes a specific appointment from storage
+    public void RemoveAppointment(Appointment apptToRemove)
+    {
+      var appointments = LoadAllAppointments();
+
+      //Match by all key fields (unique combo)
+      appointments.RemoveAll(a =>
+      a.UserId == apptToRemove.UserId &&
+      a.Date == apptToRemove.Date &&
+      a.Doctor == apptToRemove.Doctor &&
+      a.Department == apptToRemove.Department &&
+      a.Type == apptToRemove.Type
+      );
+
+      //Re-save the updated list
+      var lines = appointments.Select(a => a.ToFileString());
+      File.WriteAllLines(_filePath, lines);
     }
   }
 }
