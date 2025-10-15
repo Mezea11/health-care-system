@@ -441,30 +441,32 @@ static void PersonnelMenu(IUser activeUser, List<IUser> users)
         Console.WriteLine("Bokningar godkända (mock)...");
     }
     else if (input == "3") ////////
-
-    {
-        foreach (User user in users)
-
-        {
-            if (user.GetRole() == Role.Patient)
-            {
-                System.Console.WriteLine(user.Username);
-            }
-        }
-
-        string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-        IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
-        if (patientUser != null)
-        {
-            System.Console.WriteLine();
-        }
-
         if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal"))
         {
+            foreach (User user in users)
 
-        } // active_user check whos currently logged in. GetRole (a method to call on active user to return their Role in this case Role is representing Patient.)
+            {
+                if (user.GetRole() == Role.Patient)
+                {
+                    System.Console.WriteLine(user.Username);
+                }
+            }
 
-    }
+            string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+
+            IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+            if (patientUser != null)
+            {
+                System.Console.WriteLine();
+            }
+
+
+
+            {
+
+            } // active_user check whos currently logged in. GetRole (a method to call on active user to return their Role in this case Role is representing Patient.)
+
+        }
 
     //     Console.WriteLine("Type in the UserID for the one you want to see the journal");
     //     Role.Patient = Console.ReadLine();
