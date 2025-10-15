@@ -16,6 +16,8 @@ namespace App
         None,
         AddRegistrations,
         AddLocation,
+        ViewPatientJournal,
+        ViewAllJournals,
     }
 
     public enum Registration // Enum för början av registrerings processen

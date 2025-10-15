@@ -423,12 +423,13 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
-static void PersonnelMenu(IUser active_user, List<IUser> users)
+static void PersonnelMenu(IUser activeUser, List<IUser> users)
 {
     Console.WriteLine("\n(Personnel) Menu Choices:");
     Console.WriteLine("1. See schedule");
     Console.WriteLine("2. Accept booking (mock)");
     Console.WriteLine("3. View Patient journal entries"); /////////
+    Console.WriteLine("4. Register Appointments");
     string input = Utils.GetRequiredInput("Choice: ");
 
     if (input == "1")
@@ -441,23 +442,59 @@ static void PersonnelMenu(IUser active_user, List<IUser> users)
     }
     else if (input == "3") ////////
 
-        if (active_user.GetRole() == Role.Patient) //////////
+    {
+        foreach (User user in users)
 
         {
-            foreach (User user in users.Where(user => user.GetRole() == Role.Patient)) // Loopar igenom varje User i Users hittar
+            if (user.GetRole() == Role.Patient)
             {
-                Console.WriteLine($"Journal Entries for {Role.Patient}");///////
-                // Skicka in user ID till appointment check eller något?""
-                // När jag får ut alla appointments gör en foreach på varje appointment
-                //
-                /*foreach (Appointment in PatientMenu) *
-
-                {
-                    Console.WriteLine(Appointment)
-                }*/
-
+                System.Console.WriteLine(user.Username);
             }
         }
+
+        string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+        IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+        if (patientUser != null)
+        {
+            System.Console.WriteLine();
+        }
+
+        if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal"))
+        {
+
+        } // active_user check whos currently logged in. GetRole (a method to call on active user to return their Role in this case Role is representing Patient.)
+
+    }
+
+    //     Console.WriteLine("Type in the UserID for the one you want to see the journal");
+    //     Role.Patient = Console.ReadLine();
+    // {
+    //     foreach (User user in users.Where(user => user.GetRole() == Role.Patient)) // Looping through user in users .Where (LINQ filter) -> only get items that match a condition
+    //     {                                                                           //  User=> user.Getrole = check is their role equal to patient?
+    //         Console.WriteLine($"Journal Entries for {Role.Patient}");               // Telling that this are the journal entries for all the Patient Roles.
+    //     foreach (Appointment appointment in appointments)                       // for each appointment in appointments
+    //     {
+    //         Console.WriteLine($"Patient ID: {appointment.UserId}");             // Tell me the PatientID and journal information in the appointments
+    //     }
+    // else
+    //     {
+    //         GetIntegerInput("Not accepteble input. User only numbers.Try again: ");
+
+    //     }
+
+
+
+    // Skicka in user ID till appointment check eller något?""
+    // När jag får ut alla appointments gör en foreach på varje appointment
+
+    //14 As personnel with sufficient permissions, I need to be able to view a patients journal entries.
+    //16 As personnel with sufficient permissions, I need to be able to register appointments.
+    /*foreach (Appointment in PatientMenu) *
+
+    {
+        Console.WriteLine(Appointment)
+    }*/
+
 }
 
 
