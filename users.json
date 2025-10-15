@@ -29,7 +29,8 @@
     "Role": "Admin",
     "Registration": "Pending",
     "PermissionList": [
-      "None"
+      "None",
+      "AddPersonell"
     ]
   },
   {
