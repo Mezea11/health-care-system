@@ -6,8 +6,8 @@ namespace App
         public string Username { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
         public string PasswordSalt { get; set; } = string.Empty;
-        public Role Role { get; private set; }
-        public Registration Registration { get; private set; }
+        public Role Role { get; set; }
+        public Registration Registration { get; set; }
 
         public List<Permissions> PermissionList { get; private set; } = new List<Permissions> { Permissions.None };
         public User(int id, string username, string password, Role role)
