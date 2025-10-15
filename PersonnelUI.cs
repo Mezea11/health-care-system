@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using App;
 
 namespace App
 {
@@ -131,8 +133,14 @@ namespace App
       {
         string newText = Utils.GetRequiredInput("Enter new journal text: ");
         journalService.AddEntry(selectedId, activeUser.Username, newText);
+
+        // Send notify's
+        var notifier = new NotificationService();
+        notifier.NotifyPatient(selectedId, $"Your journal has been updated by {activeUser.Username}.");
+
         Utils.DisplaySuccesText("Entry added successfully!");
       }
+
 
       Console.WriteLine("\nPress any key to return to menu...");
       Console.ReadKey();

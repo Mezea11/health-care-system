@@ -89,4 +89,12 @@ public class JournalService
     journal.Entries.Add(new JournalEntry(author, text));
     SaveJournals();
   }
+  public class NotificationService
+  {
+    public void NotifyPatient(int patientId, string message)
+    {
+      //Mock notis for now
+      Console.WriteLine($"\n[NOTIFICATION] Patient #{patientId}: {message}\n");
+    }
+  }
 }
