@@ -16,8 +16,9 @@ namespace App
             Password = password;
             this.role = role;
             Id = id;
+            
+            registration = (role == Role.Patient || role == Role.Admin)? Registration.Pending: Registration.Accepted;
 
-            registration = role == Role.Patient ? Registration.Pending : Registration.Accepted;
             PermissionList = new List<Permissions> { Permissions.None };
         }
 
@@ -77,6 +78,19 @@ namespace App
         public void DenyAddPersonellPermission()
         {
             PermissionList.Remove(Permissions.AddPersonell);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
+
+           public void AcceptViewPermissions()
+        {
+            if (!PermissionList.Contains(Permissions.ViewPermissions))
+                PermissionList.Add(Permissions.ViewPermissions);
+        }
+
+        public void DenyViewPermissions()
+        {
+            PermissionList.Remove(Permissions.ViewPermissions);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }
