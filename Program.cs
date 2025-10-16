@@ -465,7 +465,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
             }
 
             IUser chosenAdmin = AdminList[chosenIndex];
-            Region[] regions = (Region[])Enum.GetValues(typeof(Region));
+            Region[] regions = (Region[])Enum.GetValues(typeof(Region)); // get all values from the region enum to display as selectable options
             for (int i = 0; i < regions.Length; i++)
             {
                 Console.WriteLine($"{i + 1}: {regions[i]}");
@@ -660,7 +660,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 
         case 8:
             Console.WriteLine("See my assigned region");
-            bool found = false;
+            bool found = false; //boolean created to search for a admin with true or false
             foreach (IUser user in users)
             {
                 if (user.GetRole() == Role.Admin)
@@ -668,7 +668,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     Region? region = user.GetAssignedRegion();
                     if (region == null || region == Region.None)
                     {
-                        Console.WriteLine(user.Username + " has no region assined.");
+                        Console.WriteLine(user.Username + " has no region assigned.");
                     }
                     else
                     {
