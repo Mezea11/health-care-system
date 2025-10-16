@@ -651,7 +651,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
                 if (patientUser != null)
                 {
 
-                    Console.WriteLine(users.Find);
+                    Console.WriteLine();
                     Console.ReadLine();
                 }
                 /*    else
