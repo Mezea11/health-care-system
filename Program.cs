@@ -108,7 +108,7 @@ void StartMenu(List<IUser> users)
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-                users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin)); 
+                users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
                 break;
 
             case 3:
@@ -155,7 +155,7 @@ void MainMenu()
                 Console.WriteLine("Wrong login credentials. Press enter to try again.");
                 Console.ReadLine();
             }
-            
+
         }
 
         else
@@ -380,46 +380,46 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
 
         case 5:
             {
-                
-            if (activeUser.GetRole() == Role.SuperAdmin)
-            {
-                Console.WriteLine("\nAll admins with pending request:");
-                foreach (User user in users.Where(user => user.GetRole() == Role.Admin && user.GetRegistration() == Registration.Pending))
-                {
-                    Console.WriteLine($"{user.ToString()}");
-                }
-                // Work with string get name first and after we are done we are working with index. 
-                string adminHandling = Utils.GetRequiredInput("Pick admin username you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
-                if (adminUser != null)
-                {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
-                    switch (acceptOrDeny)
-                    {
-                        case "y":
-                            adminUser.AcceptPending(); // <-- anropa metoden
-                            Utils.DisplaySuccesText("Admin registration accepted");
-                            break;
 
-                        case "d":
-                            adminUser.DenyPending();   // <-- anropa metoden
-                            Utils.DisplaySuccesText("Admin registration denied");
-                            break;
-                        default:
-                            Utils.DisplayAlertText("Only y or n is handled");
-                            break;
+                if (activeUser.GetRole() == Role.SuperAdmin)
+                {
+                    Console.WriteLine("\nAll admins with pending request:");
+                    foreach (User user in users.Where(user => user.GetRole() == Role.Admin && user.GetRegistration() == Registration.Pending))
+                    {
+                        Console.WriteLine($"{user.ToString()}");
+                    }
+                    // Work with string get name first and after we are done we are working with index. 
+                    string adminHandling = Utils.GetRequiredInput("Pick admin username you want to handle:  ");
+                    IUser? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                    if (adminUser != null)
+                    {
+                        string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
+                        switch (acceptOrDeny)
+                        {
+                            case "y":
+                                adminUser.AcceptPending(); // <-- anropa metoden
+                                Utils.DisplaySuccesText("Admin registration accepted");
+                                break;
+
+                            case "d":
+                                adminUser.DenyPending();   // <-- anropa metoden
+                                Utils.DisplaySuccesText("Admin registration denied");
+                                break;
+                            default:
+                                Utils.DisplayAlertText("Only y or n is handled");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Utils.DisplayAlertText("No admin by that name has been found");
                     }
                 }
                 else
                 {
-                    Utils.DisplayAlertText("No admin by that name has been found");
+                    Console.WriteLine("Invalid input. Please try again.");
                 }
-            }
-            else
-            {
-                Console.WriteLine("Invalid input. Please try again.");
-            }
-            break;
+                break;
             }
 
         case 6:
@@ -592,7 +592,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             {
                 System.Console.WriteLine("Access denied. Contact superadmin for permission");
             }
-           
+
             break;
 
         case 7:
@@ -616,7 +616,9 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
-        Console.WriteLine("3. Logout");
+        Console.WriteLine("3. View my schedule");
+        Console.WriteLine("4. Logout");
+
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -632,6 +634,10 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 break;
 
             case 3:
+                PersonnelUI.ViewMySchedule(activeUser);
+                break;
+
+            case 4:
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 break;
