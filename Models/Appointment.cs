@@ -16,6 +16,8 @@ public class Appointment
   public Appointment() { }
   public Registration RegistrationPending;
 
+  public bool IsApproved { get; set; } = false;
+
   //Constructor used to create a new Appointment object with all necessary details.
   //"userId" = The ID of the user who owns this appointment.
   //"date" = The date and time of the appointment.
@@ -30,6 +32,7 @@ public class Appointment
     Department = department;
     Type = type;
     RegistrationPending = Registration.Pending;
+    IsApproved = false; //Default = waiting for approval
   }
 
   //Returns a clean, formatted string representation of the appointment.
