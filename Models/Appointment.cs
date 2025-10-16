@@ -14,6 +14,8 @@ public class Appointment
   public string Type; // The type of appointment (e.g, "Checkup", "Follow-up", "Consultation).
   public Registration RegistrationPending;
 
+  public bool IsApproved { get; set; } = false;
+
   //Constructor used to create a new Appointment object with all necessary details.
   //"userId" = The ID of the user who owns this appointment.
   //"date" = The date and time of the appointment.
@@ -28,6 +30,7 @@ public class Appointment
     Department = department;
     Type = type;
     RegistrationPending = Registration.Pending;
+    IsApproved = false; //Default = waiting for approval
   }
 
   //Returns a clean, formatted string representation of the appointment.
@@ -36,6 +39,7 @@ public class Appointment
   // "Returns" = A formatted text line containing the appointment's details.
   public string Format()
   {
+    string status = IsApproved ? "Approved" : "Pending";
     //"-15" ensures the doctor and department colums are left-aligned and 15 characters wide.
     return $"Date: {Date:yyyy-MM-dd HH:mm} | Doctor: {Doctor,-15} | Location: {Department,-15} | For What: {Type}";
   }

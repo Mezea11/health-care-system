@@ -652,7 +652,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
-        Console.WriteLine("3. View my schedule");
+        Console.WriteLine("3. Approve/Deny patient appointment request");
+        Console.WriteLine("4. View my schedule");
         Console.WriteLine("4. Logout");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
@@ -668,11 +669,16 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 PersonnelUI.ModifyAppointment(users, activeUser);
                 break;
 
-            case 3:
+            case 3: //Aprove/Deny patient appointment request
+                PersonnelUI.ApproveAppointments(users, activeUser);
+                break;
+
+
+            case 4:
                 ShowSchedule(activeUser);
                 break;
 
-            case 4:
+            case 5:
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 break;
