@@ -197,28 +197,28 @@ void MainMenu()
 
                 // ADMIN MENU
                 case Role.Admin:
-                    AdminMenu(users, locations, activeUser);
+                    AdminMenu(users, locations, ref activeUser);
                     break;
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu(users, activeUser);
+                    PersonnelMenu(users, ref activeUser);
                     break;
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu(activeUser);
+                    PatientMenu(ref activeUser);
                     break;
 
                 // SUPERADMIN MENU
                 case Role.SuperAdmin:
-                    SuperAdminMenu(users, locations, activeUser);
+                    SuperAdminMenu(users, locations, ref activeUser);
                     break;
 
             }
-            Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-            string input = Console.ReadLine() ?? "".Trim();
-            if (input == "logout") activeUser = null;
+            // Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
+            // string input = Console.ReadLine() ?? "".Trim();
+            // if (input == "logout") activeUser = null;
         }
     }
 }
@@ -228,7 +228,7 @@ void MainMenu()
 // ============================
 // SUPERADMIN MENU METHOD
 // ============================
-static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
+static void SuperAdminMenu(List<IUser> users, List<Location> locations, ref IUser activeUser)
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
@@ -450,6 +450,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
         case 7:
             Console.WriteLine("Logging out...");
             FileHandler.SaveUsersToJson(users);
+
             activeUser = null;
             break;
         default:
@@ -463,7 +464,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
+static void AdminMenu(List<IUser> users, List<Location> locations, ref IUser activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -643,7 +644,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
-static void PersonnelMenu(List<IUser> users, IUser activeUser)
+static void PersonnelMenu(List<IUser> users, ref IUser activeUser)
 {
     bool inMenu = true;
     while (inMenu)
@@ -654,7 +655,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
         Console.WriteLine("3. Approve/Deny patient appointment request");
         Console.WriteLine("4. View my schedule");
-        Console.WriteLine("4. Logout");
+        Console.WriteLine("5. Logout");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -680,6 +681,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
 
             case 5:
                 Console.WriteLine("Logging out...");
+
+                activeUser = null;
                 inMenu = false;
                 break;
 
@@ -695,7 +698,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu(IUser activeUser)
+static void PatientMenu(ref IUser activeUser)
 {
     // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
@@ -853,6 +856,7 @@ static void PatientMenu(IUser activeUser)
             case 7:
                 Console.WriteLine("Logging out...");
                 inMenu = false;
+                activeUser = null;
                 break;
 
             default:
