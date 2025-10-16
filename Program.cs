@@ -262,12 +262,12 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.AcceptAddLocationPermission(); // <-- anropa metoden
+                            adminUser.GrantPermission(Permissions.AddLocation); // <-- anropa metoden
                             Utils.DisplaySuccesText($"You have accepted the permission add a location to admin user: {adminName}");
                             break;
 
                         case "d":
-                            adminUser.DenyAddLocationPermission();   // <-- anropa metoden
+                            adminUser.RevokePermission(Permissions.AddLocation);   // <-- anropa metoden
                             Utils.DisplaySuccesText("You have denied the permission");
                             break;
                         default:
@@ -301,12 +301,12 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.AcceptAddRegistrationsPermission(); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            adminUser.GrantPermission(Permissions.AddRegistrations); // <-- anropa metoden, lägg till permission till listan över permission för den admin
                             Utils.DisplaySuccesText($"You have accepted the permission handle registrations for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.DenyAddRegistrationsPermission();   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            adminUser.RevokePermission(Permissions.AddRegistrations);   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
                             Utils.DisplaySuccesText($"You have denied permission handle registrations for user: {adminName} ");
                             break;
                         default:
@@ -340,12 +340,12 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.AcceptAddPersonellPermission(); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            adminUser.GrantPermission(Permissions.AddPersonell); // <-- anropa metoden, lägg till permission till listan över permission för den admin
                             Utils.DisplaySuccesText($"You have accepted the permission to create personel for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.DenyAddPersonellPermission();   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            adminUser.GrantPermission(Permissions.AddPersonell);   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
                             Utils.DisplaySuccesText($"You have denied permission create personel for user: {adminName} ");
                             break;
                         default:
@@ -379,12 +379,12 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.AcceptViewPermissions(); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            adminUser.GrantPermission(Permissions.AddAdmin); // <-- anropa metoden, lägg till permission till listan över permission för den admin
                             Utils.DisplaySuccesText($"You have accepted the permission to view all user permissions for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.DenyViewPermissions();   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            adminUser.GrantPermission(Permissions.AddAdmin);   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
                             Utils.DisplaySuccesText($"You have denied permission to view all user permissions for user: {adminName} ");
                             break;
                         default:
@@ -479,11 +479,11 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     {
         case 1:
             Console.WriteLine("Create account for personel and admin");
-            if (activeUser.HasPermission("AddPersonell"))
+            if (activeUser.HasPermission(Permissions.AddPersonell))
             {
                 Console.WriteLine("(1). Create account for Personell");
             }
-            if (activeUser.HasPermission("AddAdmin"))
+            if (activeUser.HasPermission(Permissions.AddAdmin))
             {
                 Console.WriteLine("(2). Create account for Admin");
             }
@@ -492,7 +492,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             switch (Utils.GetIntegerInput("Choose a number: "))
             {
                 case 1:
-                    if (!activeUser.HasPermission("AddPersonell"))
+                    if (!activeUser.HasPermission(Permissions.AddPersonell))
                     {
                         Utils.DisplayAlertText("You cant do that.");
                         break;
@@ -513,7 +513,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     break;
                 case 2:
-                    if (!activeUser.HasPermission("AddAdmin"))
+                    if (!activeUser.HasPermission(Permissions.AddAdmin))
                     {
                         Utils.DisplayAlertText("You cant do that.");
                         break;
@@ -538,7 +538,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             break;
         case 3:
 
-            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission("AddLocation"))
+            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission(Permissions.AddLocation))
             {
                 Console.WriteLine("Please enter the region of the location you wish to add: ");
                 string region = Console.ReadLine() ?? "".Trim();
@@ -566,7 +566,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
         case 5:
             // bool found = activeUser
             // if(activeUser.GetPermission("addLoc"))
-            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission("AddRegistrations"))
+            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission(Permissions.AddRegistrations))
             {
 
 
@@ -608,7 +608,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             }
             break;
         case 6:
-            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission("ViewPermissions"))
+            if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission(Permissions.ViewPermissions))
             {
                 Console.WriteLine($"\nAll users:");
                 foreach (var user in users)
