@@ -7,6 +7,7 @@ namespace App
         public string PasswordHash { get; set; } = string.Empty;
         public string PasswordSalt { get; set; } = string.Empty;
         public Role Role { get; set; }
+        public PersonellRoles PersonelRole { get; set; }
         public Registration Registration { get; set; }
         public List<Permissions> PermissionList { get; set; } = new List<Permissions> { Permissions.None };
 
@@ -26,6 +27,24 @@ namespace App
                 : Registration.Accepted;
 
             // ApplyRolePermissions();
+        }
+
+
+        public void SetRolePersonell(int handleRole)
+        {
+            Console.WriteLine(handleRole);
+            // Kontrollera att användaren faktiskt är "Personnel" innan du sätter en specifik roll
+            // if (Role == Role.Personnel)
+            // {
+            //     PersonelRole = role;
+            //     // Här kan du eventuellt lägga till logik för att uppdatera rättigheter baserat på den nya PersonellRoles
+            //     // T.ex. ApplyPersonellRolePermissions();
+            // }
+            // else
+            // {
+            //     // Valfri logik: kasta ett undantag eller logga om man försöker sätta en personalroll på en icke-personal användare.
+            //     // Exempel: throw new InvalidOperationException("Kan inte sätta personalroll på en icke-personal användare.");
+            // }
         }
 
         // Parameterlös konstruktor för JSON
@@ -48,6 +67,11 @@ namespace App
             => Username == username &&
                PasswordHelper.VerifyPassword(password, PasswordHash, PasswordSalt);
 
+
+        public void setRolePersonell()
+        {
+
+        }
         public void AcceptPending() => Registration = Registration.Accepted;
         public void DenyPending() => Registration = Registration.Denied;
 

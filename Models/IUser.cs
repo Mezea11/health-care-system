@@ -10,7 +10,13 @@ namespace App
         Personnel,
         Admin,
         SuperAdmin,
+    }
 
+    public enum PersonellRoles
+    {
+        Doctor,
+        Nurse,
+        Administrator,
     }
     public enum Permissions
     {
@@ -39,28 +45,21 @@ namespace App
         string Username { get; }
         // string Password { get; }
         // Store hashed password and salt instead of plain text and remove password
-
+        string PasswordHash { get; }
+        string PasswordSalt { get; }
         void GrantPermission(Permissions perm);
         void RevokePermission(Permissions perm);
         bool HasPermission(string permissionName);
         bool HasPermission(Permissions permission);
-        string PasswordHash { get; }
-        string PasswordSalt { get; }
+
         Role GetRole();
         Registration GetRegistration();
+        PersonellRoles PersonelRole { get; }
+        void SetRolePersonell(int handleRole);
         List<Permissions> PermissionList { get; }
         bool TryLogin(string username, string password);
         void AcceptPending();
         void DenyPending();
-        // void AcceptAddLocationPermission();
-        // void DenyAddLocationPermission();
-        // void AcceptAddRegistrationsPermission();
-        // void DenyAddRegistrationsPermission();
-        // void AcceptAddPersonellPermission();
-        // void DenyAddPersonellPermission();
-
-        // void AcceptViewPermissions();
-        // void DenyViewPermissions();
     }
 
 }
