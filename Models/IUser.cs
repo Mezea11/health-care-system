@@ -5,6 +5,7 @@ namespace App
     // =================================
     public enum Role
     {
+        None,
         Patient,
         Personnel,
         Admin,
@@ -40,6 +41,7 @@ namespace App
         Role GetRole();
         Registration GetRegistration();
         List<Permissions> PermissionList { get; }
+        string SaveData();
         bool TryLogin(string username, string password);
         void AcceptPending();
         void DenyPending();
