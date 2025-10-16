@@ -14,10 +14,12 @@ namespace App
 
     public enum PersonellRoles
     {
+        None = 0, // Lägg till detta!
         Doctor,
         Nurse,
         Administrator,
     }
+
     public enum Permissions
     {
         None,
@@ -55,7 +57,7 @@ namespace App
         Role GetRole();
         Registration GetRegistration();
         PersonellRoles PersonelRole { get; }
-        void SetRolePersonell(int handleRole);
+        void SetRolePersonell(int handleRole, IUser persObj);
         List<Permissions> PermissionList { get; }
         bool TryLogin(string username, string password);
         void AcceptPending();
