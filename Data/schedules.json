@@ -1,3 +1,9 @@
 [
-  {}
+  {
+    "UserId": 0,
+    "Date": "2025-11-15T13:00:00",
+    "Doctor": "Smith",
+    "Department": "Malm\u00F6",
+    "Type": "Knee"
+  }
 ]

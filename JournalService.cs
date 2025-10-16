@@ -45,7 +45,7 @@ public class PatientJournal
 
 public class JournalService
 {
-  private string _filePath = "Date/journals.json";
+  private string _filePath = "Data/journals.json";
   private List<PatientJournal> _journals = new List<PatientJournal>();
 
   public JournalService()
@@ -61,6 +61,13 @@ public class JournalService
       return;
     }
     string json = File.ReadAllText(_filePath);
+
+    //Ensures it work if empty file
+    if (string.IsNullOrWhiteSpace(json))
+    {
+      _journals = new List<PatientJournal>();
+      return;
+    }
     _journals = JsonSerializer.Deserialize<List<PatientJournal>>(json) ?? new List<PatientJournal>();
   }
   //Save all journals to JSON
