@@ -1,12 +1,67 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using App;
 
 namespace App
 {
   // UI logic for personnel
   public static class PersonnelUI
   {
+    public static void ApproveAppointments(List<IUser> users, IUser activeUser)
+    {
+      Console.Clear();
+      Console.WriteLine($"--- Approve or Deny Appointment Request (Personnel: {activeUser.Username} ---\n)");
+
+      var scheduleService = new ScheduleService();
+      var allAppointments = scheduleService.LoadAllAppointments();
+
+      //Filter only pending (not approved)
+      var pending = allAppointments.Where(a => !a.IsApproved).ToList();
+
+      if (pending.Count == 0)
+      {
+        Utils.DisplayAlertText("There are no pending appointments.");
+        Console.ReadKey();
+        return;
+      }
+      //List all pending appointments
+      for (int i = 0; i < pending.Count; i++)
+      {
+        var appt = pending[i];
+        var patient = users.FirstOrDefault(u => u.Id == appt.UserId);
+        string patientName = patient != null ? patient.Username : $"Unknow (ID {appt.UserId})";
+        Console.WriteLine($"{i + 1}. {patientName} - {appt.Format()}");
+      }
+      int choice = Utils.GetIntegerInput("\nSelect appointment to review (0 to cancel): ");
+      if (choice == 0 || choice > pending.Count)
+        return;
+
+      var selected = pending[choice - 1];
+
+      Console.WriteLine("\nSelected: {selected.Formart()}");
+      Console.WriteLine("Approve (A) or Deny (D)?");
+      string action = Console.ReadLine()?.Trim().ToLower() ?? "";
+
+      if (action == "a")
+      {
+        selected.IsApproved = true;
+        scheduleService.SaveAppointment(selected);
+        Utils.DisplaySuccesText("Appointment approved!");
+      }
+      else if (action == "d")
+      {
+        scheduleService.RemoveAppointment(selected);
+        Utils.DisplayAlertText("Appointment denied and removed.");
+      }
+      else
+      {
+        Utils.DisplayAlertText("Invalid choice. Returning to menu...");
+      }
+      Console.WriteLine("\nPress any key to return...");
+      Console.ReadKey();
+    }
     public static void ModifyAppointment(List<IUser> users, IUser activeUser)
     {
       Console.Clear();
@@ -131,8 +186,14 @@ namespace App
       {
         string newText = Utils.GetRequiredInput("Enter new journal text: ");
         journalService.AddEntry(selectedId, activeUser.Username, newText);
+
+        // Send notify's
+        var notifier = new NotificationService();
+        notifier.NotifyPatient(selectedId, $"Your journal has been updated by {activeUser.Username}.");
+
         Utils.DisplaySuccesText("Entry added successfully!");
       }
+
 
       Console.WriteLine("\nPress any key to return to menu...");
       Console.ReadKey();
