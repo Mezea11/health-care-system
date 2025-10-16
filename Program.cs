@@ -221,7 +221,6 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
     Console.WriteLine("1. Grant admin to add location");
     Console.WriteLine("2. Overview of permissions");
     Console.WriteLine("3. Grant admin to handle registrations");
-
     Console.WriteLine("4. Grant admin to create personel");
     Console.WriteLine("5. Grant admin to check list of user permissions");
     Console.WriteLine("6. See pending admin registration requests");
@@ -465,7 +464,25 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 break;
             }
 
+            IUser chosenAdmin = AdminList[chosenIndex];
+            Region[] regions = (Region[])Enum.GetValues(typeof(Region));
+            for (int i = 0; i < regions.Length; i++)
+            {
+                Console.WriteLine($"{i + 1}: {regions[i]}");
+            }
+
+            int regionChoice = Utils.GetIntegerInput($"Choose a region for {chosenAdmin.Username}: ") - 1;
+            if (regionChoice < 0 || regionChoice >= regions.Length)
+            {
+                Utils.DisplayAlertText("Invalid region choice.");
+                break;
+            }
+
+            Region selectedRegion = regions[regionChoice];
+            chosenAdmin.AssignRegion(selectedRegion);
+            Utils.DisplaySuccesText(chosenAdmin.Username + " has been assigned to region: " + selectedRegion);
             break;
+
         case 8:
             Console.WriteLine("Logging out...");
             activeUser = null;
@@ -491,7 +508,8 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     Console.WriteLine("4. View all locations");
     Console.WriteLine("5. See pending patient request");
     Console.WriteLine($"6. See user permissions");
-    Console.WriteLine("7. Logout");
+    Console.WriteLine("8. View my regions"); // kommer att ändras vid merge.
+    Console.WriteLine("9. Logout");
 
     switch (Utils.GetIntegerInput("Choice:"))
     {
@@ -640,7 +658,33 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 
             break;
 
-        case 7:
+        case 8:
+            Console.WriteLine("See my assigned region");
+            bool found = false;
+            foreach (IUser user in users)
+            {
+                if (user.GetRole() == Role.Admin)
+                {
+                    Region? region = user.GetAssignedRegion();
+                    if (region == null || region == Region.None)
+                    {
+                        Console.WriteLine(user.Username + " has no region assined.");
+                    }
+                    else
+                    {
+                        Console.WriteLine(user.Username + " is assigned to region: " + region);
+                    }
+
+                    found = true;
+                }
+            }
+            if (!found)
+            {
+                Utils.DisplayAlertText("No admins found");
+            }
+            break;
+
+        case 9:
             Console.WriteLine("Logging out...");
             activeUser = null;
             break;

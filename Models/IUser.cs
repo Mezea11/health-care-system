@@ -61,6 +61,8 @@ namespace App
         void AcceptViewPermissions();
         void DenyViewPermissions();
         bool HasPermission(string permissionName);
+        void AssignRegion(Region region);
+        Region? GetAssignedRegion();
     }
 
 }
