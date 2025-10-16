@@ -1,48 +1,36 @@
 namespace App
 {
-    class User : IUser
+    public class User : IUser
     {
+        public int Id { get; private set; }
         public string Username { get; private set; }
         public string Password { get; private set; }
-        public int Id { get; private set; }
-        private Role role;
-        private Registration registration;
+
+        public Role Role { get; private set; }
+        public Registration Registration { get; private set; }
 
         public List<Permissions> PermissionList { get; private set; }
 
         public User(int id, string username, string password, Role role)
         {
+            Id = id;
             Username = username;
             Password = password;
-            this.role = role;
-            Id = id;
+            Role = role;
 
-            registration = (role == Role.Patient || role == Role.Admin) ? Registration.Pending : Registration.Accepted;
+            Registration = (role == Role.Patient || role == Role.Admin)
+                ? Registration.Pending
+                : Registration.Accepted;
 
             PermissionList = new List<Permissions> { Permissions.None };
         }
 
-        public Role GetRole() => role;
-        public Registration GetRegistration() => registration;
+        // === Interface-krav ===
+        public Role GetRole() => Role;
+        public Registration GetRegistration() => Registration;
 
-        public bool TryLogin(string username, string password)
-            => Username == username && Password == password;
-
-        public void AcceptPending() => registration = Registration.Accepted;
-        public void DenyPending() => registration = Registration.Denied;
-
-        public void AcceptAddLocationPermission()
-        {
-            if (!PermissionList.Contains(Permissions.AddLocation))
-                PermissionList.Add(Permissions.AddLocation);
-        }
-
-        public void DenyAddLocationPermission()
-        {
-            PermissionList.Remove(Permissions.AddLocation);
-            if (PermissionList.Count == 0)
-                PermissionList.Add(Permissions.None);
-        }
+        public string SaveData()
+            => $"ID: {Id}, Username: {Username}, Password: {Password}, Role: {Role}, Registration: {Registration}, Permissions: {string.Join(", ", PermissionList)}";
 
         public void AcceptAddRegistrationsPermission()
         {
@@ -53,6 +41,19 @@ namespace App
         public void DenyAddRegistrationsPermission()
         {
             PermissionList.Remove(Permissions.AddRegistrations);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
+
+        public void AcceptAddLocationPermission()
+        {
+            if (!PermissionList.Contains(Permissions.AddLocation))
+                PermissionList.Add(Permissions.AddLocation);
+        }
+
+        public void DenyAddLocationPermission()
+        {
+            PermissionList.Remove(Permissions.AddLocation);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }
@@ -83,6 +84,13 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
+        // === Extra funktioner ===
+        public bool TryLogin(string username, string password)
+            => Username == username && Password == password;
+
+        public void AcceptPending() => Registration = Registration.Accepted;
+        public void DenyPending() => Registration = Registration.Denied;
+
         public bool HasPermission(string permissionName)
         {
             if (Enum.TryParse<Permissions>(permissionName, true, out var perm))
@@ -92,6 +100,6 @@ namespace App
         }
 
         public override string ToString()
-            => $"Username: {Username}, Role: {role}, Registration: {registration}, Permissions: {string.Join(", ", PermissionList)}";
+            => $"ID: {Id}, Username: {Username}, Role: {Role}, Registration: {Registration}, Permissions: {string.Join(", ", PermissionList)}";
     }
 }
