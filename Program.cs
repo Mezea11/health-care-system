@@ -105,10 +105,10 @@ void StartMenu(List<IUser> users)
 
                 Console.WriteLine("Request Sent.");
                 users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
-<<<<<<< HEAD
-=======
+
+
                 FileHandler.SaveUsersToJson(users);
->>>>>>> master
+
                 break;
 
             case 3:
@@ -644,15 +644,14 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 
 }
 
-<<<<<<< HEAD
-static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
-=======
+
 
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
-static void PersonnelMenu(List<IUser> users, IUser activeUser)
->>>>>>> master
+
+static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
+
 {
     bool inMenu = true;
     while (inMenu)
@@ -661,13 +660,13 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
-<<<<<<< HEAD
+
         Console.WriteLine("3. View patient journals");
-=======
-        Console.WriteLine("3. Approve/Deny patient appointment request");
-        Console.WriteLine("4. View my schedule");
->>>>>>> master
-        Console.WriteLine("4. Logout");
+
+        Console.WriteLine("4. Approve/Deny patient appointment request");
+        Console.WriteLine("5. View my schedule");
+
+        Console.WriteLine("6. Logout");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -682,7 +681,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 PersonnelUI.ModifyAppointment(users, activeUser);
                 break;
 
-<<<<<<< HEAD
+
             case 3:
                 /* if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal"))
                 { */
@@ -713,19 +712,19 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                     Console.WriteLine("Access denied. Contact superadmin for permission");
                 }
                 break;
-            case 4:
-=======
-            case 3: //Aprove/Deny patient appointment request
+
+
+            case 4: //Aprove/Deny patient appointment request
                 PersonnelUI.ApproveAppointments(users, activeUser);
                 break;
 
 
-            case 4:
+            case 5:
                 ShowSchedule(activeUser);
                 break;
 
-            case 5:
->>>>>>> master
+            case 6:
+
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 break;
