@@ -455,7 +455,8 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
         case 7:
             Console.WriteLine("Logging out...");
             FileHandler.SaveUsersToJson(users);
-            activeUser = null;
+
+
             break;
         default:
             Utils.DisplayAlertText("Invalid input. Please try again.");
@@ -660,13 +661,11 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
-
         Console.WriteLine("3. View patient journals");
-
         Console.WriteLine("4. Approve/Deny patient appointment request");
         Console.WriteLine("5. View my schedule");
-
         Console.WriteLine("6. Logout");
+
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -681,7 +680,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
                 PersonnelUI.ModifyAppointment(users, activeUser);
                 break;
 
-
+            // VIEW A PATIENT JOURNAL
             case 3:
                 /* if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal"))
                 { */
@@ -692,24 +691,20 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
                         Console.WriteLine(user.Username);
                     }
                 }
-
                 // Work with string get name first and after we are done we are working with index. 
                 string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
                 IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
                 if (patientUser != null)
                 {
-
-                    Console.WriteLine();
+                    Console.WriteLine(patientUser);
                     Console.ReadLine();
+                    Console.WriteLine("Press enter to continue");
                 }
-                /*    else
-                   {
-                       Utils.DisplayAlertText("No patient by that name has been found");
-                   } */
-                /* } */
+
+
                 else
                 {
-                    Console.WriteLine("Access denied. Contact superadmin for permission");
+                    Utils.DisplayAlertText("No patient by that name has been found");
                 }
                 break;
 
@@ -732,6 +727,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
             default:
                 Utils.DisplayAlertText("Invalid option. Please try again.");
                 break;
+
+
 
         }
     }
