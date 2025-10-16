@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using App;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
-using App;
 /* 
 
 -- SAVE AND MOCK DATA TO TEXT FILES --
@@ -478,7 +478,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     switch (Utils.GetIntegerInput("Choice:"))
     {
         case 1:
-            Console.WriteLine("Create account for personel and admin");
+            Console.WriteLine("Create account for personel or admin");
             if (activeUser.HasPermission(Permissions.AddPersonell))
             {
                 Console.WriteLine("(1). Create account for Personell");
@@ -499,17 +499,37 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        Console.WriteLine("Create new Personel account");
                         string newUser = Utils.GetRequiredInput("Insert username: ");
-                        Console.Write("Insert password: ");
+                        // string newUser = Utils.GetRequiredInput("Insert username: ");
+                        // Console.Write("Insert password: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
-                        int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
-                        Role role = Role.Patient;
-                        if (roleInput == 2) role = Role.Personnel;
-                        else if (roleInput == 3) role = Role.Admin;
+                        // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
 
-                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, role));
-                        FileHandler.SaveUsersToJson(users);
-                        Utils.DisplaySuccesText("New user created. ");
+                        // Role role = Role.Personel;
+                        // if (roleInput == 2) role = Role.Personnel;
+                        // else if (roleInput == 3) role = Role.Admin;
+                        // create a new user as a role Personell. We need to set a personell role to the object also
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personell));
+                        IUser UserLastCreated = users.LastOrDefault();
+                        Console.WriteLine(UserLastCreated.ToString());
+                        UserLastCreated.SetRolePersonell(Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. |Choose a number: "));
+                        // switch (setRoleForPersonell)
+                        // {
+                        //     case 1:
+
+                        //         break;
+                        //     case 2:
+                        //         break;
+                        //     case 3:
+                        //         break;
+
+                        // }
+
+
+
+                        // FileHandler.SaveUsersToJson(users);
+                        // Utils.DisplaySuccesText("New user created. ");
                     }
                     break;
                 case 2:
@@ -520,6 +540,20 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        Console.WriteLine("Create new Personel account");
+                        string newUser = Utils.GetRequiredInput("Insert username: ");
+                        // string newUser = Utils.GetRequiredInput("Insert username: ");
+                        // Console.Write("Insert password: ");
+                        string newPass = Utils.GetRequiredInput("Insert password: ");
+                        // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
+
+                        Role role = Role.Admin;
+                        // if (roleInput == 2) role = Role.Personnel;
+                        // else if (roleInput == 3) role = Role.Admin;
+
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, role));
+                        // FileHandler.SaveUsersToJson(users);
+                        // Utils.DisplaySuccesText("New user created. ");
 
                     }
                     break;
