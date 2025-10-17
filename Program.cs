@@ -688,13 +688,25 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
                 break;
 
             case 8:
+
+                // Loop All users in User
                 foreach (User user in users)
+
                 {
                     Console.WriteLine(user);
                 }
-                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
-                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
 
+                // Input går in och sparas i patientHandling
+                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
+                // Searching through list of users and picks out the one that was saved in patienthandling aaaaand then saving it to patientUser
+                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+                // users -> a list<User> your collection of all users
+                //.Find A method that returns the FIRST MATCH based on condition, Returns Null if no match is found
+                // user => "lambda expression" short inline function.
+                // // user.Username.Equals() checks if the current users username equals the input
+                // Patienthandling the input user typed in earlier, the username they want to find
+                // stringComarison.OrdinalIgnoreCase Makes the comparison case-insensetive (so "Alice matches alice)
+                // Iuser patientUser
                 if (patientUser != null)
                 {
 
@@ -703,15 +715,25 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
                     string dateInput = Utils.GetRequiredInput("Date and time, format (yyyy-MM-dd HH:mm):");
 
                     if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                    //Tries to convert a string into a DateTime using exact format
+                    //dateInput = users input string
+                    //null =? culture info?
+                    //DatetimeStyles.none = no special parsing rules applied
+                    // out DATETIME APPOINTMENTDATE  if parsing succeed store in appointmentDate
                     {
                         Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
                         Console.ReadKey();
                         break;
                     }
 
-
+                    //Add a new appointment in NEWAPP with the () things inside.
                     Appointment newAppointment = new Appointment(patientUser.Id, appointmentDate, "", department, type);
+
+                    //scheduleS an object responsible for handling appointment logic such as sacing, loading or update appointments
+                    // saveAppointment() a method that accepts an appointment and stores it
+                    // newAppo the actual appointment youre trying to save
                     scheduleService.SaveAppointment(newAppointment);
+
 
                     Utils.DisplaySuccesText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
                     Console.ReadKey();
@@ -721,35 +743,6 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
                     //To can choose the user I want
                     // After choosing coming up options to schedule appointment with text and date
                     //Hantera doktorer
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                 }
                 break;
