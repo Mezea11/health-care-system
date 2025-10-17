@@ -51,8 +51,12 @@ namespace App
     // ==========================================
     // Saves (or appends) a new appointment to the JSON file.
     // ==========================================
+
+    //a public method that takes in one Appointment object
+    // its job is to save this appointment to a file, so it's not lost when the app closes
     public void SaveAppointment(Appointment appointment)
     {
+
       if (!Directory.Exists("Data"))
         Directory.CreateDirectory("Data");
 
