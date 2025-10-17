@@ -8,10 +8,10 @@ namespace App
   {
     // Mock dictionary of personnel assignments: personnel ID -> list of patient IDs
     static Dictionary<int, List<int>> AssignedPatients = new Dictionary<int, List<int>>()
-        {
-            {2, new List<int> {5, 6}},
-            {3, new List<int> {7}}
-        };
+    {
+        { 2, new List<int> { 5, 6 } },
+        { 3, new List<int> { 7 } }
+    };
 
     // =========================================
     // Modify a patient's appointment
@@ -153,13 +153,11 @@ namespace App
 
       var scheduleService = new ScheduleService();
 
-      // Load all appointments for this personnel
       var allAppointments = scheduleService.LoadAllAppointments()
           .Where(a => a.PersonnelId == activeUser.Id)
           .OrderBy(a => a.Date)
           .ToList();
 
-      // Load shifts
       var shifts = scheduleService.LoadShiftsForPersonnel(activeUser.Id)
           .OrderBy(s => s.Start)
           .ToList();
@@ -179,10 +177,37 @@ namespace App
         Console.WriteLine($"\nShift: {shift.Start:yyyy-MM-dd HH:mm} - {shift.End:HH:mm}");
         Console.ResetColor();
 
+        var colleagues = scheduleService.GetColleaguesForShift(shift);
+        if (colleagues.Any())
+        {
+          Console.ForegroundColor = ConsoleColor.DarkCyan;
+          Console.WriteLine("👥 Colleagues working this shift:");
+          Console.ResetColor();
+
+          foreach (var c in colleagues)
+            Console.WriteLine($"   - Personnel ID: {c.PersonnelId} ({c.Start:HH:mm}-{c.End:HH:mm})");
+        }
+        else
+        {
+          Console.WriteLine("👤 No colleagues working this shift.");
+        }
+
         var appsInShift = allAppointments
             .Where(a => a.Date >= shift.Start && a.Date < shift.End)
             .OrderBy(a => a.Date)
             .ToList();
+
+        TimeSpan totalShiftTime = shift.End - shift.Start;
+        TimeSpan bookedTime = TimeSpan.FromMinutes(appsInShift.Count * 30);
+        TimeSpan freeTime = totalShiftTime - bookedTime;
+
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        Console.WriteLine("\nShift Summary:");
+        Console.ResetColor();
+        Console.WriteLine($" Total Shift Time: {totalShiftTime.TotalHours:F1} hours");
+        Console.WriteLine($" Appointments: {appsInShift.Count}");
+        Console.WriteLine($" Estimated Booked Time: {bookedTime.TotalHours:F1} hours");
+        Console.WriteLine($" Free Time: {freeTime.TotalHours:F1} hours");
 
         if (!appsInShift.Any())
         {
@@ -190,19 +215,14 @@ namespace App
           continue;
         }
 
-        // Table header
-        Console.WriteLine("+----+-------------------+-----------------+-----------------+-----------+");
+        Console.WriteLine("\n+----+-------------------+-----------------+-----------------+-----------+");
         Console.WriteLine("| #  | Date & Time       | Patient         | Type            | Status    |");
         Console.WriteLine("+----+-------------------+-----------------+-----------------+-----------+");
 
         for (int i = 0; i < appsInShift.Count; i++)
         {
           var a = appsInShift[i];
-
-          // Get patient username (if needed, mock for now)
           string patientName = $"Patient {a.UserId}";
-
-          // Status color
           ConsoleColor statusColor = a.Status.ToLower() switch
           {
             "pending" => ConsoleColor.Yellow,
@@ -215,18 +235,16 @@ namespace App
           Console.WriteLine($"| {i + 1,-2} | {a.Date:yyyy-MM-dd HH:mm} | {patientName,-15} | {a.Type,-15} | {a.Status,-9} |");
           Console.ResetColor();
         }
+
         Console.WriteLine("+----+-------------------+-----------------+-----------------+-----------+");
 
-        // Interactive editing
         bool keepEditing = true;
         while (keepEditing)
         {
           Console.WriteLine("\nSelect appointment number to change status, 'n' for next shift, or 'q' to quit: ");
           string input = Console.ReadLine()?.Trim().ToLower() ?? "";
-          if (input == "q")
-            return;
-          if (input == "n")
-            break;
+          if (input == "q") return;
+          if (input == "n") break;
 
           if (int.TryParse(input, out int selectedNum) && selectedNum > 0 && selectedNum <= appsInShift.Count)
           {
@@ -249,7 +267,5 @@ namespace App
       Console.WriteLine("\nAll shifts displayed. Press any key to return...");
       Console.ReadKey();
     }
-
   }
 }
-

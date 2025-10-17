@@ -138,6 +138,33 @@ namespace App
       string json = JsonSerializer.Serialize(allShifts, new JsonSerializerOptions { WriteIndented = true });
       File.WriteAllText(_shiftsFile, json);
     }
+    public List<Shift> GetColleaguesForShift(Shift currentShift)
+    {
+      // Säkerställ att mapp finns
+      if (!Directory.Exists("Data"))
+        Directory.CreateDirectory("Data");
+
+      if (!File.Exists(_shiftsFile))
+        return new List<Shift>();
+
+      string json = File.ReadAllText(_shiftsFile);
+      if (string.IsNullOrWhiteSpace(json))
+        return new List<Shift>();
+
+      List<Shift> allShifts = JsonSerializer.Deserialize<List<Shift>>(json) ?? new List<Shift>();
+
+      // Hitta alla skift som överlappar detta skift (men inte samma personal)
+      var colleagues = allShifts
+          .Where(s => s.PersonnelId != currentShift.PersonnelId &&
+                      ((s.Start >= currentShift.Start && s.Start < currentShift.End) ||
+                       (s.End > currentShift.Start && s.End <= currentShift.End) ||
+                       (s.Start <= currentShift.Start && s.End >= currentShift.End)))
+          .OrderBy(s => s.Start)
+          .ToList();
+
+      return colleagues;
+    }
+
 
     // ===============================
     // CLASSES
@@ -148,5 +175,6 @@ namespace App
       public DateTime End { get; set; }
       public int PersonnelId { get; set; }
     }
+
   }
 }

@@ -1,4 +1,5 @@
 namespace App;
+
 class Location
 {
     public string Region { get; set; }
