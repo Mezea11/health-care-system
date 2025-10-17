@@ -654,7 +654,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
         Console.WriteLine("3. Approve/Deny patient appointment request");
         Console.WriteLine("4. View my schedule");
-        Console.WriteLine("4. Logout");
+        Console.WriteLine("5. Logout");
+        Console.WriteLine("8. Register appointments");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -683,9 +684,73 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 inMenu = false;
                 break;
 
-            default:
-                Utils.DisplayAlertText("Invalid option. Please try again.");
+            case 8:
+
+                foreach (User user in users)
+                {
+                    Console.WriteLine(user);
+                }
+                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (patientUser != null)
+
+                {
+
+                }
+
+                string User = Utils.GetRequiredInput("Doctor's name: ");
+                string department = Utils.GetRequiredInput("Department / Location: ");
+                string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
+                string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
+
+                // Validate date input
+                if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
+                    System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                {
+                    Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                    Console.ReadKey();
+                    break;
+                }
+
+                // Create and save new appointment
+                Appointment newAppointment = new Appointment(activeUser.Id, appointmentDate, doctor, department, type);
+                scheduleService.SaveAppointment(newAppointment);
+
+                Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+                Console.ReadKey();
                 break;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                // Find patient or personell  
+                // Appoint appointment time and date and to whom.
+                // Work with string get name first and after we are done we are working with index.
+                break;
+
+
+
+
+
+
+
 
         }
     }
