@@ -207,7 +207,14 @@ void MainMenu()
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu(activeUser);
+                    PatientMenu(activeUser,
+    users.Where(user =>
+        // Villkor 1: Användaren MÅSTE vara Personal
+        user.GetRole() == Role.Personnel &&
+        // Villkor 2: Personalrollen MÅSTE vara Doctor
+        user.PersonelRole == PersonellRoles.Doctor) // Eller user.GetPersonelRole() beroende på din IUser
+    .ToList());
+
                     break;
 
                 // SUPERADMIN MENU
@@ -510,26 +517,12 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                         // if (roleInput == 2) role = Role.Personnel;
                         // else if (roleInput == 3) role = Role.Admin;
                         // create a new user as a role Personell. We need to set a personell role to the object also
-                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personell));
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personnel));
                         IUser UserLastCreated = users.LastOrDefault();
+                        UserLastCreated.SetRolePersonell(Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. |Choose a number: "), UserLastCreated);
                         Console.WriteLine(UserLastCreated.ToString());
-                        UserLastCreated.SetRolePersonell(Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. |Choose a number: "));
-                        // switch (setRoleForPersonell)
-                        // {
-                        //     case 1:
-
-                        //         break;
-                        //     case 2:
-                        //         break;
-                        //     case 3:
-                        //         break;
-
-                        // }
-
-
-
-                        // FileHandler.SaveUsersToJson(users);
-                        // Utils.DisplaySuccesText("New user created. ");
+                        FileHandler.SaveUsersToJson(users);
+                        Utils.DisplaySuccesText($"New personell account for {newUser} created. ");
                     }
                     break;
                 case 2:
@@ -551,9 +544,9 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                         // if (roleInput == 2) role = Role.Personnel;
                         // else if (roleInput == 3) role = Role.Admin;
 
-                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, role));
-                        // FileHandler.SaveUsersToJson(users);
-                        // Utils.DisplaySuccesText("New user created. ");
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Admin));
+                        FileHandler.SaveUsersToJson(users);
+                        Utils.DisplaySuccesText($"New admin account for {newUser} created. ");
 
                     }
                     break;
@@ -729,7 +722,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu(IUser activeUser, List<IUser> doctors)
+static void PatientMenu(IUser activeUser, List<IUser> doctorsList)
 {
     // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
@@ -869,6 +862,12 @@ static void PatientMenu(IUser activeUser, List<IUser> doctors)
             // ==========================================
             case 5:
                 Console.WriteLine("\n--- Your Doctors ---");
+                foreach (IUser user in personnelList) // Denna loop bör fungera!
+                {
+                    Console.WriteLine($"Dr.{user.Username}");
+                }
+                Console.WriteLine("Dummy data:");
+                Console.WriteLine("Dr. Smith - Cardiology");
                 Console.WriteLine("Dr. Smith - Cardiology");
                 Console.WriteLine("Dr. Lewis - Orthopedics");
                 Console.WriteLine("Dr. Andersson - General Medicine");

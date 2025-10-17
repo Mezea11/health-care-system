@@ -30,22 +30,23 @@ namespace App
         }
 
 
-        public void SetRolePersonell(int handleRole)
+        public void SetRolePersonell(int handleRole, IUser persObj)
         {
-            Console.WriteLine(handleRole);
-            // Kontrollera att användaren faktiskt är "Personnel" innan du sätter en specifik roll
-            // if (Role == Role.Personnel)
-            // {
-            //     PersonelRole = role;
-            //     // Här kan du eventuellt lägga till logik för att uppdatera rättigheter baserat på den nya PersonellRoles
-            //     // T.ex. ApplyPersonellRolePermissions();
-            // }
-            // else
-            // {
-            //     // Valfri logik: kasta ett undantag eller logga om man försöker sätta en personalroll på en icke-personal användare.
-            //     // Exempel: throw new InvalidOperationException("Kan inte sätta personalroll på en icke-personal användare.");
-            // }
+            if (persObj.GetRole() == Role.Personnel)
+            {
+                // Kontrollera att användaren faktiskt är "Personnel" innan du sätter en specifik roll
+                if (Enum.IsDefined(typeof(PersonellRoles), handleRole))
+                {
+                    this.PersonelRole = (PersonellRoles)handleRole;
+                }
+                else
+                {
+                    // Valfri hantering för ett ogiltigt nummer
+                    Console.WriteLine($"Värdet {handleRole} är inte en giltig personalroll.");
+                }
+            }
         }
+
 
         // Parameterlös konstruktor för JSON
         public User() { }
@@ -61,6 +62,7 @@ namespace App
 
         // === Interface-krav ===
         public Role GetRole() => Role;
+
         public Registration GetRegistration() => Registration;
 
         public bool TryLogin(string username, string password)
@@ -104,6 +106,6 @@ namespace App
         //        PermissionList.Contains(perm);
 
         public override string ToString()
-            => $"ID: {Id}, Username: {Username}, Role: {Role}, Registration: {Registration}, Permissions: {string.Join(", ", PermissionList)}";
+            => $"ID: {Id}, Username: {Username}, Role: {Role}, Registration: {Registration}, Roles as Personel: {PersonelRole} Permissions: {string.Join(", ", PermissionList)}";
     }
 }
