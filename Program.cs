@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using App;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
-using App;
 /* 
 
 -- SAVE AND MOCK DATA TO TEXT FILES --
@@ -12,10 +12,10 @@ As a user, I need to be able to REQUEST registration as a patient. CHECKED
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
 As an admin with sufficient permissions, I need to be able to assign admins to certain regions.
-As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. ??? Doubles ?? 
+As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to add locations. CHECKED
-As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel. WIP
+As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what. 
 As an admin with sufficient permissions, I need to be able to add locations.
 
@@ -207,7 +207,13 @@ void MainMenu()
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu(activeUser);
+                    PatientMenu(activeUser,
+    users.Where(user =>
+        // Filter out users that dont have the role as personel and persoal role as doctor
+        user.GetRole() == Role.Personnel &&
+        user.PersonelRole == PersonellRoles.Doctor)
+    .ToList(), users); // we add the whole users list because we need it when we save to tje json file
+
                     break;
 
                 // SUPERADMIN MENU
@@ -478,7 +484,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     switch (Utils.GetIntegerInput("Choice:"))
     {
         case 1:
-            Console.WriteLine("Create account for personel and admin");
+            Console.WriteLine("Create account for personel or admin");
             if (activeUser.HasPermission(Permissions.AddPersonell))
             {
                 Console.WriteLine("(1). Create account for Personell");
@@ -499,17 +505,26 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        Console.WriteLine("Create new Personel account");
                         string newUser = Utils.GetRequiredInput("Insert username: ");
-                        Console.Write("Insert password: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
-                        int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
-                        Role role = Role.Patient;
-                        if (roleInput == 2) role = Role.Personnel;
-                        else if (roleInput == 3) role = Role.Admin;
-
-                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, role));
+                        // create a new user as a role Personell. We need to set a personell role to the object also
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personnel));
+                        IUser UserLastCreated = users.LastOrDefault();
+                        int chooseRole = Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. (Choose a number): ");
+                        string doctoDetails = "";
+                        switch (chooseRole)
+                        {
+                            case 1:
+                                doctoDetails = Utils.GetRequiredInput("Whats the area for the doctor: ");
+                                break;
+                            case 2:
+                            case 3:
+                                break;
+                        }
+                        UserLastCreated.SetRolePersonell(chooseRole, UserLastCreated, doctoDetails);
                         FileHandler.SaveUsersToJson(users);
-                        Utils.DisplaySuccesText("New user created. ");
+                        Utils.DisplaySuccesText($"New personell account for {newUser} created. ");
                     }
                     break;
                 case 2:
@@ -520,6 +535,12 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        Console.WriteLine("Create new Personel account");
+                        string newUser = Utils.GetRequiredInput("Insert username: ");
+                        string newPass = Utils.GetRequiredInput("Insert password: ");
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Admin));
+                        FileHandler.SaveUsersToJson(users);
+                        Utils.DisplaySuccesText($"New admin account for {newUser} created. ");
 
                     }
                     break;
@@ -550,7 +571,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             }
             else
             {
-                System.Console.WriteLine("Access denied. Contact superadmin for permission");
+                Utils.DisplayAlertText("Access denied. Contact superadmin for permission");
             }
 
 
@@ -604,7 +625,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             }
             else
             {
-                System.Console.WriteLine("Access denied. Contact superadmin for permission");
+                Utils.DisplayAlertText("Access denied. Contact superadmin for permission");
             }
             break;
         case 6:
@@ -618,7 +639,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             }
             else
             {
-                System.Console.WriteLine("Access denied. Contact superadmin for permission");
+                Utils.DisplayAlertText("Access denied. Contact superadmin for permission");
             }
 
             break;
@@ -695,7 +716,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu(IUser activeUser)
+static void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
 {
     // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
@@ -710,9 +731,10 @@ static void PatientMenu(IUser activeUser)
         Console.WriteLine("2. Book appointment");
         Console.WriteLine("3. See my appointments");
         Console.WriteLine("4. Cancel appointment");
-        Console.WriteLine("5. View my doctors (mock)");
-        Console.WriteLine("6. View my schedule");
-        Console.WriteLine("7. Logout");
+        Console.WriteLine("5. Request a doctor");
+        Console.WriteLine("6. View my doctors");
+        Console.WriteLine("7. View my schedule");
+        Console.WriteLine("8. Logout");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -753,8 +775,12 @@ static void PatientMenu(IUser activeUser)
             // ==========================================
             case 2:
                 Console.WriteLine("\n--- Create New Appointment ---");
-
-                string doctor = Utils.GetRequiredInput("Doctor's name: ");
+                Console.WriteLine("All docktors:  ");
+                foreach (IUser user in doctorsList)
+                {
+                    Console.WriteLine(user.ToPersonnelDisplay());
+                }
+                string doctor = Utils.GetRequiredInput("Pick a docktor for ypur appointment: ");
                 string department = Utils.GetRequiredInput("Department / Location: ");
                 string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
                 string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
@@ -831,26 +857,60 @@ static void PatientMenu(IUser activeUser)
                 break;
 
             // ==========================================
-            // CASE 5 — Mock doctors list
+            // CASE 5 — Request a doctor, from doctors list
             // ==========================================
             case 5:
-                Console.WriteLine("\n--- Your Doctors ---");
-                Console.WriteLine("Dr. Smith - Cardiology");
-                Console.WriteLine("Dr. Lewis - Orthopedics");
-                Console.WriteLine("Dr. Andersson - General Medicine");
+                Console.WriteLine("\n--- All Doctors to pick from ---");
+                foreach (IUser user in doctorsList)
+                {
+                    Console.WriteLine(user.ToPersonnelDisplay());
+                }
+                string doctorName = Utils.GetRequiredInput("Pick the name of the doctor you want to have?? ");
+                IUser? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
+                if (doctorObj != null)
+                {
+                    bool success = activeUser.AssignPersonnel(doctorObj.Id);
+                    if (success)
+                    {
+                        Utils.DisplaySuccesText($"Personal (ID: {doctorObj.Id}) tilldelad patient {activeUser.Username}.");
+                    }
+                    else
+                    {
+                        Utils.DisplayAlertText("Kunde inte tilldela personal. Patienten har redan detta ID, eller det är fel roll.");
+                    }
+                }
+                else
+                {
+                    Utils.DisplayAlertText("Wront spelling or no doctor by that name");
+                }
+                Console.WriteLine("\nPress ENTER to return...");
+                Console.ReadLine();
+                break;
+            // ==========================================
+            // CASE 6 — All doctors list
+            // ==========================================
+            case 6:
+                Console.WriteLine("\n--- Your Doctors: ---");
+                foreach (IUser user in doctorsList.Where(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
+                {
+                    Console.WriteLine(user.ToPersonnelDisplay());
+                }
                 Console.WriteLine("\nPress ENTER to return...");
                 Console.ReadLine();
                 break;
 
-            //CASE 6
-            case 6:
+            /// ==========================================
+            // CASE 7 — Show schedules 
+            // ==========================================
+            case 7:
                 ShowSchedule(activeUser);
                 break;
 
             // ==========================================
             // CASE 7 — Logout
             // ==========================================
-            case 7:
+            case 8:
+                FileHandler.SaveUsersToJson(users);
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 break;
