@@ -202,7 +202,7 @@ void MainMenu()
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu(users, activeUser);
+                    PersonnelMenu(users, activeUser, appointments);
                     break;
 
                 // PATIENT MENU
@@ -643,8 +643,11 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
-static void PersonnelMenu(List<IUser> users, IUser activeUser)
+static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
+
 {
+    ScheduleService scheduleService = new ScheduleService();
+
     bool inMenu = true;
     while (inMenu)
     {
@@ -685,76 +688,74 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 break;
 
             case 8:
-
                 foreach (User user in users)
                 {
                     Console.WriteLine(user);
                 }
-                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
+                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+
                 if (patientUser != null)
-
                 {
 
-                }
+                    string department = Utils.GetRequiredInput("Department / location");
+                    string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation)");
+                    string dateInput = Utils.GetRequiredInput("Date and time, format (yyyy-MM-dd HH:mm):");
 
-                string User = Utils.GetRequiredInput("Doctor's name: ");
-                string department = Utils.GetRequiredInput("Department / Location: ");
-                string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
-                string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
+                    if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                    {
+                        Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                        Console.ReadKey();
+                        break;
+                    }
 
-                // Validate date input
-                if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
-                    System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
-                {
-                    Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+
+                    Appointment newAppointment = new Appointment(patientUser.Id, appointmentDate, "", department, type);
+                    scheduleService.SaveAppointment(newAppointment);
+
+                    Utils.DisplaySuccesText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
                     Console.ReadKey();
                     break;
+
+
+                    //To can choose the user I want
+                    // After choosing coming up options to schedule appointment with text and date
+                    //Hantera doktorer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 }
-
-                // Create and save new appointment
-                Appointment newAppointment = new Appointment(activeUser.Id, appointmentDate, doctor, department, type);
-                scheduleService.SaveAppointment(newAppointment);
-
-                Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
-                Console.ReadKey();
                 break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                // Find patient or personell  
-                // Appoint appointment time and date and to whom.
-                // Work with string get name first and after we are done we are working with index.
-                break;
-
-
-
-
-
-
-
-
         }
-    }
 
+    }
 }
 
 // ============================

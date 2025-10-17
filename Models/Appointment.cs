@@ -35,6 +35,7 @@ public class Appointment
     IsApproved = false; //Default = waiting for approval
   }
 
+
   //Returns a clean, formatted string representation of the appointment.
   //useful for displaying data in console output or text files. .
 
