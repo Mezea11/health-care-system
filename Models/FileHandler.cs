@@ -70,10 +70,10 @@ class FileHandler
                 Converters = { new JsonStringEnumConverter() }
             };
 
-            var concreteUsers = new List<User>();
-            foreach (var u in users)
+            List<User> concreteUsers = new List<User>();
+            foreach (User user in users)
             {
-                if (u is User user)
+                if (user is User thatUser)
                     concreteUsers.Add(user);
             }
 

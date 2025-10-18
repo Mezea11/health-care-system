@@ -11,13 +11,13 @@ As a user, I need to be able to REQUEST registration as a patient. CHECKED
 
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
-As an admin with sufficient permissions, I need to be able to assign admins to certain regions.
+As an admin with sufficient permissions, I need to be able to assign admins to certain regions.  ---- Does it works ?? 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. ??? Doubles ?? 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to add locations. CHECKED
-As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel. WIP
+As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what. 
-As an admin with sufficient permissions, I need to be able to add locations.
+As an admin with sufficient permissions, I need to be able to add locations. 
 
 As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- CHECKED
 As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- CHECKED
@@ -48,16 +48,20 @@ static int GetIndexAddOne(List<IUser> users)
 // ============================
 // Main program
 // ============================
+
 List<Location> locations = new List<Location>();
 List<Appointment> appointments = new List<Appointment>();
 locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
-// Lista med alla användare 
+// Lista med alla användare, listan populeras genom att kalla på funtionen LoadUsersFromJson. 
+// Den läser av users json och gör om det till format som passar till listan.
 List<IUser> users = FileHandler.LoadUsersFromJson();
 
-
+// vi skapar en variabel som hanterar den user som är inloggad. 
+// Vi sätter den som default till null.
 IUser? activeUser = null;
+
 bool running = true;
 
 

@@ -23,7 +23,7 @@ namespace HealthCareSystem.Tests
         [Fact]
         public void TryLogin_ShouldReturnTrue_WhenPasswordIsCorrect()
         {
-            var user = new User(2, "bob", "mypassword", Role.Admin);
+            IUser user = new User(2, "bob", "mypassword", Role.Admin);
 
             var result = user.TryLogin("bob", "mypassword");
 
@@ -33,7 +33,7 @@ namespace HealthCareSystem.Tests
         [Fact]
         public void TryLogin_ShouldReturnFalse_WhenPasswordIsIncorrect()
         {
-            var user = new User(3, "charlie", "topsecret", Role.Personnel);
+            IUser user = new User(3, "charlie", "topsecret", Role.Personnel);
 
             var result = user.TryLogin("charlie", "wrongpassword");
 
@@ -43,7 +43,7 @@ namespace HealthCareSystem.Tests
         [Fact]
         public void AcceptPending_ShouldSetRegistrationToAccepted()
         {
-            var user = new User(4, "diana", "pass", Role.Patient);
+            IUser user = new User(4, "diana", "pass", Role.Patient);
 
             user.AcceptPending();
 
@@ -53,7 +53,7 @@ namespace HealthCareSystem.Tests
         [Fact]
         public void DenyPending_ShouldSetRegistrationToDenied()
         {
-            var user = new User(5, "erik", "pass", Role.Patient);
+            IUser user = new User(5, "erik", "pass", Role.Patient);
 
             user.DenyPending();
 
@@ -63,7 +63,7 @@ namespace HealthCareSystem.Tests
         [Fact]
         public void GrantPermission_ShouldAddPermission()
         {
-            var user = new User(6, "frida", "pass", Role.Admin);
+            IUser user = new User(6, "frida", "pass", Role.Admin);
 
             user.GrantPermission(Permissions.AddLocation);
 
@@ -73,7 +73,7 @@ namespace HealthCareSystem.Tests
         [Fact]
         public void RevokePermission_ShouldRemovePermission_AndFallbackToNone()
         {
-            var user = new User(7, "gustav", "pass", Role.Admin);
+            IUser user = new User(7, "gustav", "pass", Role.Admin);
             user.GrantPermission(Permissions.AddAdmin);
 
             user.RevokePermission(Permissions.AddAdmin);
