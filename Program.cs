@@ -554,7 +554,8 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
             Console.WriteLine("\nAll users:");
             foreach (var user in users)
             {
-                Console.WriteLine($"{user.Username} - {user.GetRole()}");
+                Console.WriteLine($"Username: {user.Username} - Role: {user.GetRole()}");
+                // Console.WriteLine($"{user.Username} - {user.GetRole()} {(user.GetRole() == Role.Personnel && user.PersonelRole == PersonellRoles.Doctor ? $" : { user.PersonelRole} - {user.RoleDetails}" : "")}");
             }
             break;
         case 3:
