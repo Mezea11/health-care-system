@@ -510,7 +510,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                         string newPass = Utils.GetRequiredInput("Insert password: ");
                         // create a new user as a role Personell. We need to set a personell role to the object also
                         users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personnel));
-                        IUser UserLastCreated = users.LastOrDefault();
+                        IUser? UserLastCreated = users.Last(); // take the last item in the users list. The element that we create above
                         int chooseRole = Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. (Choose a number): ");
                         string doctoDetails = "";
                         switch (chooseRole)
