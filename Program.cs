@@ -552,7 +552,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                 Console.WriteLine("\nAll patients with pending request:");
                 foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
                 {
-                    Console.WriteLine($"{user.ToString}");
+                    Console.WriteLine($"{user.ToString()}");
                 }
                 // Work with string get name first and after we are done we are working with index. 
                 string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
