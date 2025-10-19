@@ -91,8 +91,8 @@ void StartMenu(List<IUser> users)
                 string newUser = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
                 Console.Clear();
 
-                Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
-                string newPass = Console.ReadLine();
+                // Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
+                string newPass = Utils.GetRequiredInput("Tpe in your password: ");
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
@@ -556,7 +556,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                 }
                 // Work with string get name first and after we are done we are working with index. 
                 string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
                 if (patientUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  ");
