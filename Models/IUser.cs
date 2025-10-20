@@ -27,6 +27,8 @@ namespace App
         AddPersonell,
         AddAdmin,
         AddLocation,
+        ViewPatientJournal,
+        ViewAllJournals,
         ViewPermissions
     }
 

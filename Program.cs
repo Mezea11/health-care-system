@@ -106,7 +106,10 @@ void StartMenu(List<IUser> users)
 
                 Console.WriteLine("Request Sent.");
                 users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
+
+
                 FileHandler.SaveUsersToJson(users);
+
                 break;
 
             case 3:
@@ -203,7 +206,7 @@ void MainMenu()
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu(users, activeUser);
+                    PersonnelMenu(users, activeUser, appointments);
                     break;
 
                 // PATIENT MENU
@@ -229,6 +232,8 @@ void MainMenu()
         }
     }
 }
+
+
 
 
 
@@ -510,7 +515,8 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
         case 8:
             Console.WriteLine("Logging out...");
             FileHandler.SaveUsersToJson(users);
-            activeUser = null;
+
+
             break;
         default:
             Utils.DisplayAlertText("Invalid input. Please try again.");
@@ -744,10 +750,13 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 }
 
 
+
 // ============================
 // PERSONNEL MENU METHOD
 // ============================
-static void PersonnelMenu(List<IUser> users, IUser activeUser)
+
+static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
+
 {
     bool inMenu = true;
     while (inMenu)
@@ -756,9 +765,11 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
-        Console.WriteLine("3. Approve/Deny patient appointment request");
-        Console.WriteLine("4. View my schedule");
-        Console.WriteLine("4. Logout");
+        Console.WriteLine("3. View patient journals");
+        Console.WriteLine("4. Approve/Deny patient appointment request");
+        Console.WriteLine("5. View my schedule");
+        Console.WriteLine("6. Logout");
+
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -773,16 +784,46 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
                 PersonnelUI.ModifyAppointment(users, activeUser);
                 break;
 
-            case 3: //Aprove/Deny patient appointment request
+            // VIEW A PATIENT JOURNAL
+            case 3:
+                /* if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal"))
+                { */
+                foreach (User user in users)
+                {
+                    if (user.GetRole() == Role.Patient)
+                    {
+                        Console.WriteLine(user.Username);
+                    }
+                }
+                // Work with string get name first and after we are done we are working with index. 
+                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+                IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                if (patientUser != null)
+                {
+                    Console.WriteLine(patientUser);
+                    Console.ReadLine();
+                    Console.WriteLine("Press enter to continue");
+                }
+
+
+                else
+                {
+                    Utils.DisplayAlertText("No patient by that name has been found");
+                }
+                break;
+
+
+            case 4: //Aprove/Deny patient appointment request
                 PersonnelUI.ApproveAppointments(users, activeUser);
                 break;
 
 
-            case 4:
+            case 5:
                 ShowSchedule(activeUser);
                 break;
 
-            case 5:
+            case 6:
+
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 break;
@@ -790,6 +831,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
             default:
                 Utils.DisplayAlertText("Invalid option. Please try again.");
                 break;
+
+
 
         }
     }
