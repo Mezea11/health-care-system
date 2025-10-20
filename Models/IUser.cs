@@ -37,6 +37,14 @@ namespace App
         Denied,
     }
 
+    public enum Region
+    {
+        None,
+        Skåne,
+        Norrland,
+        Götaland,
+    }
+
 
     // ============================
     // Interface for all users
@@ -51,9 +59,7 @@ namespace App
         string PasswordSalt { get; }
         void GrantPermission(Permissions perm);
         void RevokePermission(Permissions perm);
-        bool HasPermission(string permissionName);
-        bool HasPermission(Permissions permission);
-
+        bool HasPermission(Permissions permissionName);
         Role GetRole();
         Registration GetRegistration();
         PersonellRoles PersonelRole { get; }
@@ -62,6 +68,16 @@ namespace App
         bool TryLogin(string username, string password);
         void AcceptPending();
         void DenyPending();
+        void AcceptAddLocationPermission();
+        void DenyAddLocationPermission();
+        void AcceptAddRegistrationsPermission();
+        void DenyAddRegistrationsPermission();
+        void AcceptAddPersonellPermission();
+        void DenyAddPersonellPermission();
+        void AcceptViewPermissions();
+        void DenyViewPermissions();
+        void AssignRegion(Region region);
+        Region? GetAssignedRegion();
     }
 
 }
