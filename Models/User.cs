@@ -69,11 +69,11 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
-        public void AcceptViewPermissions()
-        {
-            if (!PermissionList.Contains(perm))
-                PermissionList.Add(perm);
-        }
+        // public void AcceptViewPermissions()
+        // {
+        //     if (!PermissionList.Contains(perm))
+        //         PermissionList.Add(perm);
+        // }
 
         public void RevokePermission(Permissions perm)
         {
@@ -101,6 +101,16 @@ namespace App
                 PermissionList.Add(Permissions.AddRegistrations);
         }
 
+        // DONT REMOVE >YOURSELF 
+
+        public void AcceptPending() => Registration = Registration.Accepted;
+        public void DenyPending() => Registration = Registration.Denied;
+
+        public void GrantPermission(Permissions perm)
+        {
+            if (!PermissionList.Contains(perm))
+                PermissionList.Add(perm);
+        }
         public void DenyAddRegistrationsPermission()
         {
             PermissionList.Remove(Permissions.AddRegistrations);
