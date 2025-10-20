@@ -1,6 +1,4 @@
-namespace App;
-
-public class Appointment
+namespace App
 {
   // Represents a single appointment in the Healtcare system.
   // Each appointment belongs to one specific user (patient or staff),
@@ -35,8 +33,9 @@ public class Appointment
     IsApproved = false; //Default = waiting for approval
   }
 
-  //Returns a clean, formatted string representation of the appointment.
-  //useful for displaying data in console output or text files. .
+  // ✨ Nya fält:
+  public string Status { get; set; } = "Pending"; // Default state
+  public int? PersonnelId { get; set; } // Optional link to staff who created/owns the appointment
 
   // "Returns" = A formatted text line containing the appointment's details.
   public string Format() => $"{Date:yyyy-MM-dd HH:mm} - {Doctor} ({Department}) - {Type}";
@@ -54,12 +53,34 @@ public class Appointment
     string[] parts = line.Split(';');
     if (parts.Length < 5) return null;
 
+    // Returns a clean, formatted string representation of the appointment.
+    public string Format()
+  {
+    return $"Date: {Date:yyyy-MM-dd HH:mm} | Doctor: {Doctor,-15} | Location: {Department,-15} | For What: {Type} | Status: {Status}";
+  }
+
+  // Converts the appointment into a line of text (if still used for file saving)
+  public string ToFileString()
+  {
+    return $"{UserId};{Date:yyyy-MM-dd HH:mm};{Doctor};{Department};{Type};{Status}";
+  }
+
+  // Creates an Appointment object from a line of text (for backward compatibility)
+  public static Appointment FromFileString(string line)
+  {
+    string[] parts = line.Split(';');
+    if (parts.Length < 5) return null;
+
     int userId = int.Parse(parts[0]);
     DateTime date = DateTime.Parse(parts[1]);
     string doctor = parts[2];
     string department = parts[3];
     string type = parts[4];
 
-    return new Appointment(userId, date, doctor, department, type);
+    Appointment app = new Appointment(userId, date, doctor, department, type);
+    if (parts.Length >= 6) app.Status = parts[5];
+
+    return app;
   }
+}
 }

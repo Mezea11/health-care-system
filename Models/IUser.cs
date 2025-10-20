@@ -37,6 +37,14 @@ namespace App
         Denied,
     }
 
+    public enum Region
+    {
+        None,
+        Skåne,
+        Norrland,
+        Götaland,
+    }
+
 
     // ============================
     // Interface for all users
@@ -70,6 +78,18 @@ namespace App
 
         Registration GetRegistration();
         PersonellRoles PersonelRole { get; }
+
+        void SetRolePersonell(int handleRole, IUser persObj);
+        void AcceptAddLocationPermission();
+        void DenyAddLocationPermission();
+        void AcceptAddRegistrationsPermission();
+        void DenyAddRegistrationsPermission();
+        void AcceptAddPersonellPermission();
+        void DenyAddPersonellPermission();
+        void AcceptViewPermissions();
+        void DenyViewPermissions();
+        void AssignRegion(Region region);
+        Region? GetAssignedRegion();
     }
 
 }
