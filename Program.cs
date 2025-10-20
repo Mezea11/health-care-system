@@ -62,6 +62,7 @@ List<IUser> users = FileHandler.LoadUsersFromJson();
 IUser? activeUser = null;
 bool running = true;
 
+
 StartMenu(users);
 
 // ============================
@@ -142,7 +143,6 @@ static void ShowSchedule(IUser activeUser)
 
 void MainMenu()
 {
-
     // Wrap main program in a function
     // Main program loop
     while (running)
@@ -201,17 +201,17 @@ void MainMenu()
 
                 // ADMIN MENU
                 case Role.Admin:
-                    AdminMenu(users, locations, ref activeUser);
+                    AdminMenu(users, locations, activeUser);
                     break;
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu(users, ref activeUser, appointments);
+                    PersonnelMenu(users, activeUser, appointments);
                     break;
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu(ref activeUser,
+                    PatientMenu(activeUser,
     users.Where(user =>
         // Filter out users that dont have the role as personel and persoal role as doctor
         user.GetRole() == Role.Personnel &&
@@ -222,12 +222,12 @@ void MainMenu()
 
                 // SUPERADMIN MENU
                 case Role.SuperAdmin:
-                    SuperAdminMenu(users, locations, ref activeUser);
+                    SuperAdminMenu(users, locations, activeUser);
                     break;
 
             }
             // Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-            // string input = Console.ReadLine() ?? "".Trim();
+            // string? input = Console.ReadLine();
             // if (input == "logout") activeUser = null;
         }
     }
@@ -237,10 +237,10 @@ void MainMenu()
 
 
 
-// ============================
+/// ============================
 // SUPERADMIN MENU METHOD
 // ============================
-static void SuperAdminMenu(List<IUser> users, List<Location> locations, ref IUser activeUser) // creates a menu for superadmin with list of users and locations
+static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser activeUser) // creates a menu for superadmin with list of users and locations
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
@@ -515,7 +515,6 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, ref IUse
         case 8:
             Console.WriteLine("Logging out...");
             FileHandler.SaveUsersToJson(users);
-
             activeUser = null;
             break;
         default:
@@ -527,10 +526,11 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, ref IUse
 
 
 
+
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users, List<Location> locations, ref IUser activeUser)
+void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -542,8 +542,6 @@ static void AdminMenu(List<IUser> users, List<Location> locations, ref IUser act
     Console.WriteLine("7. View my schedule");
     Console.WriteLine("8. View my regions"); // kommer att ändras vid merge.
     Console.WriteLine("9. Logout");
-
-    Console.WriteLine("8. Logout");
 
     switch (Utils.GetIntegerInput("Choice:"))
     {
@@ -740,6 +738,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, ref IUser act
         case 9:
             Console.WriteLine("Logging out...");
             activeUser = null;
+            running = false;
             break;
 
         default:
@@ -755,7 +754,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, ref IUser act
 // PERSONNEL MENU METHOD
 // ============================
 
-static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointment> appointments)
+void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
 
 {
     ScheduleService scheduleService = new ScheduleService();
@@ -769,8 +768,10 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
         Console.WriteLine("3. Approve/Deny patient appointment request");
         Console.WriteLine("4. View my schedule");
-        Console.WriteLine("6. Logout");
-        Console.WriteLine("8. Register appointments");
+        Console.WriteLine("5. View patient journal");
+        Console.WriteLine("6. Register appointments");
+        Console.WriteLine("7. Logout");
+
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -784,111 +785,105 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
             case 2:
                 PersonnelUI.ModifyAppointment(users, activeUser);
                 break;
-
-            // VIEW A PATIENT JOURNAL
-            case 3:
-                /* if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal"))
-                { */
-                foreach (User user in users)
-                {
-                    if (user.GetRole() == Role.Patient)
-                    {
-                        Console.WriteLine(user.Username);
-                    }
-                }
-                // Work with string get name first and after we are done we are working with index. 
-                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-                IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
-                if (patientUser != null)
-                {
-                    Console.WriteLine(patientUser);
-                    Console.ReadLine();
-                    Console.WriteLine("Press enter to continue");
-                }
-
-
-                else
-                {
-                    Utils.DisplayAlertText("No patient by that name has been found");
-                }
-                break;
-
-
-            case 4: //Aprove/Deny patient appointment request
+            case 3: //Aprove/Deny patient appointment request
                 PersonnelUI.ApproveAppointments(users, activeUser);
                 break;
-
-
-            case 5:
+            case 4:
                 ShowSchedule(activeUser);
                 break;
-
-            case 6:
-
-                Console.WriteLine("Logging out...");
-
-                activeUser = null;
-                inMenu = false;
-                break;
-
-            case 8:
-
-                // Loop All users in User
-                foreach (User user in users)
-
+            // VIEW A PATIENT JOURNAL
+            case 5:
+                /* if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal")) */
                 {
-                    Console.WriteLine(user);
-                }
-
-                // Input går in och sparas i patientHandling
-                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
-                // Searching through list of users and picks out the one that was saved in patienthandling aaaaand then saving it to patientUser
-                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
-                // users -> a list<User> your collection of all users
-                //.Find A method that returns the FIRST MATCH based on condition, Returns Null if no match is found
-                // user => "lambda expression" short inline function.
-                // // user.Username.Equals() checks if the current users username equals the input
-                // Patienthandling the input user typed in earlier, the username they want to find
-                // stringComarison.OrdinalIgnoreCase Makes the comparison case-insensetive (so "Alice matches alice)
-                // Iuser patientUser
-                if (patientUser != null)
-                {
-
-                    string department = Utils.GetRequiredInput("Department / location");
-                    string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation)");
-                    string dateInput = Utils.GetRequiredInput("Date and time, format (yyyy-MM-dd HH:mm):");
-
-                    if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
-                    //Tries to convert a string into a DateTime using exact format
-                    //dateInput = users input string
-                    //null =? culture info?
-                    //DatetimeStyles.none = no special parsing rules applied
-                    // out DATETIME APPOINTMENTDATE  if parsing succeed store in appointmentDate
+                    foreach (User user in users)
                     {
-                        Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
-                        Console.ReadKey();
-                        break;
+                        if (user.GetRole() == Role.Patient)
+                        {
+                            Console.WriteLine(user.Username);
+                        }
+                    }
+                    // Work with string get name first and after we are done we are working with index. 
+                    string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
+                    IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                    if (patientUser != null)
+                    {
+                        Console.WriteLine(patientUser);
+                        Console.ReadLine();
+                        Console.WriteLine("Press enter to continue");
                     }
 
-                    //Add a new appointment in NEWAPP with the () things inside.
-                    Appointment newAppointment = new Appointment(patientUser.Id, appointmentDate, "", department, type);
 
-                    //scheduleS an object responsible for handling appointment logic such as sacing, loading or update appointments
-                    // saveAppointment() a method that accepts an appointment and stores it
-                    // newAppo the actual appointment youre trying to save
-                    scheduleService.SaveAppointment(newAppointment);
-
-
-                    Utils.DisplaySuccesText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
-                    Console.ReadKey();
+                    else
+                    {
+                        Utils.DisplayAlertText("No patient by that name has been found");
+                    }
                     break;
 
-
-                    //To can choose the user I want
-                    // After choosing coming up options to schedule appointment with text and date
-                    //Hantera doktorer
-
                 }
+
+            case 6:
+                {
+                    // Loop All users in User
+                    foreach (User user in users)
+
+                    {
+                        Console.WriteLine(user);
+                    }
+
+                    // Input går in och sparas i patientHandling
+                    string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
+                    // Searching through list of users and picks out the one that was saved in patienthandling aaaaand then saving it to patientUser
+                    IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+                    // users -> a list<User> your collection of all users
+                    //.Find A method that returns the FIRST MATCH based on condition, Returns Null if no match is found
+                    // user => "lambda expression" short inline function.
+                    // // user.Username.Equals() checks if the current users username equals the input
+                    // Patienthandling the input user typed in earlier, the username they want to find
+                    // stringComarison.OrdinalIgnoreCase Makes the comparison case-insensetive (so "Alice matches alice)
+                    // Iuser patientUser
+                    if (patientUser != null)
+                    {
+
+                        string department = Utils.GetRequiredInput("Department / location");
+                        string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation)");
+                        string dateInput = Utils.GetRequiredInput("Date and time, format (yyyy-MM-dd HH:mm):");
+
+                        if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                        //Tries to convert a string into a DateTime using exact format
+                        //dateInput = users input string
+                        //null =? culture info?
+                        //DatetimeStyles.none = no special parsing rules applied
+                        // out DATETIME APPOINTMENTDATE  if parsing succeed store in appointmentDate
+                        {
+                            Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                            Console.ReadKey();
+                            break;
+                        }
+
+                        //Add a new appointment in NEWAPP with the () things inside.
+                        Appointment newAppointment = new Appointment(patientUser.Id, appointmentDate, "", department, type);
+
+                        //scheduleS an object responsible for handling appointment logic such as sacing, loading or update appointments
+                        // saveAppointment() a method that accepts an appointment and stores it
+                        // newAppo the actual appointment youre trying to save
+                        scheduleService.SaveAppointment(newAppointment);
+
+
+                        Utils.DisplaySuccesText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+                        Console.ReadKey();
+                        break;
+
+
+                        //To can choose the user I want
+                        // After choosing coming up options to schedule appointment with text and date
+                        //Hantera doktorer
+                    }
+                }
+                break;
+            case 7:
+                Console.WriteLine("Logging out...");
+                activeUser = null;
+                running = false;
                 break;
             default:
                 Utils.DisplayAlertText("Invalid option. Please try again.");
@@ -901,7 +896,7 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu(ref IUser activeUser, List<IUser> doctorsList, List<IUser> users)
+void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
 {
     // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
@@ -1076,8 +1071,9 @@ static void PatientMenu(ref IUser activeUser, List<IUser> doctorsList, List<IUse
             // ==========================================
             case 6:
                 Console.WriteLine("\n--- Your Doctors: ---");
-                foreach (IUser user in doctorsList.Where(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
+                foreach (IUser user in doctorsList.FindAll(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
                 {
+
                     Console.WriteLine(user.ToPersonnelDisplay());
                 }
                 Console.WriteLine("\nPress ENTER to return...");

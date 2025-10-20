@@ -69,7 +69,7 @@ namespace App
         void DenyPending();
 
         bool TryLogin(string username, string password);
-        bool HasPermission(string permissionName);
+        // bool HasPermission(string permissionName);
         bool HasPermission(Permissions permission);
         bool AssignPersonnel(int personnelId);
 
@@ -81,7 +81,7 @@ namespace App
         Registration GetRegistration();
         PersonellRoles PersonelRole { get; }
 
-        void SetRolePersonell(int handleRole, IUser persObj);
+        // void SetRolePersonell(int handleRole, IUser persObj);
         void AcceptAddLocationPermission();
         void DenyAddLocationPermission();
         void AcceptAddRegistrationsPermission();
