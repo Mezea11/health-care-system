@@ -1,4 +1,4 @@
-using App;
+﻿using App;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
@@ -201,17 +201,17 @@ void MainMenu()
 
                 // ADMIN MENU
                 case Role.Admin:
-                    AdminMenu(users, locations, activeUser);
+                    AdminMenu(users, locations, ref activeUser);
                     break;
 
                 // PERSONNEL MENU
                 case Role.Personnel:
-                    PersonnelMenu(users, activeUser, appointments);
+                    PersonnelMenu(users, ref activeUser, appointments);
                     break;
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu(activeUser,
+                    PatientMenu(ref activeUser,
     users.Where(user =>
         // Filter out users that dont have the role as personel and persoal role as doctor
         user.GetRole() == Role.Personnel &&
@@ -222,13 +222,13 @@ void MainMenu()
 
                 // SUPERADMIN MENU
                 case Role.SuperAdmin:
-                    SuperAdminMenu(users, locations, activeUser);
+                    SuperAdminMenu(users, locations, ref activeUser);
                     break;
 
             }
-            Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-            string input = Console.ReadLine() ?? "".Trim();
-            if (input == "logout") activeUser = null;
+            // Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
+            // string input = Console.ReadLine() ?? "".Trim();
+            // if (input == "logout") activeUser = null;
         }
     }
 }
@@ -240,7 +240,7 @@ void MainMenu()
 // ============================
 // SUPERADMIN MENU METHOD
 // ============================
-static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser activeUser) // creates a menu for superadmin with list of users and locations
+static void SuperAdminMenu(List<IUser> users, List<Location> locations, ref IUser activeUser) // creates a menu for superadmin with list of users and locations
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
@@ -516,7 +516,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
             Console.WriteLine("Logging out...");
             FileHandler.SaveUsersToJson(users);
 
-
+            activeUser = null;
             break;
         default:
             Utils.DisplayAlertText("Invalid input. Please try again.");
@@ -530,7 +530,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
 // ============================
 // ADMIN MENU METHOD
 // ============================
-static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
+static void AdminMenu(List<IUser> users, List<Location> locations, ref IUser activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -755,7 +755,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
 // PERSONNEL MENU METHOD
 // ============================
 
-static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
+static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointment> appointments)
 
 {
     bool inMenu = true;
@@ -825,6 +825,8 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
             case 6:
 
                 Console.WriteLine("Logging out...");
+
+                activeUser = null;
                 inMenu = false;
                 break;
 
@@ -842,7 +844,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment>
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
+static void PatientMenu(ref IUser activeUser, List<IUser> doctorsList, List<IUser> users)
 {
     // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
@@ -1039,6 +1041,7 @@ static void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> u
                 FileHandler.SaveUsersToJson(users);
                 Console.WriteLine("Logging out...");
                 inMenu = false;
+                activeUser = null;
                 break;
 
             default:
