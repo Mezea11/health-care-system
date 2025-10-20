@@ -1,95 +1,214 @@
 namespace App;
 
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Linq;
+using System.Reflection.Metadata;
 
-/// <summary>
-/// FileHandler is responsible for saving and loading users to/from a JSON file.
-/// </summary>
 class FileHandler
 {
-    // The filename where users are stored
-    public const string UserJsonFileName = "users.json";
+    public static string UserFileName = "data/users.csv";
+
+    private const char PrimarySeperator = '|';
+    private const char ListSeperator = ',';
+
+    private static List<IUser> CreateTestUser()
+    {
+        // Använd dummy data för att populera users listan
+        return new List<IUser>
+        {
+            new User(0, "patient", "123", Role.Patient),
+            new User(1, "personell", "123", Role.Personnel),
+            new User(2, "admin", "123", Role.Admin),
+        };
+    }
+
+    // === ERSÄTTNING FÖR SerializePermissions ===
+    /// <summary>
+    /// Konverterar en lista med Permissions till en sträng, separerad av ListSeparator.
+    /// Tar bort Permissions.None om den finns.
+    /// </summary>
+    private static string SerializePermissions(List<Permissions> permissions)
+    {
+        var validPermissions = new List<string>();
+
+        foreach (var perm in permissions)
+        {
+            // Kontrollera om behörigheten INTE är Permissions.None
+            if (perm != Permissions.None)
+            {
+                validPermissions.Add(perm.ToString());
+            }
+        }
+
+        // Sammanfoga listan av strängar till en enda sträng
+        return string.Join(ListSeperator, validPermissions);
+    }
+
+    // === ERSÄTTNING FÖR SerializeIntList ===
+    /// <summary>
+    /// Konverterar en lista med int-ID:n till en sträng, separerad av ListSeparator.
+    /// </summary>
+    private static string SerializeIntList(List<int> ids)
+    {
+        var idStrings = new List<string>();
+
+        foreach (var id in ids)
+        {
+            // Konvertera varje int till en sträng
+            idStrings.Add(id.ToString());
+        }
+
+        // Sammanfoga listan av strängar till en enda sträng
+        return string.Join(ListSeperator, idStrings);
+    }
+
 
     /// <summary>
-    /// Loads users from the JSON file.
-    /// If the file does not exist, returns a list of test users.
+    /// Laddar användare från CSV-filen.
     /// </summary>
-    public static List<IUser> LoadUsersFromJson()
+
+    public static List<IUser> LoadFromCsv()
     {
-        // If the file does not exist → create test data
-        if (!File.Exists(UserJsonFileName))
+        if (!File.Exists(UserFileName))
         {
-            return new List<IUser>
-            {
-                new User(0, "patient", "123", Role.Patient),
-                new User(1, "personell", "123", Role.Personnel),
-                new User(2, "admin", "123", Role.Admin),
-                new User(3, "admin1", "123", Role.Admin),
-                new User(4, "admin2", "123", Role.Admin),
-                new User(5, "superadmin", "123", Role.SuperAdmin)
-            };
+            return CreateTestUser();
         }
+
+        List<IUser> loadedUsers = new List<IUser>();
 
         try
         {
-            // Read the entire JSON file as text
-            string json = File.ReadAllText(UserJsonFileName);
-
-            // Configure deserialization options
-            var options = new JsonSerializerOptions
+            // hämta all data från filen
+            string[] lines = File.ReadAllLines(UserFileName);
+            foreach (string line in lines)
             {
-                PropertyNameCaseInsensitive = true, // allows "username" or "Username"
-                Converters = { new JsonStringEnumConverter() } // enums are stored as strings
-            };
+                if (string.IsNullOrWhiteSpace(line)) continue;
 
-            // Deserialize JSON into a list of User objects
-            List<User>? users = JsonSerializer.Deserialize<List<User>>(json, options);
+                // vi börjar med att dela upp raden i fält med PrimarySeparator
+                string[] parts = line.Split(PrimarySeperator);
 
-            // Convert to List<IUser> (since we work with the interface)
-            return users?.ConvertAll<IUser>(u => u) ?? new List<IUser>();
+                // Här förväntar vi oss 10 fält
+                // Id, Username, PasswordHash, PasswordSalt, Role, PersonelRole, RoleDetails, Registration, PermissionList, AssignedPersonnelIds
+                if (parts.Length == 10)
+                {
+                    User user = new User();
+
+
+                    // börjar att populera enkla fält och konvertering (int, string och enum)
+                    user.Id = int.Parse(parts[0]);
+                    user.Username = parts[1];
+                    user.PasswordHash = parts[2];
+                    user.PasswordSalt = parts[3];
+                    user.Role = (Role)Enum.Parse(typeof(Role), parts[4], true);
+                    user.PersonelRole = (PersonellRoles)Enum.Parse(typeof(PersonellRoles), parts[5], true);
+                    user.RoleDetails = parts[6];
+                    user.Registration = (Registration)Enum.Parse(typeof(Registration), parts[7], true);
+
+                    // Deseralisering av PermissionList
+                    string permissionString = parts[8];
+                    user.PermissionList = new List<Permissions>();
+                    if (!string.IsNullOrWhiteSpace(permissionString))
+                    {
+                        string[] perms = permissionString.Split(ListSeperator);
+
+                        foreach (string permStr in perms)
+                        {
+                            if (Enum.TryParse<Permissions>(permStr.Trim(), true, out Permissions perm))
+                            {
+                                user.PermissionList.Add(perm);
+                            }
+
+                        }
+                    }
+
+                    // Vi kollar för säkerhetsskull att listan inte är tom. Är den tom så sätter vi Permission none för den usern 
+                    if (user.PermissionList.Count == 0) user.PermissionList.Add(Permissions.None);
+
+
+                    // Descentralisering av AssignedPersonalId 
+                    string assignedIdString = parts[9];
+                    user.AssignedPersonnelIds = new List<int>();
+                    if (!string.IsNullOrWhiteSpace(assignedIdString))
+                    {
+                        string[] idStrings = assignedIdString.Split(ListSeperator);
+                        foreach (string IdString in idStrings)
+                        {
+                            if (int.TryParse(IdString.Trim(), out int id)) user.AssignedPersonnelIds.Add(id);
+                        }
+                    }
+
+                    loadedUsers.Add(user);
+                }
+
+            }
+            return loadedUsers;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR loading users from JSON: {ex.Message}");
+            Console.WriteLine($"ERROR loading users from CSV: {ex.Message}");
             return new List<IUser>();
         }
+
+
     }
 
+
+
     /// <summary>
-    /// Saves a list of users to the JSON file.
+    /// Sparar en lista med användare till CSV-filen.
     /// </summary>
-    public static void SaveUsersToJson(List<IUser> users)
+    public static void SaveUsersToCsv(List<IUser> users)
     {
+
+        List<string> lines = new List<string>();
+
+        // Förbered konvertering av listor till strängar:
+        // Vi tar bort Permissions.None från listan innan serialisering, 
+        // eftersom den läggs till igen vid deserialisering om listan är tom.
+        // Detta gör filen renare.
+        // Mysigt med hanering av funktioner med linq på detta sättet, Men jag skrev dem som egna funktioner ovan.
+        // Func<List<Permissions>, string> SerializePermissions = perms => string.Join(ListSeperator, perms.Where(p => p != Permissions.None));
+
+        // Func<List<int>, string> SerializeIntList = ids => string.Join(ListSeperator, ids);
+
+        foreach (User user in users)
+        {
+            if (user is User concreteUser)
+            {
+                string permissionListString = SerializePermissions(concreteUser.PermissionList);
+                string assignedIdsString = SerializeIntList(concreteUser.AssignedPersonnelIds);
+
+
+                // skapa raden med PrimarySeaparator | 
+                string line = string.Join(PrimarySeperator,
+                concreteUser.Id,
+                concreteUser.Username,
+                concreteUser.PasswordHash,
+                concreteUser.PasswordSalt,
+                concreteUser.Role,
+                concreteUser.PersonelRole,
+                concreteUser.RoleDetails,
+                concreteUser.Registration,
+                permissionListString,  // seraliserar första listan
+                assignedIdsString // seraliserar andra listan
+                );
+
+                lines.Add(line);
+            }
+        }
+
         try
         {
-            // Configure serialization options
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true, // makes the JSON file nicely formatted
-                Converters = { new JsonStringEnumConverter() } // enums are stored as strings
-            };
-
-            // Because IUser is an interface, we need to serialize the concrete User objects
-            var concreteUsers = new List<User>();
-            foreach (var u in users)
-            {
-                if (u is User user)
-                    concreteUsers.Add(user);
-            }
-
-            // Serialize the list to JSON
-            string json = JsonSerializer.Serialize(concreteUsers, options);
-
-            // Write JSON to file
-            File.WriteAllText(UserJsonFileName, json);
+            File.WriteAllLines(UserFileName, lines);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"ERROR saving users to JSON: {ex.Message}");
+            Console.WriteLine($"ERROR saving users to CSV: {ex.Message}");
         }
     }
+
+
 }

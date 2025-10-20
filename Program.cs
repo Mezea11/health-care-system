@@ -57,7 +57,8 @@ locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
-List<IUser> users = FileHandler.LoadUsersFromJson();
+// List<IUser> users = FileHandler.LoadUsersFromJson();
+List<IUser> users = FileHandler.LoadFromCsv();
 
 IUser? activeUser = null;
 bool running = true;
@@ -95,7 +96,7 @@ void StartMenu(List<IUser> users)
 
                 Console.WriteLine("Request Sent.");
                 users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
-                FileHandler.SaveUsersToJson(users);
+                FileHandler.SaveUsersToCsv(users);
                 break;
             case 2:
                 string newAdmin = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
@@ -109,7 +110,7 @@ void StartMenu(List<IUser> users)
                 users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
 
 
-                FileHandler.SaveUsersToJson(users);
+                FileHandler.SaveUsersToCsv(users);
 
                 break;
 
@@ -294,7 +295,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name.");
                 }
             }
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users);
             break;
 
         case 2:
@@ -343,7 +344,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users);
             break;
 
         case 4:
@@ -384,7 +385,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 }
             }
 
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users);
             break;
         case 5:
             {
@@ -423,7 +424,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users);
             break;
 
         case 6:
@@ -514,7 +515,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
 
         case 8:
             Console.WriteLine("Logging out...");
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users);
             activeUser = null;
             break;
         default:
@@ -585,7 +586,7 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
                                 break;
                         }
                         UserLastCreated.SetRolePersonell(chooseRole, UserLastCreated, doctoDetails);
-                        FileHandler.SaveUsersToJson(users);
+                        FileHandler.SaveUsersToCsv(users);
                         Utils.DisplaySuccesText($"New personell account for {newUser} created. ");
                     }
                     break;
@@ -601,7 +602,7 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
                         string newUser = Utils.GetRequiredInput("Insert username: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
                         users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Admin));
-                        FileHandler.SaveUsersToJson(users);
+                        FileHandler.SaveUsersToCsv(users);
                         Utils.DisplaySuccesText($"New admin account for {newUser} created. ");
 
                     }
@@ -1091,7 +1092,7 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
             // CASE 7 — Logout
             // ==========================================
             case 8:
-                FileHandler.SaveUsersToJson(users);
+                FileHandler.SaveUsersToCsv(users);
                 Console.WriteLine("Logging out...");
                 inMenu = false;
                 activeUser = null;
