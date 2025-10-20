@@ -57,17 +57,29 @@ namespace App
         // Store hashed password and salt instead of plain text and remove password
         string PasswordHash { get; }
         string PasswordSalt { get; }
+        string RoleDetails { get; }
+        string ToPersonnelDisplay();
+
         void GrantPermission(Permissions perm);
         void RevokePermission(Permissions perm);
-        bool HasPermission(Permissions permissionName);
-        Role GetRole();
-        Registration GetRegistration();
-        PersonellRoles PersonelRole { get; }
-        void SetRolePersonell(int handleRole, IUser persObj);
-        List<Permissions> PermissionList { get; }
-        bool TryLogin(string username, string password);
+        void SetRolePersonell(int handleRole, IUser persObj, string roleDetails);
         void AcceptPending();
         void DenyPending();
+
+        bool TryLogin(string username, string password);
+        bool HasPermission(string permissionName);
+        bool HasPermission(Permissions permission);
+        bool AssignPersonnel(int personnelId);
+
+        Role GetRole();
+
+        List<int> AssignedPersonnelIds { get; }
+        List<Permissions> PermissionList { get; }
+
+        Registration GetRegistration();
+        PersonellRoles PersonelRole { get; }
+
+        void SetRolePersonell(int handleRole, IUser persObj);
         void AcceptAddLocationPermission();
         void DenyAddLocationPermission();
         void AcceptAddRegistrationsPermission();
