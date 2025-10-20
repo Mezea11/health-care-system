@@ -5,12 +5,21 @@ namespace App
     // =================================
     public enum Role
     {
+        None,
         Patient,
         Personnel,
         Admin,
         SuperAdmin,
-
     }
+
+    public enum PersonellRoles
+    {
+        None = 0, // Lägg till detta!
+        Doctor,
+        Nurse,
+        Administrator,
+    }
+
     public enum Permissions
     {
         None,
@@ -44,9 +53,17 @@ namespace App
     {
         int Id { get; }
         string Username { get; }
-        string Password { get; }
+        // string Password { get; }
+        // Store hashed password and salt instead of plain text and remove password
+        string PasswordHash { get; }
+        string PasswordSalt { get; }
+        void GrantPermission(Permissions perm);
+        void RevokePermission(Permissions perm);
+        bool HasPermission(string permissionName);
         Role GetRole();
         Registration GetRegistration();
+        PersonellRoles PersonelRole { get; }
+        void SetRolePersonell(int handleRole, IUser persObj);
         List<Permissions> PermissionList { get; }
         bool TryLogin(string username, string password);
         void AcceptPending();
@@ -60,7 +77,6 @@ namespace App
 
         void AcceptViewPermissions();
         void DenyViewPermissions();
-        bool HasPermission(string permissionName);
         void AssignRegion(Region region);
         Region? GetAssignedRegion();
     }

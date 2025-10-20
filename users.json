@@ -1,0 +1,123 @@
+[
+  {
+    "Id": 0,
+    "Username": "patient",
+    "PasswordHash": "W95\u002BXu4ukNTMiT5IZNHbcv94KngNZj/aQ3yIyFp6Uv4=",
+    "PasswordSalt": "Jiltee3Dbh1PpBz0JIS3lg==",
+    "Role": "Patient",
+    "PersonelRole": "None",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 1,
+    "Username": "personell",
+    "PasswordHash": "XkeKRXNC/N5x6AO/Zm/XseXwKs4KFS/RzTsFZzI/7MY=",
+    "PasswordSalt": "ssjvdOP2fU9CNnxx0MfxvA==",
+    "Role": "Personnel",
+    "PersonelRole": "None",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 2,
+    "Username": "admin",
+    "PasswordHash": "Bs7xikBzb35NmxzgMfd7Z45NJq9qfHrlvve\u002BOjGTSlk=",
+    "PasswordSalt": "4OQu\u002BVh3mks3Z/LyKQBzSw==",
+    "Role": "Admin",
+    "PersonelRole": "None",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None",
+      "AddPersonell"
+    ]
+  },
+  {
+    "Id": 3,
+    "Username": "admin1",
+    "PasswordHash": "Ahu98mmVDujSfsGtpvHMkuEwZfbszXonsgxJod9Ceh0=",
+    "PasswordSalt": "I3PlngyGhUV4SstMIVEIDA==",
+    "Role": "Admin",
+    "PersonelRole": "None",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 4,
+    "Username": "admin2",
+    "PasswordHash": "5sWR5qGbZtZWE\u002B2fTY6noj1A1LFH4tFs1TsXdkv4JRw=",
+    "PasswordSalt": "/2NRl\u002BWT59DxWj3p4WPzeQ==",
+    "Role": "Admin",
+    "PersonelRole": "None",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 5,
+    "Username": "superadmin",
+    "PasswordHash": "wXitsv8X9qBs2dWL0hHvJYTpBVI8f5Q\u002BrF8pPEtLwtw=",
+    "PasswordSalt": "D7q9g9GwO\u002B7qErZH8PA3CA==",
+    "Role": "SuperAdmin",
+    "PersonelRole": "None",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 7,
+    "Username": "stinas_katt",
+    "PasswordHash": "JJFeG6iLZRRob0Si33MGeKNe5WojF3lhNN5gQFk6Wqo=",
+    "PasswordSalt": "YlNwXxCpd68iborBRqiyEw==",
+    "Role": "Patient",
+    "PersonelRole": "None",
+    "Registration": "Pending",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 8,
+    "Username": "Smith",
+    "PasswordHash": "/yd4qpnWpF\u002Badx6VPyXYcGtVmlmbbLTGfjuMPmNrjt4=",
+    "PasswordSalt": "hv05OorfYtduDRs2OWenDQ==",
+    "Role": "Personnel",
+    "PersonelRole": "Doctor",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 9,
+    "Username": "Lewis",
+    "PasswordHash": "WL75gYnpx75SkHoTH9dsnWPcyJOG2NE32A\u002BWgyikUaw=",
+    "PasswordSalt": "b3XR229FQaGnmLK\u002BS1Kwaw==",
+    "Role": "Personnel",
+    "PersonelRole": "Doctor",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  },
+  {
+    "Id": 10,
+    "Username": "Andersson",
+    "PasswordHash": "VUZQoEq4HqwBUYDZwT7cIDhaufrUozTg\u002BvR/ci6U2Lo=",
+    "PasswordSalt": "cFvcEtMXmG6pHmZ4G20yaw==",
+    "Role": "Personnel",
+    "PersonelRole": "Doctor",
+    "Registration": "Accepted",
+    "PermissionList": [
+      "None"
+    ]
+  }
+]
