@@ -758,6 +758,8 @@ static void AdminMenu(List<IUser> users, List<Location> locations, ref IUser act
 static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointment> appointments)
 
 {
+    ScheduleService scheduleService = new ScheduleService();
+
     bool inMenu = true;
     while (inMenu)
     {
@@ -765,11 +767,10 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
-        Console.WriteLine("3. View patient journals");
-        Console.WriteLine("4. Approve/Deny patient appointment request");
-        Console.WriteLine("5. View my schedule");
+        Console.WriteLine("3. Approve/Deny patient appointment request");
+        Console.WriteLine("4. View my schedule");
         Console.WriteLine("6. Logout");
-
+        Console.WriteLine("8. Register appointments");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -830,15 +831,71 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
                 inMenu = false;
                 break;
 
+            case 8:
+
+                // Loop All users in User
+                foreach (User user in users)
+
+                {
+                    Console.WriteLine(user);
+                }
+
+                // Input går in och sparas i patientHandling
+                string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
+                // Searching through list of users and picks out the one that was saved in patienthandling aaaaand then saving it to patientUser
+                IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+                // users -> a list<User> your collection of all users
+                //.Find A method that returns the FIRST MATCH based on condition, Returns Null if no match is found
+                // user => "lambda expression" short inline function.
+                // // user.Username.Equals() checks if the current users username equals the input
+                // Patienthandling the input user typed in earlier, the username they want to find
+                // stringComarison.OrdinalIgnoreCase Makes the comparison case-insensetive (so "Alice matches alice)
+                // Iuser patientUser
+                if (patientUser != null)
+                {
+
+                    string department = Utils.GetRequiredInput("Department / location");
+                    string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation)");
+                    string dateInput = Utils.GetRequiredInput("Date and time, format (yyyy-MM-dd HH:mm):");
+
+                    if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                    //Tries to convert a string into a DateTime using exact format
+                    //dateInput = users input string
+                    //null =? culture info?
+                    //DatetimeStyles.none = no special parsing rules applied
+                    // out DATETIME APPOINTMENTDATE  if parsing succeed store in appointmentDate
+                    {
+                        Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                        Console.ReadKey();
+                        break;
+                    }
+
+                    //Add a new appointment in NEWAPP with the () things inside.
+                    Appointment newAppointment = new Appointment(patientUser.Id, appointmentDate, "", department, type);
+
+                    //scheduleS an object responsible for handling appointment logic such as sacing, loading or update appointments
+                    // saveAppointment() a method that accepts an appointment and stores it
+                    // newAppo the actual appointment youre trying to save
+                    scheduleService.SaveAppointment(newAppointment);
+
+
+                    Utils.DisplaySuccesText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+                    Console.ReadKey();
+                    break;
+
+
+                    //To can choose the user I want
+                    // After choosing coming up options to schedule appointment with text and date
+                    //Hantera doktorer
+
+                }
+                break;
             default:
                 Utils.DisplayAlertText("Invalid option. Please try again.");
                 break;
-
-
-
         }
-    }
 
+    }
 }
 
 // ============================

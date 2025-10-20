@@ -33,6 +33,9 @@ namespace App
     IsApproved = false; //Default = waiting for approval
   }
 
+
+  //Returns a clean, formatted string representation of the appointment.
+  //useful for displaying data in console output or text files. .
   // ✨ Nya fält:
   public string Status { get; set; } = "Pending"; // Default state
   public int? PersonnelId { get; set; } // Optional link to staff who created/owns the appointment
