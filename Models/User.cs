@@ -9,6 +9,7 @@ namespace App
         public Role Role { get; set; }
         public PersonellRoles PersonelRole { get; set; }
         public Registration Registration { get; set; }
+
         public List<Permissions> PermissionList { get; set; } = new List<Permissions> { Permissions.None };
 
         // Konstruktor för nya användare
@@ -81,6 +82,19 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
+        public void AcceptAddLocationPermission()
+        {
+            if (!PermissionList.Contains(Permissions.AddLocation))
+                PermissionList.Add(Permissions.AddLocation);
+        }
+
+        public void DenyAddLocationPermission()
+        {
+            PermissionList.Remove(Permissions.AddLocation);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
+        }
+
         public void AcceptAddRegistrationsPermission()
         {
             if (!PermissionList.Contains(Permissions.AddRegistrations))
@@ -120,13 +134,13 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
-        public bool HasPermission(string permissionName)
-        {
-            if (Enum.TryParse<Permissions>(permissionName, true, out var perm))
-                return PermissionList.Contains(perm);
+        // public bool HasPermission(string permissionName)
+        // {
+        //     if (Enum.TryParse<Permissions>(permissionName, true, out var perm))
+        //         return PermissionList.Contains(perm);
 
-            return false;
-        }
+        //     return false;
+        // }
 
         public bool HasPermission(Permissions permission)
             => PermissionList.Contains(permission);

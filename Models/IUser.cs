@@ -59,7 +59,7 @@ namespace App
         string PasswordSalt { get; }
         void GrantPermission(Permissions perm);
         void RevokePermission(Permissions perm);
-        bool HasPermission(string permissionName);
+        bool HasPermission(Permissions permissionName);
         Role GetRole();
         Registration GetRegistration();
         PersonellRoles PersonelRole { get; }
@@ -74,7 +74,6 @@ namespace App
         void DenyAddRegistrationsPermission();
         void AcceptAddPersonellPermission();
         void DenyAddPersonellPermission();
-
         void AcceptViewPermissions();
         void DenyViewPermissions();
         void AssignRegion(Region region);
