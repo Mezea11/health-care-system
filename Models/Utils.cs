@@ -5,7 +5,7 @@ class Utils
     // static int GetIndexAddOne(List<IUser> users) => users.Count + 1;
     public static int GetIndexAddOne(List<IUser> users)
     {
-        return users.Count() + 1;
+        return users.Last().Id + 1;
     }
 
     public static string GetRequiredInput(string promptMessage)
