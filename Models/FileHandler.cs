@@ -6,16 +6,24 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+/// <summary>
+/// FileHandler is responsible for saving and loading users to/from a JSON file.
+/// </summary>
 class FileHandler
 {
+    // The filename where users are stored
     public const string UserJsonFileName = "users.json";
 
+    /// <summary>
+    /// Loads users from the JSON file.
+    /// If the file does not exist, returns a list of test users.
+    /// </summary>
     public static List<IUser> LoadUsersFromJson()
     {
+        // If the file does not exist → create test data
         if (!File.Exists(UserJsonFileName))
         {
-            // Skapa testdata om filen inte finns
-            List<IUser> testUsers = new List<IUser>
+            return new List<IUser>
             {
                 new User(0, "patient", "123", Role.Patient),
                 new User(1, "personell", "123", Role.Personnel),
@@ -24,34 +32,25 @@ class FileHandler
                 new User(4, "admin2", "123", Role.Admin),
                 new User(5, "superadmin", "123", Role.SuperAdmin)
             };
-
-            // Tilldela permissions direkt ska göras av administratörer
-            // foreach (User user in testUsers.OfType<User>())
-            // {
-            //     user.ApplyRolePermissions();
-            // }
-
-            // return testUsers;
         }
 
         try
         {
+            // Read the entire JSON file as text
             string json = File.ReadAllText(UserJsonFileName);
 
+            // Configure deserialization options
             var options = new JsonSerializerOptions
             {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() }
+                PropertyNameCaseInsensitive = true, // allows "username" or "Username"
+                Converters = { new JsonStringEnumConverter() } // enums are stored as strings
             };
 
+            // Deserialize JSON into a list of User objects
             List<User>? users = JsonSerializer.Deserialize<List<User>>(json, options);
-            var result = users?.ConvertAll<IUser>(u => u) ?? new List<IUser>();
 
-            // Säkerställ att alla användare får rätt permissions baserat på roll
-            // foreach (var u in result.OfType<User>())
-            //     u.ApplyRolePermissions();
-
-            return result;
+            // Convert to List<IUser> (since we work with the interface)
+            return users?.ConvertAll<IUser>(u => u) ?? new List<IUser>();
         }
         catch (Exception ex)
         {
@@ -60,16 +59,21 @@ class FileHandler
         }
     }
 
+    /// <summary>
+    /// Saves a list of users to the JSON file.
+    /// </summary>
     public static void SaveUsersToJson(List<IUser> users)
     {
         try
         {
+            // Configure serialization options
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
-                Converters = { new JsonStringEnumConverter() }
+                WriteIndented = true, // makes the JSON file nicely formatted
+                Converters = { new JsonStringEnumConverter() } // enums are stored as strings
             };
 
+            // Because IUser is an interface, we need to serialize the concrete User objects
             List<User> concreteUsers = new List<User>();
             foreach (User user in users)
             {
@@ -77,7 +81,10 @@ class FileHandler
                     concreteUsers.Add(user);
             }
 
+            // Serialize the list to JSON
             string json = JsonSerializer.Serialize(concreteUsers, options);
+
+            // Write JSON to file
             File.WriteAllText(UserJsonFileName, json);
         }
         catch (Exception ex)

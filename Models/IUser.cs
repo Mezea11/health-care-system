@@ -10,8 +10,16 @@ namespace App
         Personnel,
         Admin,
         SuperAdmin,
-
     }
+
+    public enum PersonellRoles
+    {
+        None = 0, // Lägg till detta!
+        Doctor,
+        Nurse,
+        Administrator,
+    }
+
     public enum Permissions
     {
         None,
@@ -29,6 +37,14 @@ namespace App
         Denied,
     }
 
+    public enum Region
+    {
+        None,
+        Skåne,
+        Norrland,
+        Götaland,
+    }
+
 
     // ============================
     // Interface for all users
@@ -39,28 +55,41 @@ namespace App
         string Username { get; }
         // string Password { get; }
         // Store hashed password and salt instead of plain text and remove password
+        string PasswordHash { get; }
+        string PasswordSalt { get; }
+        string RoleDetails { get; }
+        string ToPersonnelDisplay();
 
         void GrantPermission(Permissions perm);
         void RevokePermission(Permissions perm);
-        bool HasPermission(string permissionName);
-        bool HasPermission(Permissions permission);
-        string PasswordHash { get; }
-        string PasswordSalt { get; }
-        Role GetRole();
-        Registration GetRegistration();
-        List<Permissions> PermissionList { get; }
-        bool TryLogin(string username, string password);
+        void SetRolePersonell(int handleRole, IUser persObj, string roleDetails);
         void AcceptPending();
         void DenyPending();
-        // void AcceptAddLocationPermission();
-        // void DenyAddLocationPermission();
-        // void AcceptAddRegistrationsPermission();
-        // void DenyAddRegistrationsPermission();
-        // void AcceptAddPersonellPermission();
-        // void DenyAddPersonellPermission();
 
-        // void AcceptViewPermissions();
-        // void DenyViewPermissions();
+        bool TryLogin(string username, string password);
+        bool HasPermission(string permissionName);
+        bool HasPermission(Permissions permission);
+        bool AssignPersonnel(int personnelId);
+
+        Role GetRole();
+
+        List<int> AssignedPersonnelIds { get; }
+        List<Permissions> PermissionList { get; }
+
+        Registration GetRegistration();
+        PersonellRoles PersonelRole { get; }
+
+        void SetRolePersonell(int handleRole, IUser persObj);
+        void AcceptAddLocationPermission();
+        void DenyAddLocationPermission();
+        void AcceptAddRegistrationsPermission();
+        void DenyAddRegistrationsPermission();
+        void AcceptAddPersonellPermission();
+        void DenyAddPersonellPermission();
+        void AcceptViewPermissions();
+        void DenyViewPermissions();
+        void AssignRegion(Region region);
+        Region? GetAssignedRegion();
     }
 
 }
