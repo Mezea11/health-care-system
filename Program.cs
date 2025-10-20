@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using App;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
-using App;
 /* 
 
 -- SAVE AND MOCK DATA TO TEXT FILES --
@@ -207,7 +207,14 @@ void MainMenu()
 
                 // PATIENT MENU
                 case Role.Patient:
-                    PatientMenu(activeUser);
+                    PatientMenu(activeUser,
+    users.Where(user =>
+        // Villkor 1: Användaren MÅSTE vara Personal
+        user.GetRole() == Role.Personnel &&
+        // Villkor 2: Personalrollen MÅSTE vara Doctor
+        user.PersonelRole == PersonellRoles.Doctor) // Eller user.GetPersonelRole() beroende på din IUser
+    .ToList());
+
                     break;
 
                 // SUPERADMIN MENU
@@ -478,7 +485,7 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
     switch (Utils.GetIntegerInput("Choice:"))
     {
         case 1:
-            Console.WriteLine("Create account for personel and admin");
+            Console.WriteLine("Create account for personel or admin");
             if (activeUser.HasPermission(Permissions.AddPersonell))
             {
                 Console.WriteLine("(1). Create account for Personell");
@@ -499,17 +506,23 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        Console.WriteLine("Create new Personel account");
                         string newUser = Utils.GetRequiredInput("Insert username: ");
-                        Console.Write("Insert password: ");
+                        // string newUser = Utils.GetRequiredInput("Insert username: ");
+                        // Console.Write("Insert password: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
-                        int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
-                        Role role = Role.Patient;
-                        if (roleInput == 2) role = Role.Personnel;
-                        else if (roleInput == 3) role = Role.Admin;
+                        // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
 
-                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, role));
+                        // Role role = Role.Personel;
+                        // if (roleInput == 2) role = Role.Personnel;
+                        // else if (roleInput == 3) role = Role.Admin;
+                        // create a new user as a role Personell. We need to set a personell role to the object also
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personnel));
+                        IUser UserLastCreated = users.LastOrDefault();
+                        UserLastCreated.SetRolePersonell(Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. |Choose a number: "), UserLastCreated);
+                        Console.WriteLine(UserLastCreated.ToString());
                         FileHandler.SaveUsersToJson(users);
-                        Utils.DisplaySuccesText("New user created. ");
+                        Utils.DisplaySuccesText($"New personell account for {newUser} created. ");
                     }
                     break;
                 case 2:
@@ -520,6 +533,20 @@ static void AdminMenu(List<IUser> users, List<Location> locations, IUser activeU
                     }
                     else
                     {
+                        Console.WriteLine("Create new Personel account");
+                        string newUser = Utils.GetRequiredInput("Insert username: ");
+                        // string newUser = Utils.GetRequiredInput("Insert username: ");
+                        // Console.Write("Insert password: ");
+                        string newPass = Utils.GetRequiredInput("Insert password: ");
+                        // int roleInput = Utils.GetIntegerInput("Pick role: (1)Patient, (2)Personnel, (3)Admin. Choose a number: ");
+
+                        Role role = Role.Admin;
+                        // if (roleInput == 2) role = Role.Personnel;
+                        // else if (roleInput == 3) role = Role.Admin;
+
+                        users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Admin));
+                        FileHandler.SaveUsersToJson(users);
+                        Utils.DisplaySuccesText($"New admin account for {newUser} created. ");
 
                     }
                     break;
@@ -695,7 +722,7 @@ static void PersonnelMenu(List<IUser> users, IUser activeUser)
 // ============================
 // PATIENT MENU METHOD
 // ============================
-static void PatientMenu(IUser activeUser)
+static void PatientMenu(IUser activeUser, List<IUser> personnelList)
 {
     // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
@@ -715,7 +742,7 @@ static void PatientMenu(IUser activeUser)
         Console.WriteLine("7. Logout");
 
         int input = Utils.GetIntegerInput("\nChoice: ");
-
+        Console.WriteLine(personnelList);
         switch (input)
         {
             // ==========================================
@@ -835,6 +862,12 @@ static void PatientMenu(IUser activeUser)
             // ==========================================
             case 5:
                 Console.WriteLine("\n--- Your Doctors ---");
+                foreach (IUser user in personnelList) // Denna loop bör fungera!
+                {
+                    Console.WriteLine($"Dr.{user.Username}");
+                }
+                Console.WriteLine("Dummy data:");
+                Console.WriteLine("Dr. Smith - Cardiology");
                 Console.WriteLine("Dr. Smith - Cardiology");
                 Console.WriteLine("Dr. Lewis - Orthopedics");
                 Console.WriteLine("Dr. Andersson - General Medicine");
