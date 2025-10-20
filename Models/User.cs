@@ -64,12 +64,12 @@ namespace App
 
         public void setRolePersonell()
         {
-
+            PermissionList.Remove(Permissions.AddPersonell);
+            if (PermissionList.Count == 0)
+                PermissionList.Add(Permissions.None);
         }
-        public void AcceptPending() => Registration = Registration.Accepted;
-        public void DenyPending() => Registration = Registration.Denied;
 
-        public void GrantPermission(Permissions perm)
+        public void AcceptViewPermissions()
         {
             if (!PermissionList.Contains(perm))
                 PermissionList.Add(perm);
