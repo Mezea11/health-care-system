@@ -1,180 +1,219 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-
 namespace App
 {
-  // ==========================================
+ 
   // ScheduleService
-  // Handles patient appointments and personnel shifts
-  // JSON files: Data/schedules.json, Data/shifts.json
-  // ==========================================
+  // Handles saving and loading of patient appointments and personnel shifts
+  // using plain text files (.txt)
+
   public class ScheduleService
   {
-    private readonly string _appointmentsFile = "Data/schedules.json";
-    private readonly string _shiftsFile = "Data/shifts.json";
+    private readonly string _appointmentsFile = "Data/appointments.txt";
+    private readonly string _shiftsFile = "Data/shifts.txt";
 
-    // ===============================
+  
     // APPOINTMENTS
-    // ===============================
+   
 
-    // Load schedule for a specific user/patient
+    
+    // Load all appointments for a specific user (patient or staff).
     public Schedule LoadSchedule(int userId)
     {
-      if (!Directory.Exists("Data")) Directory.CreateDirectory("Data");
+      EnsureDataDirectoryExists();
 
-      Schedule schedule = new Schedule(userId);
+      var schedule = new Schedule(userId);
 
       if (!File.Exists(_appointmentsFile)) return schedule;
 
-      string json = File.ReadAllText(_appointmentsFile);
-      List<Appointment> allAppointments = JsonSerializer.Deserialize<List<Appointment>>(json) ?? new List<Appointment>();
-
-      var userAppointments = allAppointments
-          .Where(a => a.UserId == userId)
-          .OrderBy(a => a.Date)
-          .ToList();
-
-      foreach (var app in userAppointments)
-        schedule.AddAppointment(app);
+      var lines = File.ReadAllLines(_appointmentsFile);
+      foreach (var line in lines)
+      {
+        var appointment = Appointment.FromFileString(line);
+        if (appointment != null && appointment.UserId == userId)
+        {
+          schedule.AddAppointment(appointment);
+        }
+      }
 
       return schedule;
     }
 
-    // Save or update an appointment
+    // Save or update a single appointment.
+    // If an appointment exists for same user/date, it is replaced.
     public void SaveAppointment(Appointment appointment)
     {
-      if (!Directory.Exists("Data")) Directory.CreateDirectory("Data");
+      EnsureDataDirectoryExists();
 
-      List<Appointment> allAppointments = new List<Appointment>();
+      List<string> appointmentLines = File.Exists(_appointmentsFile)
+        ? File.ReadAllLines(_appointmentsFile).ToList()
+        : new List<string>();
 
-      if (File.Exists(_appointmentsFile))
+      // Remove any existing appointment for the same user/date
+      appointmentLines.RemoveAll(existingLine =>
       {
-        string existingJson = File.ReadAllText(_appointmentsFile);
-        allAppointments = JsonSerializer.Deserialize<List<Appointment>>(existingJson) ?? new List<Appointment>();
+        var existingAppointment = Appointment.FromFileString(existingLine);
+        return existingAppointment != null &&
+               existingAppointment.UserId == appointment.UserId &&
+               existingAppointment.Date == appointment.Date;
+      });
 
-        // Replace existing appointment if same user/date
-        var index = allAppointments.FindIndex(a => a.UserId == appointment.UserId && a.Date == appointment.Date);
-        if (index >= 0)
-          allAppointments[index] = appointment;
-        else
-          allAppointments.Add(appointment);
-      }
-      else
-      {
-        allAppointments.Add(appointment);
-      }
+      appointmentLines.Add(appointment.ToFileString());
 
-      string newJson = JsonSerializer.Serialize(allAppointments, new JsonSerializerOptions { WriteIndented = true });
-      File.WriteAllText(_appointmentsFile, newJson);
+      File.WriteAllLines(_appointmentsFile, appointmentLines);
     }
 
-    // Remove appointment
-    public void RemoveAppointment(int userId, DateTime date)
+    
+    // Remove a specific appointment by user and date.
+    public void RemoveAppointment(int userId, DateTime appointmentDate)
     {
       if (!File.Exists(_appointmentsFile)) return;
 
-      string json = File.ReadAllText(_appointmentsFile);
-      List<Appointment> allAppointments = JsonSerializer.Deserialize<List<Appointment>>(json) ?? new List<Appointment>();
+      var appointmentLines = File.ReadAllLines(_appointmentsFile).ToList();
 
-      allAppointments.RemoveAll(a => a.UserId == userId && a.Date == date);
+      appointmentLines.RemoveAll(line =>
+      {
+        var appointment = Appointment.FromFileString(line);
+        return appointment != null &&
+               appointment.UserId == userId &&
+               appointment.Date == appointmentDate;
+      });
 
-      string updatedJson = JsonSerializer.Serialize(allAppointments, new JsonSerializerOptions { WriteIndented = true });
-      File.WriteAllText(_appointmentsFile, updatedJson);
+      File.WriteAllLines(_appointmentsFile, appointmentLines);
     }
 
-    // Load all appointments (for personnel filtering, etc.)
+  
+    // Load all appointments (used for personnel filtering, approvals, etc.)
     public List<Appointment> LoadAllAppointments()
     {
       if (!File.Exists(_appointmentsFile)) return new List<Appointment>();
 
-      string json = File.ReadAllText(_appointmentsFile);
-      if (string.IsNullOrWhiteSpace(json)) return new List<Appointment>();
+      var appointmentLines = File.ReadAllLines(_appointmentsFile);
+      var allAppointments = new List<Appointment>();
 
-      return JsonSerializer.Deserialize<List<Appointment>>(json) ?? new List<Appointment>();
+      foreach (var line in appointmentLines)
+      {
+        var appointment = Appointment.FromFileString(line);
+        if (appointment != null)
+          allAppointments.Add(appointment);
+      }
+
+      return allAppointments;
     }
 
-    // Load appointments assigned to a specific personnel
+
+    // Load appointments assigned to a specific personnel member.
     public List<Appointment> LoadPersonnelSchedule(int personnelId)
     {
-      var all = LoadAllAppointments();
-      return all.Where(a => a.PersonnelId == personnelId)
-                .OrderBy(a => a.Date)
-                .ToList();
+      var allAppointments = LoadAllAppointments();
+      return allAppointments
+        .Where(appointment => appointment.PersonnelId == personnelId)
+        .OrderBy(appointment => appointment.Date)
+        .ToList();
     }
 
-    // ===============================
-    // SHIFTS
-    // ===============================
 
-    // Load all shifts
+    // SHIFTS
+
+
+    /// Load all shifts from file.
     public List<Shift> LoadAllShifts()
     {
-      if (!Directory.Exists("Data")) Directory.CreateDirectory("Data");
+      EnsureDataDirectoryExists();
 
       if (!File.Exists(_shiftsFile)) return new List<Shift>();
 
-      string json = File.ReadAllText(_shiftsFile);
-      return JsonSerializer.Deserialize<List<Shift>>(json) ?? new List<Shift>();
+      var shiftLines = File.ReadAllLines(_shiftsFile);
+      var allShifts = new List<Shift>();
+
+      foreach (var line in shiftLines)
+      {
+        var shift = Shift.FromFileString(line);
+        if (shift != null) allShifts.Add(shift);
+      }
+
+      return allShifts;
     }
 
-    // Load shifts for a specific personnel
+    /// Load shifts assigned to a specific personnel member.
     public List<Shift> LoadShiftsForPersonnel(int personnelId)
     {
       var allShifts = LoadAllShifts();
-      return allShifts.Where(s => s.PersonnelId == personnelId)
-                      .OrderBy(s => s.Start)
-                      .ToList();
+      return allShifts
+        .Where(shift => shift.PersonnelId == personnelId)
+        .OrderBy(shift => shift.Start)
+        .ToList();
     }
 
-    // Save a shift
+    /// Save a single shift.
     public void SaveShift(Shift shift)
     {
-      var allShifts = LoadAllShifts();
-      allShifts.Add(shift);
+      EnsureDataDirectoryExists();
 
-      string json = JsonSerializer.Serialize(allShifts, new JsonSerializerOptions { WriteIndented = true });
-      File.WriteAllText(_shiftsFile, json);
+      var shiftLines = File.Exists(_shiftsFile) ? File.ReadAllLines(_shiftsFile).ToList() : new List<string>();
+      shiftLines.Add(shift.ToFileString());
+      File.WriteAllLines(_shiftsFile, shiftLines);
     }
+
+    /// Get colleagues who have overlapping shifts.
     public List<Shift> GetColleaguesForShift(Shift currentShift)
     {
-      // Säkerställ att mapp finns
-      if (!Directory.Exists("Data"))
-        Directory.CreateDirectory("Data");
+      var allShifts = LoadAllShifts();
 
-      if (!File.Exists(_shiftsFile))
-        return new List<Shift>();
-
-      string json = File.ReadAllText(_shiftsFile);
-      if (string.IsNullOrWhiteSpace(json))
-        return new List<Shift>();
-
-      List<Shift> allShifts = JsonSerializer.Deserialize<List<Shift>>(json) ?? new List<Shift>();
-
-      // Hitta alla skift som överlappar detta skift (men inte samma personal)
-      var colleagues = allShifts
-          .Where(s => s.PersonnelId != currentShift.PersonnelId &&
-                      ((s.Start >= currentShift.Start && s.Start < currentShift.End) ||
-                       (s.End > currentShift.Start && s.End <= currentShift.End) ||
-                       (s.Start <= currentShift.Start && s.End >= currentShift.End)))
-          .OrderBy(s => s.Start)
-          .ToList();
-
-      return colleagues;
+      return allShifts
+        .Where(otherShift =>
+          otherShift.PersonnelId != currentShift.PersonnelId &&
+          ((otherShift.Start >= currentShift.Start && otherShift.Start < currentShift.End) ||
+           (otherShift.End > currentShift.Start && otherShift.End <= currentShift.End) ||
+           (otherShift.Start <= currentShift.Start && otherShift.End >= currentShift.End)))
+        .OrderBy(overlappingShift => overlappingShift.Start)
+        .ToList();
     }
 
 
-    // ===============================
-    // CLASSES
-    // ===============================
+    // HELPERS
+
+    private void EnsureDataDirectoryExists()
+    {
+      if (!Directory.Exists("Data"))
+        Directory.CreateDirectory("Data");
+    }
+
+    
+    // SHIFT CLASS
+    
     public class Shift
     {
       public DateTime Start { get; set; }
       public DateTime End { get; set; }
       public int PersonnelId { get; set; }
-    }
 
+      public Shift() { }
+
+      public Shift(DateTime start, DateTime end, int personnelId)
+      {
+        Start = start;
+        End = end;
+        PersonnelId = personnelId;
+      }
+
+      // Convert shift to a line for .txt file storage.
+      public string ToFileString()
+      {
+        return $"{Start:yyyy-MM-dd HH:mm};{End:yyyy-MM-dd HH:mm};{PersonnelId}";
+      }
+
+      // Create a shift from a line read from file.
+      public static Shift? FromFileString(string line)
+      {
+        if (string.IsNullOrWhiteSpace(line)) return null;
+        var parts = line.Split(';');
+        if (parts.Length < 3) return null;
+
+        if (!DateTime.TryParse(parts[0], out DateTime start)) return null;
+        if (!DateTime.TryParse(parts[1], out DateTime end)) return null;
+        if (!int.TryParse(parts[2], out int personnelId)) return null;
+
+        return new Shift(start, end, personnelId);
+      }
+    }
   }
 }

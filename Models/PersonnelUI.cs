@@ -6,320 +6,231 @@ namespace App
 {
   public static class PersonnelUI
   {
-    // Mock dictionary of personnel assignments: personnel ID -> list of patient IDs
-    static Dictionary<int, List<int>> AssignedPatients = new Dictionary<int, List<int>>()
+    // List over which patients each personnel is assgined to.
+    private static Dictionary<int, List<int>> AssignedPatients = new Dictionary<int, List<int>>()
     {
         { 2, new List<int> { 5, 6 } },
         { 3, new List<int> { 7 } }
     };
 
-    public static void ApproveAppointments(List<IUser> users, IUser activeUser)
+  
+    // Accept or deny booknig  
+    public static void ApproveAppointments(List<IUser> allUsers, IUser loggedInPersonnel)
     {
       Console.Clear();
-      Console.WriteLine($"--- Approve or Deny Appointment Request (Personnel: {activeUser.Username} ---\n)");
+      Console.WriteLine($"--- Accept or deny booking request. ({loggedInPersonnel.Username}) ---\n");
 
       var scheduleService = new ScheduleService();
       var allAppointments = scheduleService.LoadAllAppointments();
 
-      //Filter only pending (not approved)
-      var pending = allAppointments.Where(a => !a.IsApproved).ToList();
+      // Filter out bookning that are not accepted yet.
+      var pendingAppointments = allAppointments.Where(appointment => !appointment.IsApproved).ToList();
 
-      if (pending.Count == 0)
+      if (pendingAppointments.Count == 0)
       {
-        Utils.DisplayAlertText("There are no pending appointments.");
+        Utils.DisplayAlertText("They are no bookings waitning to be accepted.");
         Console.ReadKey();
         return;
       }
-      //List all pending appointments
-      for (int i = 0; i < pending.Count; i++)
+
+      // Show all pending bookings.
+      for (int i = 0; i < pendingAppointments.Count; i++)
       {
-        var appt = pending[i];
-        var patient = users.FirstOrDefault(u => u.Id == appt.UserId);
-        string patientName = patient != null ? patient.Username : $"Unknow (ID {appt.UserId})";
-        Console.WriteLine($"{i + 1}. {patientName} - {appt.Format()}");
+        var appointment = pendingAppointments[i];
+        var patientUser = allUsers.FirstOrDefault(user => user.Id == appointment.UserId);
+        string patientName = patientUser != null ? patientUser.Username : $"Unknown patient ID (ID {appointment.UserId})";
+        Console.WriteLine($"{i + 1}. {patientName} - {appointment.Format()}");
       }
-      int choice = Utils.GetIntegerInput("\nSelect appointment to review (0 to cancel): ");
-      if (choice == 0 || choice > pending.Count)
+
+      int selectedIndex = Utils.GetIntegerInput("\nChoose bookning to manage (0 to cancel): ");
+      if (selectedIndex == 0 || selectedIndex > pendingAppointments.Count)
         return;
 
-      var selected = pending[choice - 1];
+      var selectedAppointment = pendingAppointments[selectedIndex - 1];
+      Console.WriteLine($"\nChoosed bookning: {selectedAppointment.Format()}");
 
-      Console.WriteLine("\nSelected: {selected.Formart()}");
-      Console.WriteLine("Approve (A) or Deny (D)?");
-      string action = Console.ReadLine()?.Trim().ToLower() ?? "";
+      Console.WriteLine("Accept (A) or Deny (D)? ");
+      string choice = Console.ReadLine()?.Trim().ToLower() ?? "";
 
-      if (action == "a")
+      if (choice == "a")
       {
-        selected.IsApproved = true;
-        scheduleService.SaveAppointment(selected);
-        Utils.DisplaySuccesText("Appointment approved!");
+        selectedAppointment.IsApproved = true;
+        selectedAppointment.Status = "Confirmed";
+        scheduleService.SaveAppointment(selectedAppointment);
+        Utils.DisplaySuccesText("The bookning has been approved!");
       }
-      else if (action == "d")
+      else if (choice == "d")
       {
-        scheduleService.RemoveAppointment(selected.UserId, selected.Date);
-        Utils.DisplayAlertText("Appointment denied and removed.");
+        scheduleService.RemoveAppointment(selectedAppointment.UserId, selectedAppointment.Date);
+        Utils.DisplayAlertText("The booking was denied and has been deleted.");
       }
       else
       {
-        Utils.DisplayAlertText("Invalid choice. Returning to menu...");
+        Utils.DisplayAlertText("Invalid selection. Returns to menu...");
       }
+
       Console.WriteLine("\nPress any key to return...");
       Console.ReadKey();
     }
 
-
-    // =========================================
-    // Modify a patient's appointment
-    // =========================================
-    public static void ModifyAppointment(List<IUser> users, IUser activeUser)
+    
+    // Modify a patients bookning
+    
+    public static void ModifyAppointment(List<IUser> allUsers, IUser loggedInPersonnel)
     {
       Console.Clear();
-      Console.WriteLine($"--- Modify Patient Appointment (Personnel: {activeUser.Username}) ---\n");
+      Console.WriteLine($"--- Modify patient booking ({loggedInPersonnel.Username}) ---\n");
 
-      if (!AssignedPatients.ContainsKey(activeUser.Id) || AssignedPatients[activeUser.Id].Count == 0)
+      if (!AssignedPatients.ContainsKey(loggedInPersonnel.Id) || AssignedPatients[loggedInPersonnel.Id].Count == 0)
       {
-        Utils.DisplayAlertText("You are not currently assigned to any patients.");
+        Utils.DisplayAlertText("You are not connected to any patients at this time..");
         Console.ReadKey();
         return;
       }
 
-      List<int> assignedPatients = AssignedPatients[activeUser.Id];
-      Console.WriteLine("Assigned Patients: ");
-      foreach (int pid in assignedPatients)
+      // Show patients that are assigned to a personnel.
+      List<int> patientIds = AssignedPatients[loggedInPersonnel.Id];
+      Console.WriteLine("Assigned patients: ");
+      foreach (int patientId in patientIds)
       {
-        var patient = users.FirstOrDefault(u => u.Id == pid);
+        var patient = allUsers.FirstOrDefault(user => user.Id == patientId);
         if (patient != null)
-          Console.WriteLine($"- {patient.Username} (ID: {pid})");
+          Console.WriteLine($"- {patient.Username} (ID: {patientId})");
       }
 
-      int selectedPatientId = Utils.GetIntegerInput("\nEnter Patient ID to modify appointments: ");
-      if (!assignedPatients.Contains(selectedPatientId))
+      int selectedPatientId = Utils.GetIntegerInput("\nEnter patient ID to view their appointments: ");
+      if (!patientIds.Contains(selectedPatientId))
       {
-        Utils.DisplayAlertText("You are not authorized to access this patient's schedule.");
+        Utils.DisplayAlertText("You do not have permission to change this patien's bookings.");
         return;
       }
 
       var scheduleService = new ScheduleService();
-      var schedule = scheduleService.LoadSchedule(selectedPatientId);
+      var patientSchedule = scheduleService.LoadSchedule(selectedPatientId);
 
-      if (schedule.Appointments.Count == 0)
+      if (patientSchedule.Appointments.Count == 0)
       {
-        Utils.DisplayAlertText("No appointments found for this patient.");
+        Utils.DisplayAlertText("This patient does not have any appointments.");
         return;
       }
 
-      Console.WriteLine("\nPatient Appointments: ");
-      for (int i = 0; i < schedule.Appointments.Count; i++)
-        Console.WriteLine($"{i + 1}. {schedule.Appointments[i].Format()}");
+      Console.WriteLine("\nPatients appointments:");
+      for (int i = 0; i < patientSchedule.Appointments.Count; i++)
+        Console.WriteLine($"{i + 1}. {patientSchedule.Appointments[i].Format()}");
 
-      int selectedIndex = Utils.GetIntegerInput("\nChoose appointment number to modify: ") - 1;
-      if (selectedIndex < 0 || selectedIndex >= schedule.Appointments.Count)
+      int selectedIndex = Utils.GetIntegerInput("\nSelect which appointments to change: ") - 1;
+      if (selectedIndex < 0 || selectedIndex >= patientSchedule.Appointments.Count)
       {
-        Utils.DisplayAlertText("Invalid selection.");
+        Utils.DisplayAlertText("Unvalid choice.");
         return;
       }
 
-      var appointment = schedule.Appointments[selectedIndex];
+      var selectedAppointment = patientSchedule.Appointments[selectedIndex];
 
-      string newDoctor = Utils.GetRequiredInput($"Doctor ({appointment.Doctor}): ");
-      string newDepartment = Utils.GetRequiredInput($"Department ({appointment.Department}): ");
-      string newType = Utils.GetRequiredInput($"Type ({appointment.Type}): ");
-      string dateInput = Utils.GetRequiredInput($"Date & Time ({appointment.Date:yyyy-MM-dd HH:mm}): ");
+      string newDoctor = Utils.GetRequiredInput($"Doctor ({selectedAppointment.Doctor}): ");
+      string newDepartment = Utils.GetRequiredInput($"Department ({selectedAppointment.Department}): ");
+      string newType = Utils.GetRequiredInput($"Type ({selectedAppointment.Type}): ");
+      string newDateInput = Utils.GetRequiredInput($"Date & Time ({selectedAppointment.Date:yyyy-MM-dd HH:mm}): ");
 
-      if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
+      if (!DateTime.TryParseExact(newDateInput, "yyyy-MM-dd HH:mm", null,
           System.Globalization.DateTimeStyles.None, out DateTime newDate))
       {
-        Utils.DisplayAlertText("Invalid date format. Modification canceled.");
+        Utils.DisplayAlertText("Unvalid dateformat. The change was canceled.");
         return;
       }
 
-      appointment.Doctor = newDoctor;
-      appointment.Department = newDepartment;
-      appointment.Type = newType;
-      appointment.Date = newDate;
-      appointment.PersonnelId = activeUser.Id;
+      selectedAppointment.Doctor = newDoctor;
+      selectedAppointment.Department = newDepartment;
+      selectedAppointment.Type = newType;
+      selectedAppointment.Date = newDate;
+      selectedAppointment.PersonnelId = loggedInPersonnel.Id;
 
-      scheduleService.SaveAppointment(appointment);
-      Utils.DisplaySuccesText("Appointment modified successfully!");
+      scheduleService.SaveAppointment(selectedAppointment);
+      Utils.DisplaySuccesText("Appointment have been updated!");
     }
 
-    // =========================================
-    // Open a patient's journal
-    // =========================================
-    public static void OpenJournal(List<IUser> users, IUser activeUser)
+    
+    // Open Patient journal
+    
+    public static void OpenJournal(List<IUser> allUsers, IUser loggedInPersonnel)
     {
       Console.Clear();
-      Console.WriteLine($"--- Open Journal (Personnel: {activeUser.Username}) ---\n");
+      Console.WriteLine($"--- Open patient's journal ({loggedInPersonnel.Username}) ---\n");
 
-      if (!AssignedPatients.ContainsKey(activeUser.Id) || AssignedPatients[activeUser.Id].Count == 0)
+      if (!AssignedPatients.ContainsKey(loggedInPersonnel.Id) || AssignedPatients[loggedInPersonnel.Id].Count == 0)
       {
-        Utils.DisplayAlertText("You are not currently assigned to any patients.");
+        Utils.DisplayAlertText("You are not assigned to any patient's.");
         Console.ReadKey();
         return;
       }
 
-      List<int> assignedPatients = AssignedPatients[activeUser.Id];
-      Console.WriteLine("Assigned Patients:");
-      foreach (int pid in assignedPatients)
+      List<int> patientIds = AssignedPatients[loggedInPersonnel.Id];
+      Console.WriteLine("Assigned patient's:");
+      foreach (int patientId in patientIds)
       {
-        var patient = users.FirstOrDefault(u => u.Id == pid);
+        var patient = allUsers.FirstOrDefault(user => user.Id == patientId);
         if (patient != null)
-          Console.WriteLine($"- {patient.Username} (ID: {pid})");
+          Console.WriteLine($"- {patient.Username} (ID: {patientId})");
       }
 
-      int selectedId = Utils.GetIntegerInput("\nEnter Patient ID to open their journal: ");
-      if (!assignedPatients.Contains(selectedId))
+      int selectedPatientId = Utils.GetIntegerInput("\nSelect patient ID to open journal: ");
+      if (!patientIds.Contains(selectedPatientId))
       {
-        Utils.DisplayAlertText("You are not authorized to access this patient's journal.");
+        Utils.DisplayAlertText("You have no permission to view this patient's journal.");
         return;
       }
 
       var journalService = new JournalService();
-      var entries = journalService.GetJournalEntries(selectedId);
+      var journalEntries = journalService.GetJournalEntries(selectedPatientId);
 
       Console.Clear();
-      Console.WriteLine($"--- Journal for Patient #{selectedId} ---\n");
-      if (entries.Count == 0)
-        Console.WriteLine("(No entries yet)");
+      Console.WriteLine($"--- Journal of patient #{selectedPatientId} ---\n");
+      if (journalEntries.Count == 0)
+        Console.WriteLine("(No entires yet)");
       else
-        entries.ForEach(e => Console.WriteLine(e.Format()));
+        journalEntries.ForEach(entry => Console.WriteLine(entry.Format()));
 
-      Console.WriteLine("\nAdd a new entry? (y/n): ");
-      string choice = Console.ReadLine()?.Trim().ToLower() ?? "";
-      if (choice == "y")
+      Console.WriteLine("\nDo you want to add an entry? (y/n): ");
+      string addNewEntry = Console.ReadLine()?.Trim().ToLower() ?? "";
+      if (addNewEntry == "j")
       {
-        string newText = Utils.GetRequiredInput("Enter new journal text: ");
-        journalService.AddEntry(selectedId, activeUser.Username, newText);
-
-        Utils.DisplaySuccesText("Entry added successfully!");
+        string newText = Utils.GetRequiredInput("Write your entry: ");
+        journalService.AddEntry(selectedPatientId, loggedInPersonnel.Username, newText);
+        Utils.DisplaySuccesText("Entry saved!");
       }
 
-      Console.WriteLine("\nPress any key to return to menu...");
+      Console.WriteLine("\nPress any key to return...");
       Console.ReadKey();
     }
 
-    // =========================================
-    // Advanced interactive schedule view
-    // =========================================
-    public static void ViewMySchedule(IUser activeUser)
+    
+    // Show personnel schedule
+    
+    public static void ViewMySchedule(IUser loggedInPersonnel)
     {
       Console.Clear();
-      Console.WriteLine($"--- My Work Schedule ({activeUser.Username}) ---\n");
+      Console.WriteLine($"--- My schedule ({loggedInPersonnel.Username}) ---\n");
 
       var scheduleService = new ScheduleService();
-
       var allAppointments = scheduleService.LoadAllAppointments()
-          .Where(a => a.PersonnelId == activeUser.Id)
-          .OrderBy(a => a.Date)
+          .Where(appointment => appointment.PersonnelId == loggedInPersonnel.Id)
+          .OrderBy(appointment => appointment.Date)
           .ToList();
 
-      var shifts = scheduleService.LoadShiftsForPersonnel(activeUser.Id)
-          .OrderBy(s => s.Start)
-          .ToList();
-
-      Console.WriteLine("Filter by date? (yyyy-MM-dd) or leave empty for all: ");
-      string dateFilterInput = Console.ReadLine()?.Trim() ?? "";
-      DateTime? filterDate = null;
-      if (!string.IsNullOrEmpty(dateFilterInput) && DateTime.TryParse(dateFilterInput, out DateTime parsedDate))
-        filterDate = parsedDate.Date;
-
-      foreach (var shift in shifts)
+      if (!allAppointments.Any())
       {
-        if (filterDate.HasValue && shift.Start.Date != filterDate.Value)
-          continue;
-
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"\nShift: {shift.Start:yyyy-MM-dd HH:mm} - {shift.End:HH:mm}");
-        Console.ResetColor();
-
-        var colleagues = scheduleService.GetColleaguesForShift(shift);
-        if (colleagues.Any())
-        {
-          Console.ForegroundColor = ConsoleColor.DarkCyan;
-          Console.WriteLine("👥 Colleagues working this shift:");
-          Console.ResetColor();
-
-          foreach (var c in colleagues)
-            Console.WriteLine($"   - Personnel ID: {c.PersonnelId} ({c.Start:HH:mm}-{c.End:HH:mm})");
-        }
-        else
-        {
-          Console.WriteLine("👤 No colleagues working this shift.");
-        }
-
-        var appsInShift = allAppointments
-            .Where(a => a.Date >= shift.Start && a.Date < shift.End)
-            .OrderBy(a => a.Date)
-            .ToList();
-
-        TimeSpan totalShiftTime = shift.End - shift.Start;
-        TimeSpan bookedTime = TimeSpan.FromMinutes(appsInShift.Count * 30);
-        TimeSpan freeTime = totalShiftTime - bookedTime;
-
-        Console.ForegroundColor = ConsoleColor.DarkYellow;
-        Console.WriteLine("\nShift Summary:");
-        Console.ResetColor();
-        Console.WriteLine($" Total Shift Time: {totalShiftTime.TotalHours:F1} hours");
-        Console.WriteLine($" Appointments: {appsInShift.Count}");
-        Console.WriteLine($" Estimated Booked Time: {bookedTime.TotalHours:F1} hours");
-        Console.WriteLine($" Free Time: {freeTime.TotalHours:F1} hours");
-
-        if (!appsInShift.Any())
-        {
-          Console.WriteLine("  (No appointments in this shift)");
-          continue;
-        }
-
-        Console.WriteLine("\n+----+-------------------+-----------------+-----------------+-----------+");
-        Console.WriteLine("| #  | Date & Time       | Patient         | Type            | Status    |");
-        Console.WriteLine("+----+-------------------+-----------------+-----------------+-----------+");
-
-        for (int i = 0; i < appsInShift.Count; i++)
-        {
-          var a = appsInShift[i];
-          string patientName = $"Patient {a.UserId}";
-          ConsoleColor statusColor = a.Status.ToLower() switch
-          {
-            "pending" => ConsoleColor.Yellow,
-            "confirmed" => ConsoleColor.Green,
-            "cancelled" => ConsoleColor.Red,
-            _ => ConsoleColor.White
-          };
-
-          Console.ForegroundColor = statusColor;
-          Console.WriteLine($"| {i + 1,-2} | {a.Date:yyyy-MM-dd HH:mm} | {patientName,-15} | {a.Type,-15} | {a.Status,-9} |");
-          Console.ResetColor();
-        }
-
-        Console.WriteLine("+----+-------------------+-----------------+-----------------+-----------+");
-
-        bool keepEditing = true;
-        while (keepEditing)
-        {
-          Console.WriteLine("\nSelect appointment number to change status, 'n' for next shift, or 'q' to quit: ");
-          string input = Console.ReadLine()?.Trim().ToLower() ?? "";
-          if (input == "q") return;
-          if (input == "n") break;
-
-          if (int.TryParse(input, out int selectedNum) && selectedNum > 0 && selectedNum <= appsInShift.Count)
-          {
-            var selectedAppointment = appsInShift[selectedNum - 1];
-            Console.WriteLine("Change status to: 1) Pending 2) Confirmed 3) Cancelled");
-            string statusChoice = Console.ReadLine()?.Trim() ?? "";
-            switch (statusChoice)
-            {
-              case "1": selectedAppointment.Status = "Pending"; break;
-              case "2": selectedAppointment.Status = "Confirmed"; break;
-              case "3": selectedAppointment.Status = "Cancelled"; break;
-              default: Console.WriteLine("Invalid choice."); continue;
-            }
-            scheduleService.SaveAppointment(selectedAppointment);
-            Utils.DisplaySuccesText("Appointment status updated!");
-          }
-        }
+        Utils.DisplayAlertText("You have no appointment's in your schedule.");
+        Console.ReadKey();
+        return;
       }
 
-      Console.WriteLine("\nAll shifts displayed. Press any key to return...");
+      Console.WriteLine("Your upcoming appointments:\n");
+      foreach (var appointment in allAppointments)
+      {
+        Console.WriteLine(appointment.Format());
+      }
+
+      Console.WriteLine("\nPress any key to return...");
       Console.ReadKey();
     }
   }
