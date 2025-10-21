@@ -46,7 +46,7 @@ Admin	Manages the permission system, personnel accounts, locations, and approves
 Personnel	Views and manages patient medical journals (including setting read permissions), registers/modifies appointments, and views location schedules.
 Patient	Requests registration, views personal medical journal, and requests/views appointments
 
-
+---
 ####  Implemented Features
 ##### General Access
 - Secure Login and Logout system (using password hashing/salting).
@@ -76,6 +76,30 @@ Patient	Requests registration, views personal medical journal, and requests/view
 
 - Booking: Request an appointment with specific details.
 
+---
+### Quality Assurance
+#### Unit Tests (XUnit)
+To ensure the stability and reliability of the core logic, the project utilizes XUnit for unit testing. The test suite specifically validates critical aspects of the User data model and security features:
+
+Authentication & Security:
+
+- Verification that passwords are hashed and salted upon user creation.
+
+- Testing successful (True) and failed (False) login attempts using TryLogin.
+
+Registration Flow:
+
+- Confirmation that the registration status correctly moves from Pending to Accepted or Denied.
+
+Granular Permissions:
+
+- Testing the mechanics of granting and revoking specific permissions (e.g., AddLocation, AddAdmin).
+
+- Validation that access checks (HasPermission) work correctly and that permissions lists default to Permissions.None when empty.
+
+
+---
+
 ## 🚀 How to Run
 
 1. **Requirements**:
@@ -89,12 +113,11 @@ Patient	Requests registration, views personal medical journal, and requests/view
    1 Open a terminal in the project root directory or open it in a IDE.
     2 Run the following commands: (due to some complications we need to tell the build function what file we want to use)
      ```bash
+     # dotnet build to only build the project
     dotnet build 
+    # dotnet run to build and ru the project
     dotnet run
      ```
-<!-- 1. Open the project in **Visual Studio** or another C# IDE.
-2. dotnet build
-3. dotnet run -->
 
 ### Predefined Test Accounts
 
@@ -106,3 +129,21 @@ If the data file (data/users.csv) does not exist, the application will automatic
 | personell | Personell | 123 |
 | admin | Admin | 123 |
 | superadmin | SuperAdmin | 123 |
+
+
+#### Running the Unit Tests
+The dedicated unit tests, likely located in a separate test project (e.g., HealthCareSystem.Tests), can be executed using the .NET CLI. This is essential to confirm that all core business and security logic is functioning correctly as intended.
+
+Navigate to the project's root directory in your terminal and run:
+
+```bash
+     # Command to discover and run all unit tests in the solution
+     dotnet test --logger "console;verbosity=detailed"
+```
+Using verbosity=detailed will provide a more descriptive output for each test run, making it clearer what the test suite is handling, instead of just the summary.
+
+<!-- 1. Open the project in **Visual Studio** or another C# IDE.
+2. dotnet build
+3. dotnet run -->
+
+---
