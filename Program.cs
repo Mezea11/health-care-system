@@ -12,13 +12,13 @@ As a user, I need to be able to REQUEST registration as a patient. CHECKED
 
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
-As an admin with sufficient permissions, I need to be able to assign admins to certain regions.
+As an admin with sufficient permissions, I need to be able to assign admins to certain regions.  ---- Does it works ?? 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to add locations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what. 
-As an admin with sufficient permissions, I need to be able to add locations.
+As an admin with sufficient permissions, I need to be able to add locations. 
 
 As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- CHECKED
 As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- CHECKED
@@ -49,6 +49,7 @@ static int GetIndexAddOne(List<User> users)
 // ============================
 // Main program
 // ============================
+
 List<Location> locations = new List<Location>();
 List<Appointment> appointments = new List<Appointment>();
 /* List<AdminLocation> adminLocations = new List<AdminLocation>();
@@ -90,8 +91,8 @@ void StartMenu(List<User> users)
                 string newUser = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
                 Console.Clear();
 
-                Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
-                string newPass = Console.ReadLine();
+                // Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
+                string newPass = Utils.GetRequiredInput("Tpe in your password: ");
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
@@ -640,7 +641,7 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
                 Console.WriteLine("\nAll patients with pending request:");
                 foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
                 {
-                    Console.WriteLine($"{user.ToString}");
+                    Console.WriteLine($"{user.ToString()}");
                 }
                 // Work with string get name first and after we are done we are working with index. 
                 string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
