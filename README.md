@@ -146,4 +146,18 @@ Using verbosity=detailed will provide a more descriptive output for each test ru
 2. dotnet build
 3. dotnet run -->
 
+##### installing XUnit 
+
+```bash
+# 1. Add the core testing framework (xUnit)
+dotnet add package xunit
+
+# 2. Add the Visual Studio test runner (required to run tests in VS and with 'dotnet test')
+dotnet add package xunit.runner.visualstudio
+
+# 3. Add the Microsoft Test SDK (required for test discovery and execution)
+dotnet add package Microsoft.NET.Test.Sdk
+
+```
+
 ---
