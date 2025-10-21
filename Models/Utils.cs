@@ -2,10 +2,10 @@ namespace App;
 
 class Utils
 {
-    // static int GetIndexAddOne(List<IUser> users) => users.Count + 1;
-    public static int GetIndexAddOne(List<IUser> users)
+    // static int GetIndexAddOne(List<User> users) => users.Count + 1;
+    public static int GetIndexAddOne(List<User> users)
     {
-        return users.Count() + 1;
+        return users.Last().Id + 1;
     }
 
     public static string GetRequiredInput(string promptMessage)
@@ -18,7 +18,7 @@ class Utils
             Console.Write(promptMessage);
 
             // Läs inmatning. Använd ?? "" för att garantera att 'input' aldrig är null.
-            input = Console.ReadLine() ?? "";
+            input = Console.ReadLine() ?? "".Trim();
 
             // Om inmatningen fortfarande är tom, visa ett felmeddelande.
             if (string.IsNullOrWhiteSpace(input))

@@ -1,0 +1,11 @@
+0|patient|W95+Xu4ukNTMiT5IZNHbcv94KngNZj/aQ3yIyFp6Uv4=|Jiltee3Dbh1PpBz0JIS3lg==|Patient|None||Accepted||11,12
+1|personell|XkeKRXNC/N5x6AO/Zm/XseXwKs4KFS/RzTsFZzI/7MY=|ssjvdOP2fU9CNnxx0MfxvA==|Personnel|None||Accepted||
+2|admin|Bs7xikBzb35NmxzgMfd7Z45NJq9qfHrlvve+OjGTSlk=|4OQu+Vh3mks3Z/LyKQBzSw==|Admin|None||Accepted|AddPersonell|
+3|admin1|Ahu98mmVDujSfsGtpvHMkuEwZfbszXonsgxJod9Ceh0=|I3PlngyGhUV4SstMIVEIDA==|Admin|None||Pending||
+4|admin2|5sWR5qGbZtZWE+2fTY6noj1A1LFH4tFs1TsXdkv4JRw=|+2NRl+WT59DxWj3p4WPzeQ==|Admin|None||Pending||
+7|stinas_katt|JJFeG6iLZRRob0Si33MGeKNe5WojF3lhNN5gQFk6Wqo=|YlNwXxCpd68iborBRqiyEw==|Patient|None||Pending||
+8|Smith|/yd4qpnWpF+adx6VPyXYcGtVmlmbbLTGfjuMPmNrjt4=|hv05OorfYtduDRs2OWenDQ==|Personnel|Doctor|Cardiology|Accepted||
+9|Lewis|WL75gYnpx75SkHoTH9dsnWPcyJOG2NE32A+WgyikUaw=|b3XR229FQaGnmLK+S1Kwaw==|Personnel|Doctor|Cardiology|Accepted||
+10|Andersson|VUZQoEq4HqwBUYDZwT7cIDhaufrUozTg+vR/ci6U2Lo=|cFvcEtMXmG6pHmZ4G20yaw==|Personnel|Doctor|General Medicine|Accepted||
+11|Snuggles|GfCvRha4173kzQ9jX4Tdn5v65CmB1KeEAPQA2+w0h84=|2iN3NmImBxaNoyZLxvo1Iw==|Personnel|Doctor|Metaphysical Wellness|Accepted||
+12|Livingstone|4LPIPQHJN2Yt25BtXhb/NdnJX3NoPctXhvnjM9v95I8=|8OU9Z7IPFWt/Dc97tu8Wsg==|Personnel|Doctor|medicine, geography, and exploration|Accepted||
