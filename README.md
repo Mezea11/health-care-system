@@ -126,7 +126,7 @@ If the data file (data/users.csv) does not exist, the application will automatic
 | Username | Role | Password|
 | --- | ----------- | ------ |
 | patient | Patient | 123 |
-| personell | Personell | 123 |
+| personnel | Personnel | 123 |
 | admin | Admin | 123 |
 | superadmin | SuperAdmin | 123 |
 
