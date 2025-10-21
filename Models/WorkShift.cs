@@ -19,7 +19,7 @@ namespace App
       Department = department;
     }
 
-    //Used to diesply in console
+    //Used to display in console
     public string Format()
     {
       return $"{PersonnelName,-15} | {Department,-12} | {Start:yyyy-MM-dd HH:mm} - {End:HH:mm}";

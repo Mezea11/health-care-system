@@ -1,60 +1,77 @@
-namespace App;
-
-// Represents a user's complete schedule.
-// A schedule contains all appointments that belong to a specific user(patient or staff)
-public class Schedule
+namespace App
 {
-  public int UserId; // The ID of the user who owns this schedule.
-  public List<Appointment> Appointments; // A list that stores all appointments for this user.
-
-
-  // Constructor for creating a new empty schedule for a user.
-
-  // "userId" = The ID of the logged-in user.
-  public Schedule(int userId)
+  
+  // Represents a user's complete schedule.
+  // A schedule contains all appointments that belong to one user
+  // (either a patient or a staff member).
+  
+  public class Schedule
   {
-    UserId = userId;
-    Appointments = new List<Appointment>();
-  }
+    // --- Properties ---
+    public int UserId { get; set; } // The ID of the user who owns this schedule.
+    public List<Appointment> Appointments { get; set; } // All appointments for this user.
 
-  //Adds an appointment to the user's schedule.
-  //Only adds the appointment if it belongs to the correct user (matching UserId).
-
-  //"appointment" = The appointment to add.
-  public void AddAppointment(Appointment appointment)
-  {
-    if (appointment != null && appointment.UserId == UserId) // Added null part
+    // --- Constructor ---
+    // Creates a new empty schedule for a specific user.
+    public Schedule(int userId)
     {
+      UserId = userId;
+      Appointments = new List<Appointment>();
+    }
+
+    // Adds an appointment to the user's schedule.
+    // Only adds it if the appointment belongs to the correct user.
+    public void AddAppointment(Appointment appointment)
+    {
+      if (appointment == null)
+      {
+        Console.WriteLine("Tried to add a null appointment — ignored.");
+        return;
+      }
+
+      if (appointment.UserId != UserId)
+      {
+        Console.WriteLine($"Appointment does not belong to user #{UserId} — ignored.");
+        return;
+      }
+
       Appointments.Add(appointment);
     }
-  }
 
-  //Retrieves all appointments for a specific week, based on a given start date.
-
-  //Retrives all appointments for a given week
-  public List<Appointment> GetAppointmentsForWeek(DateTime weekStart)
-  {
-    //Filter appointments that occur between weekStart (inclusive) and weekEnd (exclusive).
-    DateTime weekEnd = weekStart.AddDays(7);
-    return Appointments
-    .Where(a => a.Date >= weekStart && a.Date < weekEnd)
-    .OrderBy(a => a.Date)
-    .ToList();
-  }
-
-  // Prints the user's entrie schedule to the console in a readable format.
-  //Mainly used for debugging or test-based testing.
-  public void PrintSchedule()
-  {
-    Console.WriteLine($"\n--- Schedule for user #{UserId} ---:");
-    if (!Appointments.Any())
+    
+    // Returns all appointments for a specific week.
+    // The week starts at the given 'weekStart' date and includes 7 days.
+    
+    public List<Appointment> GetAppointmentsForWeek(DateTime weekStart)
     {
-      Console.WriteLine("No appointments found."); // Added no appointments found.
-      return;
+      DateTime weekEnd = weekStart.AddDays(7);
+
+      var weeklyAppointments = Appointments
+        .Where(appointment => appointment.Date >= weekStart && appointment.Date < weekEnd)
+        .OrderBy(appointment => appointment.Date)
+        .ToList();
+
+      return weeklyAppointments;
     }
-    foreach (var a in Appointments.OrderBy(a => a.Date))
+
+    
+    // Prints the full schedule to the console in a readable format.
+    // Mainly used for debugging, testing, or quick overviews.
+    
+    public void PrintSchedule()
     {
-      Console.WriteLine(a.Format());
+      Console.WriteLine($"\n--- Schedule for user #{UserId} ---");
+
+      if (!Appointments.Any())
+      {
+        Console.WriteLine("No appointments found.");
+        return;
+      }
+
+      foreach (var appointment in Appointments.OrderBy(appointment => appointment.Date))
+      {
+        Console.WriteLine(appointment.Format());
+      }
     }
   }
 }
