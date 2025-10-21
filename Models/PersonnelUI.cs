@@ -5,236 +5,8 @@ namespace App
 
     public static class PersonnelUI
     {
-<<<<<<< HEAD
         // Mock dictionary of personnel assignments: personnel ID -> list of assigned patient IDs
         static Dictionary<int, List<int>> AssignedPatients = new Dictionary<int, List<int>>()
-=======
-        { 2, new List<int> { 5, 6 } },
-        { 3, new List<int> { 7 } }
-    };
-
-    public static void ApproveAppointments(List<User> users, User activeUser)
-    {
-      Console.Clear();
-      Console.WriteLine($"--- Approve or Deny Appointment Request (Personnel: {activeUser.Username} ---\n)");
-
-      var scheduleService = new ScheduleService();
-      var allAppointments = scheduleService.LoadAllAppointments();
-
-      //Filter only pending (not approved)
-      var pending = allAppointments.Where(a => !a.IsApproved).ToList();
-
-      if (pending.Count == 0)
-      {
-        Utils.DisplayAlertText("There are no pending appointments.");
-        Console.ReadKey();
-        return;
-      }
-      //List all pending appointments
-      for (int i = 0; i < pending.Count; i++)
-      {
-        var appt = pending[i];
-        var patient = users.FirstOrDefault(u => u.Id == appt.UserId);
-        string patientName = patient != null ? patient.Username : $"Unknow (ID {appt.UserId})";
-        Console.WriteLine($"{i + 1}. {patientName} - {appt.Format()}");
-      }
-      int choice = Utils.GetIntegerInput("\nSelect appointment to review (0 to cancel): ");
-      if (choice == 0 || choice > pending.Count)
-        return;
-
-      var selected = pending[choice - 1];
-
-      Console.WriteLine("\nSelected: {selected.Formart()}");
-      Console.WriteLine("Approve (A) or Deny (D)?");
-      string action = Console.ReadLine()?.Trim().ToLower() ?? "";
-
-      if (action == "a")
-      {
-        selected.IsApproved = true;
-        scheduleService.SaveAppointment(selected);
-        Utils.DisplaySuccesText("Appointment approved!");
-      }
-      else if (action == "d")
-      {
-        scheduleService.RemoveAppointment(selected.UserId, selected.Date);
-        Utils.DisplayAlertText("Appointment denied and removed.");
-      }
-      else
-      {
-        Utils.DisplayAlertText("Invalid choice. Returning to menu...");
-      }
-      Console.WriteLine("\nPress any key to return...");
-      Console.ReadKey();
-    }
-
-
-    // =========================================
-    // Modify a patient's appointment
-    // =========================================
-    public static void ModifyAppointment(List<User> users, User activeUser)
-    {
-      Console.Clear();
-      Console.WriteLine($"--- Modify Patient Appointment (Personnel: {activeUser.Username}) ---\n");
-
-      if (!AssignedPatients.ContainsKey(activeUser.Id) || AssignedPatients[activeUser.Id].Count == 0)
-      {
-        Utils.DisplayAlertText("You are not currently assigned to any patients.");
-        Console.ReadKey();
-        return;
-      }
-
-      List<int> assignedPatients = AssignedPatients[activeUser.Id];
-      Console.WriteLine("Assigned Patients: ");
-      foreach (int pid in assignedPatients)
-      {
-        var patient = users.FirstOrDefault(u => u.Id == pid);
-        if (patient != null)
-          Console.WriteLine($"- {patient.Username} (ID: {pid})");
-      }
-
-      int selectedPatientId = Utils.GetIntegerInput("\nEnter Patient ID to modify appointments: ");
-      if (!assignedPatients.Contains(selectedPatientId))
-      {
-        Utils.DisplayAlertText("You are not authorized to access this patient's schedule.");
-        return;
-      }
-
-      var scheduleService = new ScheduleService();
-      var schedule = scheduleService.LoadSchedule(selectedPatientId);
-
-      if (schedule.Appointments.Count == 0)
-      {
-        Utils.DisplayAlertText("No appointments found for this patient.");
-        return;
-      }
-
-      Console.WriteLine("\nPatient Appointments: ");
-      for (int i = 0; i < schedule.Appointments.Count; i++)
-        Console.WriteLine($"{i + 1}. {schedule.Appointments[i].Format()}");
-
-      int selectedIndex = Utils.GetIntegerInput("\nChoose appointment number to modify: ") - 1;
-      if (selectedIndex < 0 || selectedIndex >= schedule.Appointments.Count)
-      {
-        Utils.DisplayAlertText("Invalid selection.");
-        return;
-      }
-
-      var appointment = schedule.Appointments[selectedIndex];
-
-      string newDoctor = Utils.GetRequiredInput($"Doctor ({appointment.Doctor}): ");
-      string newDepartment = Utils.GetRequiredInput($"Department ({appointment.Department}): ");
-      string newType = Utils.GetRequiredInput($"Type ({appointment.Type}): ");
-      string dateInput = Utils.GetRequiredInput($"Date & Time ({appointment.Date:yyyy-MM-dd HH:mm}): ");
-
-      if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
-          System.Globalization.DateTimeStyles.None, out DateTime newDate))
-      {
-        Utils.DisplayAlertText("Invalid date format. Modification canceled.");
-        return;
-      }
-
-      appointment.Doctor = newDoctor;
-      appointment.Department = newDepartment;
-      appointment.Type = newType;
-      appointment.Date = newDate;
-      appointment.PersonnelId = activeUser.Id;
-
-      scheduleService.SaveAppointment(appointment);
-      Utils.DisplaySuccesText("Appointment modified successfully!");
-    }
-
-    // =========================================
-    // Open a patient's journal
-    // =========================================
-    public static void OpenJournal(List<User> users, User activeUser)
-    {
-      Console.Clear();
-      Console.WriteLine($"--- Open Journal (Personnel: {activeUser.Username}) ---\n");
-
-      if (!AssignedPatients.ContainsKey(activeUser.Id) || AssignedPatients[activeUser.Id].Count == 0)
-      {
-        Utils.DisplayAlertText("You are not currently assigned to any patients.");
-        Console.ReadKey();
-        return;
-      }
-
-      List<int> assignedPatients = AssignedPatients[activeUser.Id];
-      Console.WriteLine("Assigned Patients:");
-      foreach (int pid in assignedPatients)
-      {
-        var patient = users.FirstOrDefault(u => u.Id == pid);
-        if (patient != null)
-          Console.WriteLine($"- {patient.Username} (ID: {pid})");
-      }
-
-      int selectedId = Utils.GetIntegerInput("\nEnter Patient ID to open their journal: ");
-      if (!assignedPatients.Contains(selectedId))
-      {
-        Utils.DisplayAlertText("You are not authorized to access this patient's journal.");
-        return;
-      }
-
-      var journalService = new JournalService();
-      var entries = journalService.GetJournalEntries(selectedId);
-
-      Console.Clear();
-      Console.WriteLine($"--- Journal for Patient #{selectedId} ---\n");
-      if (entries.Count == 0)
-        Console.WriteLine("(No entries yet)");
-      else
-        entries.ForEach(e => Console.WriteLine(e.Format()));
-
-      Console.WriteLine("\nAdd a new entry? (y/n): ");
-      string choice = Console.ReadLine()?.Trim().ToLower() ?? "";
-      if (choice == "y")
-      {
-        string newText = Utils.GetRequiredInput("Enter new journal text: ");
-        journalService.AddEntry(selectedId, activeUser.Username, newText);
-
-        Utils.DisplaySuccesText("Entry added successfully!");
-      }
-
-      Console.WriteLine("\nPress any key to return to menu...");
-      Console.ReadKey();
-    }
-
-    // =========================================
-    // Advanced interactive schedule view
-    // =========================================
-    public static void ViewMySchedule(User activeUser)
-    {
-      Console.Clear();
-      Console.WriteLine($"--- My Work Schedule ({activeUser.Username}) ---\n");
-
-      var scheduleService = new ScheduleService();
-
-      var allAppointments = scheduleService.LoadAllAppointments()
-          .Where(a => a.PersonnelId == activeUser.Id)
-          .OrderBy(a => a.Date)
-          .ToList();
-
-      var shifts = scheduleService.LoadShiftsForPersonnel(activeUser.Id)
-          .OrderBy(s => s.Start)
-          .ToList();
-
-      Console.WriteLine("Filter by date? (yyyy-MM-dd) or leave empty for all: ");
-      string dateFilterInput = Console.ReadLine()?.Trim() ?? "";
-      DateTime? filterDate = null;
-      if (!string.IsNullOrEmpty(dateFilterInput) && DateTime.TryParse(dateFilterInput, out DateTime parsedDate))
-        filterDate = parsedDate.Date;
-
-      foreach (var shift in shifts)
-      {
-        if (filterDate.HasValue && shift.Start.Date != filterDate.Value)
-          continue;
-
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"\nShift: {shift.Start:yyyy-MM-dd HH:mm} - {shift.End:HH:mm}");
-        Console.ResetColor();
-
-        var colleagues = scheduleService.GetColleaguesForShift(shift);
-        if (colleagues.Any())
->>>>>>> master
         {
             { 2, new List<int> { 5, 6 } }, // Example: Personnel with ID 2 is responsible for aptients 5 and 6
             { 3, new List<int> { 7 } } // Example: Personnel with ID 3 is responsible for patient 7
@@ -245,7 +17,7 @@ namespace App
         // Method to allow personnel to approve or deny appointment requests
         // users - list of all users in the system
         // activePersonnel - the currently logged-in personnel performing the action
-        public static void ApproveAppointments(List<IUser> users, IUser activePersonnel)
+        public static void ApproveAppointments(List<User> users, User activePersonnel)
         {
             Console.Clear(); // Clear the console for fresh view
             Console.WriteLine($"--- Approve or Deny Appointment Requests (Personnel: {activePersonnel.Username}) ---\n");// Display header with name of active personnel
@@ -326,7 +98,7 @@ namespace App
 
         // Modify a Patient's Appointment
 
-        public static void ModifyAppointment(List<IUser> users, IUser activePersonnel)
+        public static void ModifyAppointment(List<User> users, User activePersonnel)
         {
             Console.Clear(); // Clear the console and display header
             Console.WriteLine($"--- Modify Patient Appointment (Personnel: {activePersonnel.Username}) ---\n");
@@ -415,7 +187,7 @@ namespace App
 
         // Open a Patient's Journal
 
-        public static void OpenJournal(List<IUser> users, IUser activePersonnel)
+        public static void OpenJournal(List<User> users, User activePersonnel)
         {
             Console.Clear(); // Clear the console and show header
             Console.WriteLine($"--- Open Journal (Personnel: {activePersonnel.Username}) ---\n");
@@ -483,7 +255,7 @@ namespace App
 
         // View Own Schedule
 
-        public static void ViewMySchedule(IUser activePersonnel)
+        public static void ViewMySchedule(User activePersonnel)
         {
             Console.Clear(); // Clear console and display header
             Console.WriteLine($"--- My Work Schedule ({activePersonnel.Username}) ---\n");
