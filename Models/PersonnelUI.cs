@@ -13,10 +13,65 @@ namespace App
         { 3, new List<int> { 7 } }
     };
 
+    public static void ApproveAppointments(List<User> users, User activeUser)
+    {
+      Console.Clear();
+      Console.WriteLine($"--- Approve or Deny Appointment Request (Personnel: {activeUser.Username} ---\n)");
+
+      var scheduleService = new ScheduleService();
+      var allAppointments = scheduleService.LoadAllAppointments();
+
+      //Filter only pending (not approved)
+      var pending = allAppointments.Where(a => !a.IsApproved).ToList();
+
+      if (pending.Count == 0)
+      {
+        Utils.DisplayAlertText("There are no pending appointments.");
+        Console.ReadKey();
+        return;
+      }
+      //List all pending appointments
+      for (int i = 0; i < pending.Count; i++)
+      {
+        var appt = pending[i];
+        var patient = users.FirstOrDefault(u => u.Id == appt.UserId);
+        string patientName = patient != null ? patient.Username : $"Unknow (ID {appt.UserId})";
+        Console.WriteLine($"{i + 1}. {patientName} - {appt.Format()}");
+      }
+      int choice = Utils.GetIntegerInput("\nSelect appointment to review (0 to cancel): ");
+      if (choice == 0 || choice > pending.Count)
+        return;
+
+      var selected = pending[choice - 1];
+
+      Console.WriteLine("\nSelected: {selected.Formart()}");
+      Console.WriteLine("Approve (A) or Deny (D)?");
+      string action = Console.ReadLine()?.Trim().ToLower() ?? "";
+
+      if (action == "a")
+      {
+        selected.IsApproved = true;
+        scheduleService.SaveAppointment(selected);
+        Utils.DisplaySuccesText("Appointment approved!");
+      }
+      else if (action == "d")
+      {
+        scheduleService.RemoveAppointment(selected.UserId, selected.Date);
+        Utils.DisplayAlertText("Appointment denied and removed.");
+      }
+      else
+      {
+        Utils.DisplayAlertText("Invalid choice. Returning to menu...");
+      }
+      Console.WriteLine("\nPress any key to return...");
+      Console.ReadKey();
+    }
+
+
     // =========================================
     // Modify a patient's appointment
     // =========================================
-    public static void ModifyAppointment(List<IUser> users, IUser activeUser)
+    public static void ModifyAppointment(List<User> users, User activeUser)
     {
       Console.Clear();
       Console.WriteLine($"--- Modify Patient Appointment (Personnel: {activeUser.Username}) ---\n");
@@ -91,7 +146,7 @@ namespace App
     // =========================================
     // Open a patient's journal
     // =========================================
-    public static void OpenJournal(List<IUser> users, IUser activeUser)
+    public static void OpenJournal(List<User> users, User activeUser)
     {
       Console.Clear();
       Console.WriteLine($"--- Open Journal (Personnel: {activeUser.Username}) ---\n");
@@ -146,7 +201,7 @@ namespace App
     // =========================================
     // Advanced interactive schedule view
     // =========================================
-    public static void ViewMySchedule(IUser activeUser)
+    public static void ViewMySchedule(User activeUser)
     {
       Console.Clear();
       Console.WriteLine($"--- My Work Schedule ({activeUser.Username}) ---\n");

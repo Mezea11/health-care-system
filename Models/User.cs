@@ -1,6 +1,51 @@
 namespace App
 {
-    public class User : IUser
+    public enum Role
+    {
+        None,
+        Patient,
+        Personnel,
+        Admin,
+        SuperAdmin,
+    }
+
+    public enum PersonellRoles
+    {
+        None, // Lägg till detta!
+        Doctor,
+        Nurse,
+        Administrator,
+    }
+
+    public enum Permissions
+    {
+        None,
+        AddRegistrations,
+        AddPersonell,
+        AddAdmin,
+        AddLocation,
+        ViewPatientJournal,
+        ViewAllJournals,
+        ViewPermissions
+    }
+
+    public enum Registration // Enum för början av registrerings processen
+    {
+        Accepted,
+        Pending,
+        Denied,
+    }
+
+    public enum Region
+    {
+        None,
+        Skåne,
+        Norrland,
+        Götaland,
+    }
+
+
+    public class User
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
@@ -42,7 +87,7 @@ namespace App
             return false; // Tilldelning misslyckades (inte en patient eller redan tilldelad)
         }
 
-        public void SetRolePersonell(int handleRole, IUser persObj, string roleDetails)
+        public void SetRolePersonell(int handleRole, User persObj, string roleDetails)
         {
             // Kontrollera om användaren är Personal innan vi ens försöker ändra något
             if (persObj.GetRole() == Role.Personnel)
@@ -107,15 +152,15 @@ namespace App
                 PermissionList.Add(Permissions.None);
         }
 
-        public void AcceptViewPermissions(Permissions perm)
-        {
-            if (!PermissionList.Contains(perm))
-                PermissionList.Add(perm);
-        }
+        // public void AcceptViewPermissions(Permissions perm)
+        // {
+        //     if (!PermissionList.Contains(perm))
+        //         PermissionList.Add(perm);
+        // }
 
-        public void RevokePermission()
+        public void RevokePermission(Permissions perm)
         {
-            PermissionList.Remove(Permissions.AddLocation);
+            PermissionList.Remove(perm);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }
@@ -139,6 +184,16 @@ namespace App
                 PermissionList.Add(Permissions.AddRegistrations);
         }
 
+        // DONT REMOVE >YOURSELF 
+
+        public void AcceptPending() => Registration = Registration.Accepted;
+        public void DenyPending() => Registration = Registration.Denied;
+
+        public void GrantPermission(Permissions perm)
+        {
+            if (!PermissionList.Contains(perm))
+                PermissionList.Add(perm);
+        }
         public void DenyAddRegistrationsPermission()
         {
             PermissionList.Remove(Permissions.AddRegistrations);
