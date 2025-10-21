@@ -46,7 +46,7 @@ namespace App
                 var appointment = pendingAppointments[index];
 
                 //Find the patient associated with this appointment
-                IUser? patient = null;
+                User? patient = null;
                 foreach (var user in users)
                 {
                     if (user.Id == appointment.UserId)
@@ -114,7 +114,7 @@ namespace App
             Console.WriteLine("Assigned Patients:"); //Display all assgined patients with theri names
             foreach (int patientId in assignedPatientIds)
             {
-                IUser? patient = null;
+                User? patient = null;
                 foreach (var user in users) // Find the user object that matches this patient ID
                 {
                     if (user.Id == patientId)
@@ -203,7 +203,7 @@ namespace App
             Console.WriteLine("Assigned Patients:"); // Display all assigned patients with their names
             foreach (int patientId in assignedPatientIds)
             {
-                IUser? patient = null;
+                User? patient = null;
                 foreach (var user in users) // Find the corresponding user object for each patient ID
                 {
                     if (user.Id == patientId)
