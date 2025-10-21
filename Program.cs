@@ -769,8 +769,9 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
         Console.WriteLine("3. Approve/Deny patient appointment request");
         Console.WriteLine("4. View my schedule");
-        Console.WriteLine("6. Logout");
-        Console.WriteLine("8. Register appointments");
+        Console.WriteLine("7. Register appointments");
+        Console.WriteLine("8. Logout");
+
 
         int input = Utils.GetIntegerInput("\nChoice: ");
 
@@ -823,7 +824,7 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
                 ShowSchedule(activeUser);
                 break;
 
-            case 6:
+            case 8:
 
                 Console.WriteLine("Logging out...");
 
@@ -831,7 +832,7 @@ static void PersonnelMenu(List<IUser> users, ref IUser activeUser, List<Appointm
                 inMenu = false;
                 break;
 
-            case 8:
+            case 7:
 
                 // Loop All users in User
                 foreach (User user in users)
