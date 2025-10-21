@@ -255,7 +255,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
 
                 // Get user input, compare user input to admin names in list
                 string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
+                User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?"); // Accept or deny giving permission from enum list
@@ -280,7 +280,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                     Utils.DisplayAlertText("No admin with that name.");
                 }
             }
-            FileHandler.SaveUsersToJson(users); // Save to JSON
+            FileHandler.SaveUsersToCsv(users); // Save to JSON
             break;
 
         case 2:
@@ -330,7 +330,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
-            FileHandler.SaveUsersToJson(users); // save user to JSON file
+            FileHandler.SaveUsersToCsv(users); // save user to JSON file
             break;
 
         case 4:
@@ -343,7 +343,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 }
                 // Select admin through input. Compare input to admin name in list
                 string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); 
+                User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); 
                 if (adminUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
@@ -369,7 +369,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 }
             }
 
-            FileHandler.SaveUsersToJson(users); // save user to JSON
+            FileHandler.SaveUsersToCsv(users); // save user to JSON
             break;
         case 5:
             {
@@ -383,7 +383,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
 
                 // Select admin through input. Compare input to admin name in list
                 string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); 
+                User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); 
                 if (adminUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for viewing all users permissions?");
@@ -408,7 +408,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
-            FileHandler.SaveUsersToJson(users); // save user to JSON
+            FileHandler.SaveUsersToCsv(users); // save user to JSON
             break;
 
         case 6:
@@ -425,7 +425,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                     
                     // User input. Compare user input to names in list, select user based on name
                     string adminHandling = Utils.GetRequiredInput("Pick admin username you want to handle:  ");
-                    IUser? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase)); 
+                    User? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase)); 
                     if (adminUser != null)
                     {
                         string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
@@ -500,7 +500,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
             break;
 
         case 8:
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users);
             Console.WriteLine("\n1. Write 'logout' to log out.");
             Console.WriteLine("2. Write 'return' to go back.");
 
@@ -719,7 +719,7 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
             }
             break;
         case 9:
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users);
             Console.WriteLine("\n1. Write 'logout' to log out.");
             Console.WriteLine("2. Write 'return' to go back.");
             break;
@@ -738,7 +738,7 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
 // ============================
 
 
-void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
+void PersonnelMenu(List<User> users, User activeUser, List<Appointment> appointments)
 
 {
     ScheduleService scheduleService = new ScheduleService();
@@ -788,7 +788,7 @@ void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appoin
                     }
                     // Work with string get name first and after we are done we are working with index. 
                     string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-                    IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); 
+                    User? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); 
                     if (patientUser != null)
                     {
                         Console.WriteLine(patientUser);
@@ -1066,7 +1066,7 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             // CASE 8 — Logout
             // ==========================================
             case 8:
-                FileHandler.SaveUsersToJson(users);
+                FileHandler.SaveUsersToCsv(users);
                 Console.WriteLine("\n1. Write 'logout' to log out.");
                 Console.WriteLine("2. Write 'return' to go back.");
                 break;
@@ -1080,7 +1080,7 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
 
 
 //COMMON METHOD - Show current user's schedule
-static void ShowSchedule(IUser activeUser)
+static void ShowSchedule(User activeUser)
 {
     Console.Clear();
     Console.WriteLine($"--- Schedule for {activeUser.Username} ---\n");
