@@ -13,16 +13,99 @@ class FileHandler
 
     private const char PrimarySeperator = '|';
     private const char ListSeperator = ',';
-
+    const string DefaultPassword = "123";
     private static List<IUser> CreateTestUser()
     {
-        // Använd dummy data för att populera users listan
-        return new List<IUser>
+        Console.WriteLine("file dont exist");
+        const string DefaultPassword = "123";
+
+        // 1. Skapa alla användare med den enkla konstruktorn
+        // Detta hanterar ID, Username, Role, och att skicka in password som has/saltar det 
+        var users = new List<User>
+    {
+        // Enkla roller
+        new User(0, "patient", DefaultPassword, Role.Patient),
+        new User(1, "personell", DefaultPassword, Role.Personnel),
+        new User(2, "admin", DefaultPassword, Role.Admin),
+        new User(3, "admin", DefaultPassword, Role.Admin),
+        new User(4, "admin1", DefaultPassword, Role.Admin),
+        new User(5, "admin2", DefaultPassword, Role.Admin),
+
+        // Läkare skapas först som vanlig 'Personnel'
+        new User(6, "Smith", DefaultPassword, Role.Personnel),
+        new User(7, "admin_doctor", DefaultPassword, Role.Personnel),
+        new User(8, "Andersson", DefaultPassword, Role.Personnel),
+        new User(9, "Snuggles", DefaultPassword, Role.Personnel),
+        new User(10, "Livingstone", DefaultPassword, Role.Personnel),
+        new User(11, "superadmin", DefaultPassword, Role.SuperAdmin),
+    };
+
+        // ----------------------------------------------------------------------
+        // 2. HANTERING AV BEHÖRIGHETER (Permissions)
+        // ----------------------------------------------------------------------
+
+        // Hitta admin med ID 2 (första admin som får permissons för att göra saker)
+        var mainAdmin = users.FirstOrDefault(u => u.Id == 2);
+        if (mainAdmin != null)
         {
-            new User(0, "patient", "123", Role.Patient),
-            new User(1, "personell", "123", Role.Personnel),
-            new User(2, "admin", "123", Role.Admin),
-        };
+            // Tänk: mainAdmin.PermissionList.Add(Permissions.ManageUsers);
+            mainAdmin.PermissionList.Add(Permissions.AddPersonell);
+            mainAdmin.PermissionList.Add(Permissions.AddRegistrations);
+            mainAdmin.Registration = Registration.Accepted;
+        }
+
+        // Hitta admin med ID 4
+        var secondaryAdmin = users.FirstOrDefault(u => u.Id == 4);
+        secondaryAdmin?.PermissionList.Add(Permissions.AddPersonell);
+
+        // ----------------------------------------------------------------------
+        // 3. LÄKARHANTERING (Använd LINQ (FirstOrDefault) för att hitta och uppdatera specifika användare)
+        // ----------------------------------------------------------------------
+        // 
+
+        // Smith (Doctor, Cardiology)
+        var smith = users.FirstOrDefault(u => u.Id == 6);
+        if (smith != null)
+        {
+            smith.PersonelRole = PersonellRoles.Doctor;
+            smith.RoleDetails = "Cardiology";
+        }
+
+        // admin_doctor (Doctor, General Medicine)
+        var adminDoctor = users.FirstOrDefault(u => u.Id == 7);
+        if (adminDoctor != null)
+        {
+            adminDoctor.PersonelRole = PersonellRoles.Doctor;
+            adminDoctor.RoleDetails = "General Medicine";
+        }
+
+        // Andersson (Doctor, Neurology)
+        var andersson = users.FirstOrDefault(u => u.Id == 8);
+        if (andersson != null)
+        {
+            andersson.PersonelRole = PersonellRoles.Doctor;
+            andersson.RoleDetails = "Neurology";
+        }
+
+        // Snuggles (Doctor, Metaphysical Wellness)
+        var snuggles = users.FirstOrDefault(u => u.Id == 9);
+        if (snuggles != null)
+        {
+            snuggles.PersonelRole = PersonellRoles.Doctor;
+            snuggles.RoleDetails = "Metaphysical Wellness";
+        }
+
+        // Livingstone (Doctor, complex RoleDetails)
+        var livingstone = users.FirstOrDefault(u => u.Id == 10);
+        if (livingstone != null)
+        {
+            livingstone.PersonelRole = PersonellRoles.Doctor;
+            livingstone.RoleDetails = "medicine, geography, and exploration";
+        }
+        // spara till data.csv 
+        SaveUsersToCsv(users.ConvertAll<IUser>(u => u));
+        // 3. Returnera listan som List<IUser>
+        return users.ConvertAll<IUser>(u => u);
     }
 
     // === ERSÄTTNING FÖR SerializePermissions ===
