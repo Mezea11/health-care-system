@@ -64,7 +64,7 @@ List<User> users = FileHandler.LoadFromCsv();
 User? activeUser = null;
 bool running = true;
 
-
+Console.Clear();
 StartMenu(users);
 
 // ============================
