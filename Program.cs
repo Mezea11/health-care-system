@@ -234,7 +234,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
     Console.WriteLine("1. Grant admin to add location");
     Console.WriteLine("2. Overview of permissions");
     Console.WriteLine("3. Grant admin to handle registrations");
-    Console.WriteLine("4. Grant admin to create personel");
+    Console.WriteLine("4. Grant admin to create personnel");
     Console.WriteLine("5. Grant admin to check list of user permissions");
     Console.WriteLine("6. See pending admin registration requests");
     Console.WriteLine("7. Assign admins to certain regions");
@@ -260,17 +260,17 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?"); // Accept or deny giving permission from enum list
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for adding location? \n"); // Accept or deny giving permission from enum list
                     switch (acceptOrDeny)
                     {
                         case "y":
                             adminUser.GrantPermission(Permissions.AddLocation); // Grants permission
-                            Utils.DisplaySuccesText($"You have accepted the permission add a location to admin user: {adminName}");
+                            Utils.DisplaySuccessText($"You have accepted the permission add a location to admin user: {adminName}");
                             break;
 
                         case "d":
                             adminUser.RevokePermission(Permissions.AddLocation);   // Denies permission
-                            Utils.DisplaySuccesText("You have denied the permission");
+                            Utils.DisplaySuccessText("You have denied the permission");
                             break;
                         default:
                             Utils.DisplayAlertText("Only y or n is handled");
@@ -310,17 +310,17 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for handling registration requests?\n");
                     switch (acceptOrDeny)
                     {
                         case "y":
                             adminUser.GrantPermission(Permissions.AddRegistrations); // grant admin permission to add registrations
-                            Utils.DisplaySuccesText($"You have accepted the permission handle registrations for admin: {adminName} ");
+                            Utils.DisplaySuccessText($"You have accepted the permission handle registrations for admin: {adminName} ");
                             break;
 
                         case "d":
                             adminUser.RevokePermission(Permissions.AddRegistrations);   // deny admin permissions to add registrations
-                            Utils.DisplaySuccesText($"You have denied permission handle registrations for user: {adminName} ");
+                            Utils.DisplaySuccessText($"You have denied permission handle registrations for user: {adminName} ");
                             break;
                         default:
                             Utils.DisplayAlertText("Only y or n is handled");
@@ -348,17 +348,17 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for handling registration requests?\n");
                     switch (acceptOrDeny)
                     {
                         case "y":
                             adminUser.GrantPermission(Permissions.AddPersonell); // grant permission to add personnel
-                            Utils.DisplaySuccesText($"You have accepted the permission to create personel for admin: {adminName} ");
+                            Utils.DisplaySuccessText($"You have accepted the permission to create personnel for admin: {adminName} ");
                             break;
 
                         case "d":
                             adminUser.RevokePermission(Permissions.AddPersonell);   // deny permission to add personnel
-                            Utils.DisplaySuccesText($"You have denied permission create personel for user: {adminName} ");
+                            Utils.DisplaySuccessText($"You have denied permission create personnel for user: {adminName} ");
                             break;
                         default:
                             Utils.DisplayAlertText("Only y or n is handled");
@@ -388,17 +388,17 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for viewing all users permissions?");
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for viewing all users permissions?\n");
                     switch (acceptOrDeny)
                     {
                         case "y":
                             adminUser.GrantPermission(Permissions.AddAdmin); // grant permission to view all user permissions
-                            Utils.DisplaySuccesText($"You have accepted the permission to view all user permissions for admin: {adminName} ");
+                            Utils.DisplaySuccessText($"You have accepted the permission to view all user permissions for admin: {adminName} ");
                             break;
 
                         case "d":
                             adminUser.RevokePermission(Permissions.AddAdmin);   // deny permission to view all user permissions
-                            Utils.DisplaySuccesText($"You have denied permission to view all user permissions for user: {adminName} ");
+                            Utils.DisplaySuccessText($"You have denied permission to view all user permissions for user: {adminName} ");
                             break;
                         default:
                             Utils.DisplayAlertText("Only y or n is handled");
@@ -430,17 +430,17 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                     User? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase));
                     if (adminUser != null)
                     {
-                        string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
+                        string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}, Do you want accept(y) or deny(d) the request: \n");
                         switch (acceptOrDeny)
                         {
                             case "y":
                                 adminUser.AcceptPending(); // accept pending registration and allow admin to create account
-                                Utils.DisplaySuccesText("Admin registration accepted");
+                                Utils.DisplaySuccessText("Admin registration accepted");
                                 break;
 
                             case "d":
                                 adminUser.DenyPending();   // deny pending registration request
-                                Utils.DisplaySuccesText("Admin registration denied");
+                                Utils.DisplaySuccessText("Admin registration denied");
                                 break;
                             default:
                                 Utils.DisplayAlertText("Only y or n is handled");
@@ -498,7 +498,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
 
             Region selectedRegion = regions[regionChoice];
             chosenAdmin.AssignRegion(selectedRegion);
-            Utils.DisplaySuccesText(chosenAdmin.Username + " has been assigned to region: " + selectedRegion);
+            Utils.DisplaySuccessText(chosenAdmin.Username + " has been assigned to region: " + selectedRegion);
             break;
 
         case 8:
@@ -531,19 +531,19 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
     Console.WriteLine("8. View my regions"); // kommer att ändras vid merge.
     Console.WriteLine("9. Logout");
 
-    switch (Utils.GetIntegerInput("Choice:"))
+    switch (Utils.GetIntegerInput("Choice: "))
     {
         case 1:
-            Console.WriteLine("Create account for personel or admin");
+            Console.WriteLine("Create account for personnel or admin");
             if (activeUser.HasPermission(Permissions.AddPersonell)) // if admin has permission
             {
-                Console.WriteLine("(1). Create account for Personell"); // can then create an account for personnel or...
+                Console.WriteLine("(1). Create account for personnel"); // can then create an account for personnel or...
             }
             if (activeUser.HasPermission(Permissions.AddAdmin))
             {
                 Console.WriteLine("(2). Create account for Admin"); // ...an account for admin if admin has the correct
             }
-            Console.WriteLine("(3). Go up"); // goes back
+            Console.WriteLine("(3). Return"); // goes back
             switch (Utils.GetIntegerInput("Choose a number: "))
             {
                 case 1:
@@ -554,13 +554,13 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
                     }
                     else
                     {
-                        Console.WriteLine("Create new Personel account"); //otherwise the admin is able to start creating account by username and password.
+                        Console.WriteLine("Create new personnel account"); //otherwise the admin is able to start creating account by username and password.
                         string newUser = Utils.GetRequiredInput("Insert username: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
 
                         users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personnel)); // the new personnel goes into the list of personnel
                         User? UserLastCreated = users.Last(); // this code takes the last item in the users list. The element that we created above...
-                        int chooseRole = Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. (Choose a number): "); // ...and giving the new personnel a role.
+                        int chooseRole = Utils.GetIntegerInput("Pick role for the personnel: (1)Doctor, (2)Nurse, (3)Administrator. (Choose a number): "); // ...and giving the new personnel a role.
                         string doctoDetails = "";
                         switch (chooseRole)
                         {
@@ -573,7 +573,7 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
                         }
                         UserLastCreated.SetRolePersonell(chooseRole, UserLastCreated, doctoDetails);
                         FileHandler.SaveUsersToCsv(users);
-                        Utils.DisplaySuccesText($"New personell account for {newUser} created. ");
+                        Utils.DisplaySuccessText($"New personnel account for {newUser} created. ");
                     }
                     break;
                 case 2:
@@ -584,12 +584,12 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
                     }
                     else
                     {
-                        Console.WriteLine("Create new Personel account");
+                        Console.WriteLine("Create new personnel account");
                         string newUser = Utils.GetRequiredInput("Insert username: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
                         users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Admin));
                         FileHandler.SaveUsersToCsv(users);
-                        Utils.DisplaySuccesText($"New admin account for {newUser} created. ");
+                        Utils.DisplaySuccessText($"New admin account for {newUser} created. ");
 
                     }
                     break;
@@ -649,17 +649,17 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
                 User? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
                 if (patientUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  "); // accept or deny
+                    string acceptOrDeny = Utils.GetRequiredInput($"You picked: {patientUser.Username}. Do you want accept(y) or deny(d) the request:  "); // accept or deny
                     switch (acceptOrDeny)
                     {
                         case "y":
                             patientUser.AcceptPending(); // calls the method when yes
-                            Utils.DisplaySuccesText("Correct with accept");
+                            Utils.DisplaySuccessText("Request accepted.");
                             break;
 
                         case "d":
                             patientUser.DenyPending();   // calls the method when no
-                            Utils.DisplaySuccesText("Correct with deny");
+                            Utils.DisplaySuccessText("Request denied.");
                             break;
                         default:
                             Utils.DisplayAlertText("Only y or n is handled"); // error handling
@@ -745,9 +745,6 @@ void PersonnelMenu(List<User> users, User activeUser, List<Appointment> appointm
 {
     ScheduleService scheduleService = new ScheduleService();
 
-    bool inMenu = true;
-    while (inMenu)
-    {
         Console.Clear();
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
         Console.WriteLine("1. Open assigned patient journal");
@@ -819,7 +816,7 @@ void PersonnelMenu(List<User> users, User activeUser, List<Appointment> appointm
                     // Input går in och sparas i patientHandling
                     string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
                     // Searching through list of users and picks out the one that was saved in patienthandling aaaaand then saving it to patientUser
-                    User patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+                    User? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
                     // users -> a list<User> your collection of all users
                     //.Find A method that returns the FIRST MATCH based on condition, Returns Null if no match is found
                     // user => "lambda expression" short inline function.
@@ -855,7 +852,7 @@ void PersonnelMenu(List<User> users, User activeUser, List<Appointment> appointm
                         scheduleService.SaveAppointment(newAppointment);
 
 
-                        Utils.DisplaySuccesText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+                        Utils.DisplaySuccessText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
                         Console.ReadKey();
                         break;
 
@@ -876,7 +873,6 @@ void PersonnelMenu(List<User> users, User activeUser, List<Appointment> appointm
         }
 
     }
-}
 
 // ============================
 // PATIENT MENU METHOD
@@ -935,12 +931,12 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
         // ==========================================
         case 2:
             Console.WriteLine("\n--- Create New Appointment ---");
-            Console.WriteLine("All docktors:  ");
+            Console.WriteLine("All doctors:  ");
             foreach (User user in doctorsList)
             {
                 Console.WriteLine(user.ToPersonnelDisplay());
             }
-            string doctor = Utils.GetRequiredInput("Pick a docktor for ypur appointment: ");
+            string doctor = Utils.GetRequiredInput("Pick a doctor for your appointment: ");
             string department = Utils.GetRequiredInput("Department / Location: ");
             string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
             string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
@@ -958,7 +954,7 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             Appointment newAppointment = new Appointment(activeUser.Id, appointmentDate, doctor, department, type);
             scheduleService.SaveAppointment(newAppointment);
 
-            Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+            Utils.DisplaySuccessText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
             Console.ReadLine();
             break;
 
@@ -1011,7 +1007,7 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
 
             // Attempt to remove the appointment from JSON
             scheduleService.RemoveAppointment(activeUser.Id, cancelDate);
-            Utils.DisplaySuccesText("Appointment canceled (if it existed).");
+            Utils.DisplaySuccessText("Appointment canceled (if it existed).");
             Console.ReadKey();
             break;
 
@@ -1024,23 +1020,23 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             {
                 Console.WriteLine(user.ToPersonnelDisplay());
             }
-            string doctorName = Utils.GetRequiredInput("Pick the name of the doctor you want to have?? ");
+            string doctorName = Utils.GetRequiredInput("Pick the name of the doctor (no prefix): ");
             User? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
             if (doctorObj != null)
             {
                 bool success = activeUser.AssignPersonnel(doctorObj.Id);
                 if (success)
                 {
-                    Utils.DisplaySuccesText($"Personal (ID: {doctorObj.Id}) tilldelad patient {activeUser.Username}.");
+                    Utils.DisplaySuccessText($"Personnel (ID: {doctorObj.Id}) assigned to patient: {activeUser.Username}.");
                 }
                 else
                 {
-                    Utils.DisplayAlertText("Kunde inte tilldela personal. Patienten har redan detta ID, eller det är fel roll.");
+                    Utils.DisplayAlertText("Couldn't add personnel. The patient already has this ID, or it's the wrong role.");
                 }
             }
             else
             {
-                Utils.DisplayAlertText("Wront spelling or no doctor by that name");
+                Utils.DisplayAlertText("Wrong spelling or no doctor by that name");
             }
             Console.WriteLine("\nPress ENTER to return...");
             break;
@@ -1098,5 +1094,6 @@ static void ShowSchedule(User activeUser)
     {
         schedule.PrintSchedule();
     }
+    Console.ReadLine();
     Console.WriteLine("\nPress any key to return...");
 }

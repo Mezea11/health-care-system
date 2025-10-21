@@ -78,7 +78,7 @@ namespace App
                 // Approve the appointment and save changes
                 selectedAppointment.IsApproved = true;
                 scheduleService.SaveAppointment(selectedAppointment);
-                Utils.DisplaySuccesText("Appointment approved!");
+                Utils.DisplaySuccessText("Appointment approved!");
             }
             else if (action == "d")
             {
@@ -181,7 +181,7 @@ namespace App
 
             // Save the modified appointment
             scheduleService.SaveAppointment(appointmentToModify);
-            Utils.DisplaySuccesText("Appointment modified successfully!");
+            Utils.DisplaySuccessText("Appointment modified successfully!");
         }
 
 
@@ -246,7 +246,7 @@ namespace App
             {
                 string newEntryText = Utils.GetRequiredInput("Enter new journal text: "); // Get the text for the new journal entry
                 journalService.AddEntry(selectedPatientId, activePersonnel.Username, newEntryText); // Add the new entry to the patient's jounral
-                Utils.DisplaySuccesText("Entry added successfully!"); // Notify the user that the entry was added successfully
+                Utils.DisplaySuccessText("Entry added successfully!"); // Notify the user that the entry was added successfully
             }
 
             Console.WriteLine("\nPress any key to return to menu..."); // Wait for the user to press a key before returning
@@ -376,7 +376,7 @@ namespace App
                             default: Console.WriteLine("Invalid choice."); continue;
                         }
                         scheduleService.SaveAppointment(selectedAppointment); // Save the updated appointment
-                        Utils.DisplaySuccesText("Appointment status updated!");
+                        Utils.DisplaySuccessText("Appointment status updated!");
                     }
                 }
             }
