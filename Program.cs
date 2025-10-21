@@ -2,6 +2,7 @@
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
+using System.Xml.Linq;
 /* 
 
 -- SAVE AND MOCK DATA TO TEXT FILES --
@@ -42,24 +43,24 @@ As a logged in user, I need to be able to view my schedule.
 
 
 
-static int GetIndexAddOne(List<IUser> users)
+static int GetIndexAddOne(List<IUser> users) // Method to +1 to ID on every new user that's added
 {
     return users.Count + 1;
 }
 // ============================
 // Main program
 // ============================
-List<Location> locations = new List<Location>();
-List<Appointment> appointments = new List<Appointment>();
+List<Location> locations = new List<Location>(); // List for new locations
+List<Appointment> appointments = new List<Appointment>(); // List for new appointments
 /* List<AdminLocation> adminLocations = new List<AdminLocation>();
  */
-locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
+locations.Add(new Location("Skåne", "Lunds Universitetssjukhus")); // Hardcoded Locations 
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
-// Lista med alla användare 
-List<IUser> users = FileHandler.LoadUsersFromJson();
 
-IUser? activeUser = null;
+List<IUser> users = FileHandler.LoadUsersFromJson(); // Loads the user data for "LOADUSERSFROMJSON"
+
+IUser? activeUser = null; // IUSER May be NUll, and in this case before logging in AU = null
 bool running = true;
 
 
@@ -70,7 +71,7 @@ StartMenu(users);
 // ============================
 
 // THIS METHOD ALLOWS USER TO EITHER LOGIN OR REGISTER
-void StartMenu(List<IUser> users)
+void StartMenu(List<IUser> users) // The start menu is using the List with users
 {
     while (true)
     {
@@ -82,7 +83,7 @@ void StartMenu(List<IUser> users)
         // Console.Write("Choice: ");
         // string choice = Console.ReadLine();
 
-        switch (Utils.GetIntegerInput("Pick a number: "))
+        switch (Utils.GetIntegerInput("Pick a number: ")) // Using the GetIntegerInput a lot, which is a WriteLine, Readline, Try parse and alert text all in one.
         {
             case 1:
                 // CREATE LOGIC IN HERE TO REGISTER A NEW USER
@@ -94,8 +95,8 @@ void StartMenu(List<IUser> users)
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-                users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
-                FileHandler.SaveUsersToJson(users);
+                users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD ((Get INDExAddOne +1 to UserId whhen user is created))
+                FileHandler.SaveUsersToJson(users); // Saving the new user & data to File
                 break;
             case 2:
                 string newAdmin = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
@@ -106,10 +107,10 @@ void StartMenu(List<IUser> users)
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-                users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
+                users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin)); // Create new Admin Object.
 
 
-                FileHandler.SaveUsersToJson(users);
+                FileHandler.SaveUsersToJson(users); //Save a user in the FileHandler class through the SaveUToJson method.
 
                 break;
 
@@ -126,16 +127,16 @@ static void ShowSchedule(IUser activeUser)
     Console.Clear();
     Console.WriteLine($"--- Schedule for {activeUser.Username} ---\n");
 
-    var scheduleService = new ScheduleService();
-    var schedule = scheduleService.LoadSchedule(activeUser.Id);
+    var scheduleService = new ScheduleService(); // Create a new instance of ScheduleService and store it in the variable scheduleService
+    var schedule = scheduleService.LoadSchedule(activeUser.Id); // Loads the schedule for the activeUser including ID and save it in schedule
 
-    if (schedule.Appointments.Count == 0)
+    if (schedule.Appointments.Count == 0) // If there is = 0 Appointments scheduled
     {
         Utils.DisplayAlertText("No appointments found in your schedule.");
     }
     else
     {
-        schedule.PrintSchedule();
+        schedule.PrintSchedule(); // Print whatever they have on their schedule.
     }
     Console.WriteLine("\nPress any key to return...");
     Console.ReadKey();
@@ -164,7 +165,7 @@ void MainMenu()
             // TryLogin method invoked
             foreach (IUser user in users)
             {
-                if (user.TryLogin(username, password))
+                if (user.TryLogin(username, password)) // Using TryLogin a bit as well, makes less lines for login, does the username and password match any of existing users?
                 {
                     activeUser = user;
                     break;
@@ -183,7 +184,7 @@ void MainMenu()
         {
             // If user as a role as patient has a registratin not yet handled by admin. Will not be able to login. But it will have a active_user as not null
             if (activeUser.GetRegistration() != Registration.Accepted)
-            {
+            {   // DisplayAlert text find in Utils, makes alert text if its not correct input.
                 Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
                 Console.ReadKey();
                 activeUser = null;
@@ -193,10 +194,10 @@ void MainMenu()
             // MENU: LOGGED IN
             // ============================
             Console.Clear();
-            Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
+            Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})"); // Shows username and the Role you are logged in as.
             Console.WriteLine("----------------------------------");
             Console.WriteLine(activeUser.GetRole());
-            switch (activeUser.GetRole())
+            switch (activeUser.GetRole()) // Gives you the correct menu according to the Role you are logged in as.
             {
 
                 // ADMIN MENU
@@ -212,12 +213,9 @@ void MainMenu()
                 // PATIENT MENU
                 case Role.Patient:
                     PatientMenu(activeUser,
-    users.Where(user =>
-        // Filter out users that dont have the role as personel and persoal role as doctor
-        user.GetRole() == Role.Personnel &&
-        user.PersonelRole == PersonellRoles.Doctor)
-    .ToList(), users); // we add the whole users list because we need it when we save to tje json file
-
+                    users.Where(user => user.GetRole() == Role.Personnel && user.PersonelRole == PersonellRoles.Doctor).ToList(), users);
+                    // Filter out users that dont have the role as personel and personal role as doctor
+                    // we add the whole users list because we need it when we save to tje json file
                     break;
 
                 // SUPERADMIN MENU
@@ -240,7 +238,7 @@ void MainMenu()
 /// ============================
 // SUPERADMIN MENU METHOD
 // ============================
-static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser activeUser) // creates a menu for superadmin with list of users and locations
+void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser activeUser) // creates a menu for superadmin with list of users and locations
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
     Console.WriteLine("1. Grant admin to add location");
@@ -738,7 +736,6 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
         case 9:
             Console.WriteLine("Logging out...");
             activeUser = null;
-            running = false;
             break;
 
         default:
@@ -958,18 +955,18 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                 Console.WriteLine("All docktors:  ");
                 foreach (IUser user in doctorsList)
                 {
-                    Console.WriteLine(user.ToPersonnelDisplay());
+                    Console.WriteLine(user.ToPersonnelDisplay()); //Writes out all users that are doctors with help of the method
                 }
-                string doctor = Utils.GetRequiredInput("Pick a docktor for ypur appointment: ");
+                string doctor = Utils.GetRequiredInput("Pick a docktor for ypur appointment: "); // Let you choose a doctor & method helps with null input and so there is less code 
                 string department = Utils.GetRequiredInput("Department / Location: ");
                 string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
-                string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
+                string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): "); //
 
                 // Validate date input
                 if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
-                    System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                    System.Globalization.DateTimeStyles.None, out DateTime appointmentDate)) // Input from date and time has to be specific
                 {
-                    Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                    Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm"); //if not this error message will appear
                     Console.ReadKey();
                     break;
                 }
@@ -979,7 +976,7 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                 scheduleService.SaveAppointment(newAppointment);
 
                 Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
-                Console.ReadKey();
+                Console.ReadKey(); // Visar en text som returnar värdena
                 break;
 
             // ==========================================
@@ -1011,21 +1008,21 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                 Console.WriteLine("\n--- Cancel Appointment ---");
 
                 Schedule cancelSchedule = scheduleService.LoadSchedule(activeUser.Id);
-                if (cancelSchedule.Appointments.Count == 0)
+                if (cancelSchedule.Appointments.Count == 0) //Loop through all schedules, loads from activeUser, if theres none
                 {
-                    Utils.DisplayAlertText("You have no appointments to cancel.");
+                    Utils.DisplayAlertText("You have no appointments to cancel."); //This shows
                     Console.ReadKey();
                     break;
                 }
 
-                cancelSchedule.PrintSchedule();
+                cancelSchedule.PrintSchedule(); //IF there are schedules 
 
                 string cancelInput = Utils.GetRequiredInput("\nEnter the exact date and time of the appointment to cancel (yyyy-MM-dd HH:mm): ");
 
                 if (!DateTime.TryParseExact(cancelInput, "yyyy-MM-dd HH:mm", null,
-                    System.Globalization.DateTimeStyles.None, out DateTime cancelDate))
+                    System.Globalization.DateTimeStyles.None, out DateTime cancelDate)) //If you entered exact format you will cancel that appointment
                 {
-                    Utils.DisplayAlertText("Invalid date format.");
+                    Utils.DisplayAlertText("Invalid date format."); //This will appear if the format is not correct.
                     Console.ReadKey();
                     break;
                 }
@@ -1046,10 +1043,11 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                     Console.WriteLine(user.ToPersonnelDisplay());
                 }
                 string doctorName = Utils.GetRequiredInput("Pick the name of the doctor you want to have?? ");
+                // Search for a doctor in list, store the result in doctorsList, if no match? doctorobj = null
                 IUser? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
                 if (doctorObj != null)
                 {
-                    bool success = activeUser.AssignPersonnel(doctorObj.Id);
+                    bool success = activeUser.AssignPersonnel(doctorObj.Id); // Assign Doctor+ID to the active patient.
                     if (success)
                     {
                         Utils.DisplaySuccesText($"Personal (ID: {doctorObj.Id}) tilldelad patient {activeUser.Username}.");
@@ -1071,10 +1069,11 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
             // ==========================================
             case 6:
                 Console.WriteLine("\n--- Your Doctors: ---");
+                //Loop through all doctors that are assigned to the active user.
                 foreach (IUser user in doctorsList.FindAll(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
                 {
 
-                    Console.WriteLine(user.ToPersonnelDisplay());
+                    Console.WriteLine(user.ToPersonnelDisplay()); //Return Doctor user or a personnel user.
                 }
                 Console.WriteLine("\nPress ENTER to return...");
                 Console.ReadLine();
@@ -1093,7 +1092,7 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
             case 8:
                 FileHandler.SaveUsersToJson(users);
                 Console.WriteLine("Logging out...");
-                inMenu = false;
+
                 activeUser = null;
                 break;
 
