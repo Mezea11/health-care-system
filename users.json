@@ -40,7 +40,8 @@
     "Registration": "Accepted",
     "PermissionList": [
       "None",
-      "AddPersonell"
+      "AddPersonell",
+      "AddRegistrations"
     ],
     "AssignedPersonnelIds": []
   },
