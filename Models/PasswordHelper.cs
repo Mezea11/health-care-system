@@ -66,7 +66,7 @@ public static class PasswordHelper
             byte[] hashBytes = sha26Hash.ComputeHash(passwordandSaltBytes);
             string computedHash = Convert.ToBase64String(hashBytes);
             Console.WriteLine("2. Hashning (SHA256) utfördes på de nya kombinerade bytesen.");
-            Console.WriteLine($"   NYBERÄKNAD Hash: {computedHash}");
+            Console.WriteLine($"  NYBERÄKNAD Hash: {computedHash}");
 
             Console.WriteLine($"3. Jämförelse: Nyberäknad Hash == Lagrad Hash? -> {computedHash == storedHash}");
             Console.WriteLine("--- SLUT: VerifyPasswordSalted ---\n");

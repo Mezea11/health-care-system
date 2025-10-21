@@ -14,7 +14,7 @@ class FileHandler
     private const char PrimarySeperator = '|';
     private const char ListSeperator = ',';
     const string DefaultPassword = "123";
-    private static List<IUser> CreateTestUser()
+    private static List<User> CreateTestUser()
     {
         Console.WriteLine("file dont exist");
         const string DefaultPassword = "123";
@@ -103,9 +103,9 @@ class FileHandler
             livingstone.RoleDetails = "medicine, geography, and exploration";
         }
         // spara till data.csv 
-        SaveUsersToCsv(users.ConvertAll<IUser>(u => u));
-        // 3. Returnera listan som List<IUser>
-        return users.ConvertAll<IUser>(u => u);
+        SaveUsersToCsv(users);
+        // 3. Returnera listan som List<User>
+        return users.ConvertAll<User>(u => u);
     }
 
     // === ERSÄTTNING FÖR SerializePermissions ===
@@ -153,14 +153,14 @@ class FileHandler
     /// Laddar användare från CSV-filen.
     /// </summary>
 
-    public static List<IUser> LoadFromCsv()
+    public static List<User> LoadFromCsv()
     {
         if (!File.Exists(UserFileName))
         {
             return CreateTestUser();
         }
 
-        List<IUser> loadedUsers = new List<IUser>();
+        List<User> loadedUsers = new List<User>();
 
         try
         {
@@ -232,7 +232,7 @@ class FileHandler
         catch (Exception ex)
         {
             Console.WriteLine($"ERROR loading users from CSV: {ex.Message}");
-            return new List<IUser>();
+            return new List<User>();
         }
 
 
@@ -243,7 +243,7 @@ class FileHandler
     /// <summary>
     /// Sparar en lista med användare till CSV-filen.
     /// </summary>
-    public static void SaveUsersToCsv(List<IUser> users)
+    public static void SaveUsersToCsv(List<User> users)
     {
 
         List<string> lines = new List<string>();

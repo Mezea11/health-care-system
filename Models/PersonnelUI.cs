@@ -13,7 +13,7 @@ namespace App
         { 3, new List<int> { 7 } }
     };
 
-    public static void ApproveAppointments(List<IUser> users, IUser activeUser)
+    public static void ApproveAppointments(List<User> users, User activeUser)
     {
       Console.Clear();
       Console.WriteLine($"--- Approve or Deny Appointment Request (Personnel: {activeUser.Username} ---\n)");
@@ -71,7 +71,7 @@ namespace App
     // =========================================
     // Modify a patient's appointment
     // =========================================
-    public static void ModifyAppointment(List<IUser> users, IUser activeUser)
+    public static void ModifyAppointment(List<User> users, User activeUser)
     {
       Console.Clear();
       Console.WriteLine($"--- Modify Patient Appointment (Personnel: {activeUser.Username}) ---\n");
@@ -146,7 +146,7 @@ namespace App
     // =========================================
     // Open a patient's journal
     // =========================================
-    public static void OpenJournal(List<IUser> users, IUser activeUser)
+    public static void OpenJournal(List<User> users, User activeUser)
     {
       Console.Clear();
       Console.WriteLine($"--- Open Journal (Personnel: {activeUser.Username}) ---\n");
@@ -201,7 +201,7 @@ namespace App
     // =========================================
     // Advanced interactive schedule view
     // =========================================
-    public static void ViewMySchedule(IUser activeUser)
+    public static void ViewMySchedule(User activeUser)
     {
       Console.Clear();
       Console.WriteLine($"--- My Work Schedule ({activeUser.Username}) ---\n");
