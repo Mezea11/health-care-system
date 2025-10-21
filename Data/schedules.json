@@ -5,7 +5,10 @@
     "Doctor": "Smith",
     "Department": "Malm\u00F6",
     "Type": "Knee",
-    "IsApproved": false
+    "Status": "Pending",
+    "PersonnelId": null,
+    "IsApproved": false,
+    "RegistrationPending": 1
   },
   {
     "UserId": 7,
@@ -13,7 +16,10 @@
     "Doctor": "",
     "Department": "Sk\u00E5ne",
     "Type": "Sk\u00E4ra av ben",
-    "IsApproved": false
+    "Status": "Pending",
+    "PersonnelId": null,
+    "IsApproved": false,
+    "RegistrationPending": 1
   },
   {
     "UserId": 1,
@@ -21,6 +27,20 @@
     "Doctor": "",
     "Department": "Sk\u00E5ne",
     "Type": "Macka",
-    "IsApproved": false
+    "Status": "Pending",
+    "PersonnelId": null,
+    "IsApproved": false,
+    "RegistrationPending": 1
+  },
+  {
+    "UserId": 0,
+    "Date": "2025-07-03T14:30:00",
+    "Doctor": "dr smith",
+    "Department": "medicine",
+    "Type": "checkup",
+    "Status": "Pending",
+    "PersonnelId": null,
+    "IsApproved": false,
+    "RegistrationPending": 1
   }
 ]
