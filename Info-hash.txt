@@ -1,0 +1,172 @@
+Beskrivning av Säkerhetsloggen
+Loggfilen dokumenterar två huvudprocesser:
+
+1. --- START: HashPasswordSalted --- (Lösenordsskapande/Lagring)
+Denna funktion används när en ny användare registreras eller när en användare byter lösenord. Målet är att skapa en säker, unik hash som lagras i databasen istället för det riktiga lösenordet.
+
+Steg i Loggen	Beskrivning
+Inkommande lösenord	Lösenordet användaren angav (t.ex. 'pass', 'mypassword').
+1. Salt... genererades slumpmässigt.	En unik, slumpmässig sträng (Salt) skapas. Saltet är 16 bytes långt och lagras tillsammans med hashen. Detta är avgörande för säkerheten (förhindrar "rainbow table"-attacker).
+Salt i Base64-strängformat	Det slumpmässigt genererade Saltet, konverterat till textformat (Base64) för lagring.
+2. Lösenord och Salt slogs ihop	Det inkommande lösenordet kombineras med det unika Saltet. Denna kombination är det som sedan hashas.
+3. SHA256 hashing utfördes	Hashing-algoritmen (i detta fall SHA256) tillämpas på den kombinerade strängen. SHA256 skapar en unik, fast längd (32 bytes / 256 bitar) utifrån input.
+Hash i Base64-strängformat	Det slutliga, säkra hashen (32 bytes), konverterad till textformat (Base64). Detta värde lagras i databasen tillsammans med Saltet.
+
+
+2. --- START: VerifyPasswordSalted --- (Lösenordsverifiering/Inloggning)
+Denna funktion används när en användare försöker logga in. Målet är att bevisa att det angivna lösenordet är korrekt utan att lagra eller känna till det ursprungliga lösenordet.
+
+Steg i Loggen	Beskrivning
+Inkommande lösenord att verifiera	Lösenordet som användaren har angett vid inloggningen (t.ex. 'wrongpassword' eller 'mypassword').
+Lagrad Hash	Den hash som tidigare skapades och lagrades i databasen/filen.
+Lagrat Salt	Det unika Salt som tidigare skapades och lagrades i databasen/filen för denna specifika användare.
+1. Det nya lösenordet och det lagrade Saltet slogs ihop	Samma process som vid lagringen: Det inloggade lösenordet kombineras med det lagrade Saltet. Detta är nödvändigt för att återskapa exakt samma indata som användes vid den ursprungliga hashningen.
+2. Hashning (SHA256) utfördes	Hashing-algoritmen (SHA256) tillämpas på den nya kombinerade strängen. Detta ger en NYBERÄKNAD Hash.
+3. Jämförelse: Nyberäknad Hash == Lagrad Hash?	Systemet jämför nu den NYBERÄKNADE Hashen med den Lagrade Hashen.
+Resultat (True/False)	* True: Lösenordet är korrekt, inloggning tillåts. (T.ex. 4JYOHLIypo/... == 4JYOHLIypo/... -> True)
+* False: Lösenordet är felaktigt, inloggning nekas. (T.ex. ROc7PzrtOcg/... != ivKehmBc... -> False)
+
+Sammanfattning av exempel i loggen
+Typ av logg	Lösenord	Resultat	Syfte
+VerifyPasswordSalted (Första)	'wrongpassword'	False	Misslyckad inloggning. Den nyberäknade hashen matchade inte den lagrade hashen.
+HashPasswordSalted	'pass' (med IGlfszYe...)	LenJpThT...	Lösenord lagrat. Skapar en ny hash/salt för en användare.
+HashPasswordSalted	'nursepass'	eMeI0YDh...	Lösenord lagrat. Skapar en ny hash/salt för en användare.
+HashPasswordSalted	'mypassword'	4JYOHLIy...	Lösenord lagrat. Skapar en ny hash/salt för en användare.
+VerifyPasswordSalted (Andra)	'mypassword'	True	Lyckad inloggning. Den nyberäknade hashen matchade exakt den lagrade hashen.
+
+Alla efterföljande HashPasswordSalted i slutet av filen representerar bara ytterligare lösenord som hashas för lagring (troligen för att skapa de olika testanvändarna som du nämnde i README-filen). Observera att varje gång samma lösenord hashas ('pass') får den en unik hash eftersom Saltet alltid genereras slumpmässigt.
+
+dessa exemplen är utifrån våra tester: 
+
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'pass'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): IGlfszYeCWoSBkn0q+hBlA==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'passIGlfszYeCWoSBkn0q+hBlA=='
+    Strängen konverterades till bytes (28 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): LenJpThTr1m0LFOdPJUjmENTMEFCCKfB6EbVX62Ijjw=
+--- SLUT: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'nursepass'
+Inkommande lösenord: 'mypassword'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): zxKAgWTJxrLROaOGX4MEDw==
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): wm3dUNSj3VyXr/D5RbDB/Q==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'mypasswordzxKAgWTJxrLROaOGX4MEDw=='
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'nursepasswm3dUNSj3VyXr/D5RbDB/Q=='
+    Strängen konverterades till bytes (34 bytes) för hashing (UTF8).
+    Strängen konverterades till bytes (33 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): eMeI0YDhHdM5YSb//nCXkFXR+S0jkhDTPuDqjdmHOL0=
+--- SLUT: HashPasswordSalted ---
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): 4JYOHLIypo/CXA1u/qmHY8HNXLMwIf2YYJLFrEHWCO0=
+--- SLUT: HashPasswordSalted ---
+--- START: VerifyPasswordSalted ---
+Inkommande lösenord att verifiera: 'mypassword'
+Lagrad Hash: 4JYOHLIypo/CXA1u/qmHY8HNXLMwIf2YYJLFrEHWCO0=
+Lagrat Salt: zxKAgWTJxrLROaOGX4MEDw==
+1. Det nya lösenordet och det lagrade Saltet slogs ihop igen.
+    Kombinerad sträng: 'mypasswordzxKAgWTJxrLROaOGX4MEDw=='
+    Strängen konverterades till bytes (34 bytes).
+2. Hashning (SHA256) utfördes på de nya kombinerade bytesen.
+    NYBERÄKNAD Hash: 4JYOHLIypo/CXA1u/qmHY8HNXLMwIf2YYJLFrEHWCO0=
+3. Jämförelse: Nyberäknad Hash == Lagrad Hash? -> True
+--- SLUT: VerifyPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'securepass'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): GdxAYMSw+DqcGsnrVq+iBQ==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'securepassGdxAYMSw+DqcGsnrVq+iBQ=='
+    Strängen konverterades till bytes (34 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): lms0nAha+7R4ABw0T2cQfF3JnJ5hsf4UdmaYK7SiLQ0=
+--- SLUT: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'patientpass'
+--- START: HashPasswordSalted ---
+1. Salt (16 bytes) genererades slumpmässigt.
+Inkommande lösenord: 'secret123'
+    Salt i Base64-strängformat (lagringsformat): fa1iIN625ACkTR92OLc+lg==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'patientpassfa1iIN625ACkTR92OLc+lg=='
+1. Salt (16 bytes) genererades slumpmässigt.
+    Strängen konverterades till bytes (35 bytes) för hashing (UTF8).
+    Salt i Base64-strängformat (lagringsformat): Q73XxzySfNsgI0oncwk87Q==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'secret123Q73XxzySfNsgI0oncwk87Q=='
+    Strängen konverterades till bytes (33 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): Z+5gzI78kZSVZohw+eIF4DTrGrHXWPrbRFezAvngxXU=
+--- SLUT: HashPasswordSalted ---
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): MHFYG1UxIgHOeAVxzToePtpS1+toqtYbVSggv5mB8pQ=
+--- SLUT: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'superpass'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): 5cndRabkpoHSHA02cIJzZg==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'superpass5cndRabkpoHSHA02cIJzZg=='
+    Strängen konverterades till bytes (33 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): cgBgtz2JzEZpsQx/Ge98TCN172XjA5cW8N5QyISV4Ks=
+--- SLUT: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'pass'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): zGhqVTZYSTwZNJJcIzME2Q==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'passzGhqVTZYSTwZNJJcIzME2Q=='
+    Strängen konverterades till bytes (28 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): FxidLMvKh1SVNKGzy+BBcSeg3hL3CrdmRltXBKih5t4=
+--- SLUT: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'pass'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): xAe/3BZKdb5LpkjX2qIZAw==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'passxAe/3BZKdb5LpkjX2qIZAw=='
+    Strängen konverterades till bytes (28 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): QHBFAnNj5/VkLU7iEDxZPElUKL5W8qrZkJGgF3tEtSs=
+--- SLUT: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'pass'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): kkcxh6PFwt8IY7XgxP+CFg==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'passkkcxh6PFwt8IY7XgxP+CFg=='
+    Strängen konverterades till bytes (28 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): 282iCZF62f8E9h0P7a4wQR666NIudvxV7Duhv0+ViAU=
+--- SLUT: HashPasswordSalted ---
+--- START: HashPasswordSalted ---
+Inkommande lösenord: 'pass'
+1. Salt (16 bytes) genererades slumpmässigt.
+    Salt i Base64-strängformat (lagringsformat): bSTnQK3m5UJvLf+6l8FZfQ==
+2. Lösenord och Salt slogs ihop till en enda sträng.
+    Kombinerad sträng: 'passbSTnQK3m5UJvLf+6l8FZfQ=='
+    Strängen konverterades till bytes (28 bytes) för hashing (UTF8).
+3. SHA256 hashing utfördes EN GÅNG på de kombinerade bytesen.
+    Resultatet är 32 bytes (256 bitar).
+    Hash i Base64-strängformat (lagringsformat): /fe0zx4Auejj9CtfYrGdbiBWI+TmGj6zjLGYN8Rdoj0=
+--- SLUT: HashPasswordSalted ---

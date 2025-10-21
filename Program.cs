@@ -12,13 +12,13 @@ As a user, I need to be able to REQUEST registration as a patient. CHECKED
 
 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle the permission system, in fine granularity.
-As an admin with sufficient permissions, I need to be able to assign admins to certain regions.
+As an admin with sufficient permissions, I need to be able to assign admins to certain regions.  ---- Does it works ?? 
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to handle registrations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to add locations. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to create accounts for personnel. CHECKED
 As an admin with sufficient permissions, I need to be able to give admins the permission to view a list of who has permission to what. 
-As an admin with sufficient permissions, I need to be able to add locations.
+As an admin with sufficient permissions, I need to be able to add locations. 
 
 As an admin with sufficient permissions, I need to be able to accept user registration as patients. -- CHECKED
 As an admin with sufficient permissions, I need to be able to deny user registration as patients. -- CHECKED
@@ -42,13 +42,14 @@ As a logged in user, I need to be able to view my schedule.
 
 
 
-static int GetIndexAddOne(List<IUser> users)
+static int GetIndexAddOne(List<User> users)
 {
     return users.Count + 1;
 }
 // ============================
 // Main program
 // ============================
+
 List<Location> locations = new List<Location>();
 List<Appointment> appointments = new List<Appointment>();
 /* List<AdminLocation> adminLocations = new List<AdminLocation>();
@@ -57,9 +58,10 @@ locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
-List<IUser> users = FileHandler.LoadUsersFromJson();
+// List<User> users = FileHandler.LoadUsersFromJson();
+List<User> users = FileHandler.LoadFromCsv();
 
-IUser? activeUser = null;
+User? activeUser = null;
 bool running = true;
 
 
@@ -70,7 +72,7 @@ StartMenu(users);
 // ============================
 
 // THIS METHOD ALLOWS USER TO EITHER LOGIN OR REGISTER
-void StartMenu(List<IUser> users)
+void StartMenu(List<User> users)
 {
     while (true)
     {
@@ -89,13 +91,13 @@ void StartMenu(List<IUser> users)
                 string newUser = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
                 Console.Clear();
 
-                Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
-                string newPass = Console.ReadLine();
+                // Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
+                string newPass = Utils.GetRequiredInput("Tpe in your password: ");
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
                 users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
-                FileHandler.SaveUsersToJson(users);
+                FileHandler.SaveUsersToCsv(users);
                 break;
             case 2:
                 string newAdmin = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
@@ -109,7 +111,7 @@ void StartMenu(List<IUser> users)
                 users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
 
 
-                FileHandler.SaveUsersToJson(users);
+                FileHandler.SaveUsersToCsv(users);
 
                 break;
 
@@ -120,26 +122,7 @@ void StartMenu(List<IUser> users)
     }
 
 }
-//COMMON METHOD - Show current user's schedule
-static void ShowSchedule(IUser activeUser)
-{
-    Console.Clear();
-    Console.WriteLine($"--- Schedule for {activeUser.Username} ---\n");
 
-    var scheduleService = new ScheduleService();
-    var schedule = scheduleService.LoadSchedule(activeUser.Id);
-
-    if (schedule.Appointments.Count == 0)
-    {
-        Utils.DisplayAlertText("No appointments found in your schedule.");
-    }
-    else
-    {
-        schedule.PrintSchedule();
-    }
-    Console.WriteLine("\nPress any key to return...");
-    Console.ReadKey();
-}
 
 void MainMenu()
 {
@@ -162,7 +145,7 @@ void MainMenu()
             string password = Utils.GetRequiredInput("Password: ");
 
             // TryLogin method invoked
-            foreach (IUser user in users)
+            foreach (User user in users)
             {
                 if (user.TryLogin(username, password))
                 {
@@ -212,12 +195,11 @@ void MainMenu()
                 // PATIENT MENU
                 case Role.Patient:
                     PatientMenu(activeUser,
-    users.Where(user =>
-        // Filter out users that dont have the role as personel and persoal role as doctor
-        user.GetRole() == Role.Personnel &&
-        user.PersonelRole == PersonellRoles.Doctor)
-    .ToList(), users); // we add the whole users list because we need it when we save to tje json file
-
+                        users.Where(user =>
+                        // Filter out users that dont have the role as personel and persoal role as doctor
+                        user.GetRole() == Role.Personnel &&
+                        user.PersonelRole == PersonellRoles.Doctor)
+                        .ToList(), users); // we add the whole users list because we need it when we save to tje json file
                     break;
 
                 // SUPERADMIN MENU
@@ -226,25 +208,30 @@ void MainMenu()
                     break;
 
             }
-            // Console.WriteLine("\nWrite 'logout' or press Enter to continue.");
-            // string? input = Console.ReadLine();
-            // if (input == "logout") activeUser = null;
+      
+            string? input = Console.ReadLine();
+            if (input == "logout") 
+            {
+                activeUser = null;
+                break;
+            } else if(input == "return")
+            {
+                continue;
+            }
         }
     }
 }
 
 
 
-
-
 /// ============================
 // SUPERADMIN MENU METHOD
 // ============================
-static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser activeUser) // creates a menu for superadmin with list of users and locations
+static void SuperAdminMenu(List<User> users, List<Location> locations, User activeUser) // creates a menu for superadmin with list of users and locations
 {
     Console.WriteLine("\n(SuperAdmin) Options:");
-    Console.WriteLine("1. Grant admin to add location");
-    Console.WriteLine("2. Overview of permissions");
+    Console.WriteLine("1. Grant admin to add location"); 
+    Console.WriteLine("2. Overview of permissions"); 
     Console.WriteLine("3. Grant admin to handle registrations");
     Console.WriteLine("4. Grant admin to create personel");
     Console.WriteLine("5. Grant admin to check list of user permissions");
@@ -261,27 +248,27 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
             {
                 Console.WriteLine("A list of all admins");
 
+                // Loop through all admins
                 foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
-                // foreach(User user in users)
                 {
-                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
                     Console.WriteLine($"{user.ToString()}");
                 }
-                // Work with string get name first and after we are done we are working with index. 
+
+                // Get user input, compare user input to admin names in list
                 string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?");
+                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for adding location?"); // Accept or deny giving permission from enum list
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.GrantPermission(Permissions.AddLocation); // <-- anropa metoden
+                            adminUser.GrantPermission(Permissions.AddLocation); // Grants permission
                             Utils.DisplaySuccesText($"You have accepted the permission add a location to admin user: {adminName}");
                             break;
 
                         case "d":
-                            adminUser.RevokePermission(Permissions.AddLocation);   // <-- anropa metoden
+                            adminUser.RevokePermission(Permissions.AddLocation);   // Denies permission
                             Utils.DisplaySuccesText("You have denied the permission");
                             break;
                         default:
@@ -294,16 +281,19 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name.");
                 }
             }
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users); // Save to JSON
             break;
 
         case 2:
             Console.WriteLine("Overview regarding the permissions for all users");
-
-            foreach (IUser user in users)
+            
+            // Display all permissions for users
+                Console.WriteLine($"\nAll users:");
+            foreach (var user in users)
             {
-                Console.WriteLine(user.ToString());
+                Console.WriteLine($"{user.Username} - {user.GetRole()} - Permissions: {string.Join(", ", user.PermissionList)}");
             }
+                Console.Write($"\nPress Enter to continue: ");
             break;
 
         case 3:
@@ -311,26 +301,24 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 Console.WriteLine("A list of all admins");
 
                 foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
-                // foreach(User user in users)
                 {
-                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
                     Console.WriteLine($"{user.ToString()}");
                 }
-                // Work with string get name first and after we are done we are working with index. 
+                // Select admin through input. Compare input to admin name in list
                 string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
                 if (adminUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.GrantPermission(Permissions.AddRegistrations); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            adminUser.GrantPermission(Permissions.AddRegistrations); // grant admin permission to add registrations
                             Utils.DisplaySuccesText($"You have accepted the permission handle registrations for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.RevokePermission(Permissions.AddRegistrations);   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            adminUser.RevokePermission(Permissions.AddRegistrations);   // deny admin permissions to add registrations
                             Utils.DisplaySuccesText($"You have denied permission handle registrations for user: {adminName} ");
                             break;
                         default:
@@ -343,7 +331,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users); // save user to JSON file
             break;
 
         case 4:
@@ -351,26 +339,24 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 Console.WriteLine("A list of all admins");
 
                 foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
-                // foreach(User user in users)
                 {
-                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
                     Console.WriteLine($"{user.ToString()}");
                 }
-                // Work with string get name first and after we are done we are working with index. 
+                // Select admin through input. Compare input to admin name in list
                 string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); 
                 if (adminUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for handling registration requests?");
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.GrantPermission(Permissions.AddPersonell); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            adminUser.GrantPermission(Permissions.AddPersonell); // grant permission to add personnel
                             Utils.DisplaySuccesText($"You have accepted the permission to create personel for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.GrantPermission(Permissions.AddPersonell);   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            adminUser.RevokePermission(Permissions.AddPersonell);   // deny permission to add personnel
                             Utils.DisplaySuccesText($"You have denied permission create personel for user: {adminName} ");
                             break;
                         default:
@@ -384,33 +370,33 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 }
             }
 
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users); // save user to JSON
             break;
         case 5:
             {
                 Console.WriteLine("A list of all admins");
 
+                // Loop through all admins and print
                 foreach (User user in users.Where(user => user.GetRole() == Role.Admin))
-                // foreach(User user in users)
                 {
-                    // if(user.GetRole() == Role.Admin && user.checkpermissions() == Permissions.None)
                     Console.WriteLine($"{user.ToString()}");
                 }
-                // Work with string get name first and after we are done we are working with index. 
+
+                // Select admin through input. Compare input to admin name in list
                 string adminName = Utils.GetRequiredInput("Pick admin name you want to handle:  ");
-                IUser? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); 
                 if (adminUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}, Do you want accept(y) or deny(d) the permission for viewing all users permissions?");
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.GrantPermission(Permissions.AddAdmin); // <-- anropa metoden, lägg till permission till listan över permission för den admin
+                            adminUser.GrantPermission(Permissions.AddAdmin); // grant permission to view all user permissions
                             Utils.DisplaySuccesText($"You have accepted the permission to view all user permissions for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.GrantPermission(Permissions.AddAdmin);   // <-- anropa metoden, ta bort permissions i listan över permissions. Om listan är tom sätt permissions till None. 
+                            adminUser.RevokePermission(Permissions.AddAdmin);   // deny permission to view all user permissions
                             Utils.DisplaySuccesText($"You have denied permission to view all user permissions for user: {adminName} ");
                             break;
                         default:
@@ -423,7 +409,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                     Utils.DisplayAlertText("No admin with that name found.");
                 }
             }
-            FileHandler.SaveUsersToJson(users);
+            FileHandler.SaveUsersToCsv(users); // save user to JSON
             break;
 
         case 6:
@@ -431,26 +417,28 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
 
                 if (activeUser.GetRole() == Role.SuperAdmin)
                 {
+                    // Loop through list of all pending requests (users with registration.pending status)
                     Console.WriteLine("\nAll admins with pending request:");
                     foreach (User user in users.Where(user => user.GetRole() == Role.Admin && user.GetRegistration() == Registration.Pending))
                     {
                         Console.WriteLine($"{user.ToString()}");
                     }
-                    // Work with string get name first and after we are done we are working with index. 
+                    
+                    // User input. Compare user input to names in list, select user based on name
                     string adminHandling = Utils.GetRequiredInput("Pick admin username you want to handle:  ");
-                    IUser? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                    User? adminUser = users.Find(user => user.Username.Equals(adminHandling, StringComparison.OrdinalIgnoreCase)); 
                     if (adminUser != null)
                     {
                         string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}, Do you want accept(y) or deny(d) the request:  ");
                         switch (acceptOrDeny)
                         {
                             case "y":
-                                adminUser.AcceptPending(); // <-- anropa metoden
+                                adminUser.AcceptPending(); // accept pending registration and allow admin to create account
                                 Utils.DisplaySuccesText("Admin registration accepted");
                                 break;
 
                             case "d":
-                                adminUser.DenyPending();   // <-- anropa metoden
+                                adminUser.DenyPending();   // deny pending registration request
                                 Utils.DisplaySuccesText("Admin registration denied");
                                 break;
                             default:
@@ -477,12 +465,12 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 Utils.DisplayAlertText("No admins found"); //om ingen admin hittas.
                 break;
             }
-            List<IUser> AdminList = new List<IUser>(); //annars skapas en ny lista med bara admins genom index 
+            List<User> AdminList = new List<User>(); //annars skapas en ny lista med bara admins genom index 
             for (int i = 0; i < users.Count; ++i) //för att det ska bli enklare för superadmin att välja genom siffror istället för text
             {
                 if (users[i].GetRole() == Role.Admin)
                 {
-                    AdminList.Add((IUser)users[i]); //listan spottas ut för varje admin-användare
+                    AdminList.Add((User)users[i]); //listan spottas ut för varje admin-användare
                     Console.WriteLine(AdminList.Count + ": " + users[i].Username);
                 }
             }
@@ -493,7 +481,7 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
                 break;
             }
 
-            IUser chosenAdmin = AdminList[chosenIndex];
+            User chosenAdmin = AdminList[chosenIndex];
             Region[] regions = (Region[])Enum.GetValues(typeof(Region)); // get all values from the region enum to display as selectable options
             for (int i = 0; i < regions.Length; i++)
             {
@@ -513,9 +501,10 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
             break;
 
         case 8:
-            Console.WriteLine("Logging out...");
-            FileHandler.SaveUsersToJson(users);
-            activeUser = null;
+            FileHandler.SaveUsersToCsv(users);
+            Console.WriteLine("\n1. Write 'logout' to log out.");
+            Console.WriteLine("2. Write 'return' to go back.");
+
             break;
         default:
             Utils.DisplayAlertText("Invalid input. Please try again.");
@@ -525,12 +514,10 @@ static void SuperAdminMenu(List<IUser> users, List<Location> locations, IUser ac
 }
 
 
-
-
 // ============================
 // ADMIN MENU METHOD
 // ============================
-void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
+void AdminMenu(List<User> users, List<Location> locations, User activeUser)
 {
     Console.WriteLine("\n(Admin) Options:");
     Console.WriteLine("1. Create account");
@@ -556,7 +543,6 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
                 Console.WriteLine("(2). Create account for Admin");
             }
             Console.WriteLine("(3). Go up");
-            // Console.WriteLine("(3) Go up");
             switch (Utils.GetIntegerInput("Choose a number: "))
             {
                 case 1:
@@ -572,7 +558,7 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
                         string newPass = Utils.GetRequiredInput("Insert password: ");
                         // create a new user as a role Personell. We need to set a personell role to the object also
                         users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Personnel));
-                        IUser? UserLastCreated = users.Last(); // take the last item in the users list. The element that we create above
+                        User? UserLastCreated = users.Last(); // take the last item in the users list. The element that we create above
                         int chooseRole = Utils.GetIntegerInput("Pick role for the personell: (1)Doctor, (2)Nurse, (3)Administrator. (Choose a number): ");
                         string doctoDetails = "";
                         switch (chooseRole)
@@ -585,7 +571,7 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
                                 break;
                         }
                         UserLastCreated.SetRolePersonell(chooseRole, UserLastCreated, doctoDetails);
-                        FileHandler.SaveUsersToJson(users);
+                        FileHandler.SaveUsersToCsv(users);
                         Utils.DisplaySuccesText($"New personell account for {newUser} created. ");
                     }
                     break;
@@ -601,7 +587,7 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
                         string newUser = Utils.GetRequiredInput("Insert username: ");
                         string newPass = Utils.GetRequiredInput("Insert password: ");
                         users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Admin));
-                        FileHandler.SaveUsersToJson(users);
+                        FileHandler.SaveUsersToCsv(users);
                         Utils.DisplaySuccesText($"New admin account for {newUser} created. ");
 
                     }
@@ -617,7 +603,6 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
             foreach (var user in users)
             {
                 Console.WriteLine($"Username: {user.Username} - Role: {user.GetRole()}");
-                // Console.WriteLine($"{user.Username} - {user.GetRole()} {(user.GetRole() == Role.Personnel && user.PersonelRole == PersonellRoles.Doctor ? $" : { user.PersonelRole} - {user.RoleDetails}" : "")}");
             }
             break;
         case 3:
@@ -648,8 +633,7 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
             }
             break;
         case 5:
-            // bool found = activeUser
-            // if(activeUser.GetPermission("addLoc"))
+        
             if (activeUser.GetRole() == Role.Admin && activeUser.HasPermission(Permissions.AddRegistrations))
             {
 
@@ -657,11 +641,11 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
                 Console.WriteLine("\nAll patients with pending request:");
                 foreach (User user in users.Where(user => user.GetRole() == Role.Patient && user.GetRegistration() == Registration.Pending))
                 {
-                    Console.WriteLine($"{user.ToString}");
+                    Console.WriteLine($"{user.ToString()}");
                 }
                 // Work with string get name first and after we are done we are working with index. 
                 string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-                IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                User? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
                 if (patientUser != null)
                 {
                     string acceptOrDeny = Utils.GetRequiredInput($"You choosed: {patientUser.Username}, Do you want accept(y) or deny(d) the request:  ");
@@ -713,7 +697,7 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
         case 8:
             Console.WriteLine("See my assigned region");
             bool found = false; //boolean created to search for a admin with true or false
-            foreach (IUser user in users)
+            foreach (User user in users)
             {
                 if (user.GetRole() == Role.Admin)
                 {
@@ -736,9 +720,9 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
             }
             break;
         case 9:
-            Console.WriteLine("Logging out...");
-            activeUser = null;
-            running = false;
+            FileHandler.SaveUsersToCsv(users);
+            Console.WriteLine("\n1. Write 'logout' to log out.");
+            Console.WriteLine("2. Write 'return' to go back.");
             break;
 
         default:
@@ -754,7 +738,8 @@ void AdminMenu(List<IUser> users, List<Location> locations, IUser activeUser)
 // PERSONNEL MENU METHOD
 // ============================
 
-void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appointments)
+
+void PersonnelMenu(List<User> users, User activeUser, List<Appointment> appointments)
 
 {
     ScheduleService scheduleService = new ScheduleService();
@@ -764,7 +749,7 @@ void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appoin
     {
         Console.Clear();
         Console.WriteLine($"\n(Personnel) Menu - Logged in as {activeUser.Username}");
-        Console.WriteLine("1. Open assigned patient journal");
+        Console.WriteLine("1. Open assigned patient journal"); 
         Console.WriteLine("2. Modify patient appointment"); //Add after Open Journal
         Console.WriteLine("3. Approve/Deny patient appointment request");
         Console.WriteLine("4. View my schedule");
@@ -793,18 +778,18 @@ void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appoin
                 break;
             // VIEW A PATIENT JOURNAL
             case 5:
-                /* if (activeUser.GetRole() == Role.Personnel && activeUser.HasPermission("ViewPatientJournal")) */
                 {
+
                     foreach (User user in users)
                     {
-                        if (user.GetRole() == Role.Patient)
+                        if (user.GetRole() == Role.Patient) 
                         {
                             Console.WriteLine(user.Username);
                         }
                     }
                     // Work with string get name first and after we are done we are working with index. 
                     string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle:  ");
-                    IUser? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
+                    User? patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase)); 
                     if (patientUser != null)
                     {
                         Console.WriteLine(patientUser);
@@ -833,14 +818,14 @@ void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appoin
                     // Input går in och sparas i patientHandling
                     string patientHandling = Utils.GetRequiredInput("Pick patient name you want to handle: ");
                     // Searching through list of users and picks out the one that was saved in patienthandling aaaaand then saving it to patientUser
-                    IUser patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
+                    User patientUser = users.Find(user => user.Username.Equals(patientHandling, StringComparison.OrdinalIgnoreCase));
                     // users -> a list<User> your collection of all users
                     //.Find A method that returns the FIRST MATCH based on condition, Returns Null if no match is found
                     // user => "lambda expression" short inline function.
                     // // user.Username.Equals() checks if the current users username equals the input
                     // Patienthandling the input user typed in earlier, the username they want to find
                     // stringComarison.OrdinalIgnoreCase Makes the comparison case-insensetive (so "Alice matches alice)
-                    // Iuser patientUser
+                    // User patientUser
                     if (patientUser != null)
                     {
 
@@ -881,9 +866,8 @@ void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appoin
                 }
                 break;
             case 7:
-                Console.WriteLine("Logging out...");
-                activeUser = null;
-                running = false;
+                Console.WriteLine("\n1. Write 'logout' to log out.");
+                Console.WriteLine("2. Write 'return' to go back.");
                 break;
             default:
                 Utils.DisplayAlertText("Invalid option. Please try again.");
@@ -896,15 +880,11 @@ void PersonnelMenu(List<IUser> users, IUser activeUser, List<Appointment> appoin
 // ============================
 // PATIENT MENU METHOD
 // ============================
-void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
+void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
 {
     // Initialize ScheduleService (handles JSON read/write)
     ScheduleService scheduleService = new ScheduleService();
 
-    bool inMenu = true;
-
-    while (inMenu)
-    {
         Console.Clear();
         Console.WriteLine("\n(Patient) Menu Choices:");
         Console.WriteLine("1. See Journal");
@@ -946,7 +926,6 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                     }
                 }
                 Console.WriteLine("\nPress any key to return to menu...");
-                Console.ReadKey();
                 break;
 
 
@@ -956,7 +935,7 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
             case 2:
                 Console.WriteLine("\n--- Create New Appointment ---");
                 Console.WriteLine("All docktors:  ");
-                foreach (IUser user in doctorsList)
+                foreach (User user in doctorsList)
                 {
                     Console.WriteLine(user.ToPersonnelDisplay());
                 }
@@ -979,7 +958,7 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                 scheduleService.SaveAppointment(newAppointment);
 
                 Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
-                Console.ReadKey();
+                Console.ReadLine();
                 break;
 
             // ==========================================
@@ -1001,7 +980,6 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                 }
 
                 Console.WriteLine("\nPress ENTER to return to menu...");
-                Console.ReadLine();
                 break;
 
             // ==========================================
@@ -1041,12 +1019,12 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
             // ==========================================
             case 5:
                 Console.WriteLine("\n--- All Doctors to pick from ---");
-                foreach (IUser user in doctorsList)
+                foreach (User user in doctorsList)
                 {
                     Console.WriteLine(user.ToPersonnelDisplay());
                 }
                 string doctorName = Utils.GetRequiredInput("Pick the name of the doctor you want to have?? ");
-                IUser? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
+                User? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
                 if (doctorObj != null)
                 {
                     bool success = activeUser.AssignPersonnel(doctorObj.Id);
@@ -1064,20 +1042,18 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                     Utils.DisplayAlertText("Wront spelling or no doctor by that name");
                 }
                 Console.WriteLine("\nPress ENTER to return...");
-                Console.ReadLine();
                 break;
             // ==========================================
             // CASE 6 — All doctors list
             // ==========================================
             case 6:
                 Console.WriteLine("\n--- Your Doctors: ---");
-                foreach (IUser user in doctorsList.FindAll(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
+                foreach (User user in doctorsList.FindAll(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
                 {
 
                     Console.WriteLine(user.ToPersonnelDisplay());
                 }
                 Console.WriteLine("\nPress ENTER to return...");
-                Console.ReadLine();
                 break;
 
             /// ==========================================
@@ -1088,13 +1064,12 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
                 break;
 
             // ==========================================
-            // CASE 7 — Logout
+            // CASE 8 — Logout
             // ==========================================
             case 8:
-                FileHandler.SaveUsersToJson(users);
-                Console.WriteLine("Logging out...");
-                inMenu = false;
-                activeUser = null;
+                FileHandler.SaveUsersToCsv(users);
+                Console.WriteLine("\n1. Write 'logout' to log out.");
+                Console.WriteLine("2. Write 'return' to go back.");
                 break;
 
             default:
@@ -1104,7 +1079,23 @@ void PatientMenu(IUser activeUser, List<IUser> doctorsList, List<IUser> users)
 
     }
 
+
+//COMMON METHOD - Show current user's schedule
+static void ShowSchedule(User activeUser)
+{
+    Console.Clear();
+    Console.WriteLine($"--- Schedule for {activeUser.Username} ---\n");
+
+    var scheduleService = new ScheduleService();
+    var schedule = scheduleService.LoadSchedule(activeUser.Id);
+
+    if (schedule.Appointments.Count == 0)
+    {
+        Utils.DisplayAlertText("No appointments found in your schedule.");
+    }
+    else
+    {
+        schedule.PrintSchedule();
+    }
+    Console.WriteLine("\nPress any key to return...");
 }
-
-
-
