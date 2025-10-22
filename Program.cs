@@ -199,8 +199,8 @@ void MainMenu()
                         users.Where(user =>
                         // Filter out users that dont have the role as personel and persoal role as doctor
                         user.GetRole() == Role.Personnel &&
-                        user.PersonelRole == PersonellRoles.Doctor)
-                        .ToList(), users); // we add the whole users list because we need it when we save with method ToList.
+                        user.PersonnelRole == PersonelRoles.Doctor)
+                        .ToList(), users); // we add the whole users list because we need it when we save to tje json file
                     break;
 
                 // SUPERADMIN MENU
@@ -353,12 +353,12 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.GrantPermission(Permissions.AddPersonell); // grant permission to add personnel
+                            adminUser.GrantPermission(Permissions.AddPersonnel); // grant permission to add personnel
                             Utils.DisplaySuccessText($"You have accepted the permission to create personnel for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.RevokePermission(Permissions.AddPersonell);   // deny permission to add personnel
+                            adminUser.RevokePermission(Permissions.AddPersonnel);   // deny permission to add personnel
                             Utils.DisplaySuccessText($"You have denied permission create personnel for user: {adminName} ");
                             break;
                         default:
@@ -536,7 +536,7 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
     {
         case 1:
             Console.WriteLine("Create account for personnel or admin");
-            if (activeUser.HasPermission(Permissions.AddPersonell)) // if admin has permission
+            if (activeUser.HasPermission(Permissions.AddPersonnel)) // if admin has permission
             {
                 Console.WriteLine("(1). Create account for personnel"); // can then create an account for personnel or...
             }
@@ -548,7 +548,7 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
             switch (Utils.GetIntegerInput("Choose a number: "))
             {
                 case 1:
-                    if (!activeUser.HasPermission(Permissions.AddPersonell)) // if admin does not have correct permission -> error handling
+                    if (!activeUser.HasPermission(Permissions.AddPersonnel)) // if admin does not have correct permission -> error handling
                     {
                         Utils.DisplayAlertText("You cant do that."); // error handling
                         break;

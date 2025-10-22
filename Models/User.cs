@@ -9,7 +9,7 @@ namespace App
         SuperAdmin,
     }
 
-    public enum PersonellRoles
+    public enum PersonelRoles
     {
         None, // Lägg till detta!
         Doctor,
@@ -21,7 +21,7 @@ namespace App
     {
         None,
         AddRegistrations,
-        AddPersonell,
+        AddPersonnel,
         AddAdmin,
         AddLocation,
         ViewPatientJournal,
@@ -53,7 +53,7 @@ namespace App
         public string PasswordSalt { get; set; } = string.Empty;
         public string RoleDetails { get; set; } = string.Empty;
         public Role Role { get; set; }
-        public PersonellRoles PersonelRole { get; set; }
+        public PersonelRoles PersonnelRole { get; set; }
         public Registration Registration { get; set; }
 
         public List<Permissions> PermissionList { get; set; } = new List<Permissions> { Permissions.None };
@@ -93,13 +93,13 @@ namespace App
             if (persObj.GetRole() == Role.Personnel)
             {
                 // Kontrollera att det inkommande numret är giltigt
-                if (Enum.IsDefined(typeof(PersonellRoles), handleRole))
+                if (Enum.IsDefined(typeof(PersonelRoles), handleRole))
                 {
                     // Sätt den nya PersonelRolen
-                    PersonelRole = (PersonellRoles)handleRole;
+                    PersonnelRole = (PersonelRoles)handleRole;
 
                     // Kontrollera om den NYA rollen är DOCTOR.
-                    if (PersonelRole == PersonellRoles.Doctor)
+                    if (PersonnelRole == PersonelRoles.Doctor)
                     {
                         // Om rollen ÄR DOCTOR:
                         // Sätt RoleDetails till det inmatade värdet om det är meningsfullt.
@@ -147,7 +147,7 @@ namespace App
 
         public void setRolePersonell()
         {
-            PermissionList.Remove(Permissions.AddPersonell);
+            PermissionList.Remove(Permissions.AddPersonnel);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }
@@ -203,13 +203,13 @@ namespace App
 
         public void AcceptAddPersonellPermission()
         {
-            if (!PermissionList.Contains(Permissions.AddPersonell))
-                PermissionList.Add(Permissions.AddPersonell);
+            if (!PermissionList.Contains(Permissions.AddPersonnel))
+                PermissionList.Add(Permissions.AddPersonnel);
         }
 
         public void DenyAddPersonellPermission()
         {
-            PermissionList.Remove(Permissions.AddPersonell);
+            PermissionList.Remove(Permissions.AddPersonnel);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }
@@ -245,7 +245,7 @@ namespace App
         public string ToPersonnelDisplay()
         {
             // Vi lägger till säkerhetskontroller för att vara defensiva
-            if (Role != Role.Personnel || PersonelRole != PersonellRoles.Doctor)
+            if (Role != Role.Personnel || PersonnelRole != PersonelRoles.Doctor)
             {
                 // Returnera en tom sträng eller en standardsträng om det inte är en doktor
                 return $"{Username} - No doctore.";
@@ -262,10 +262,10 @@ namespace App
         {
             // Bygg strängen dynamiskt för att bara visa personalinformation om rollen är Personnel.
             string roleInfo = (Role == Role.Personnel)
-                ? $", Personell Role: {PersonelRole}, Details: {RoleDetails}"
+                ? $", Personell Role: {PersonnelRole}, Details: {RoleDetails}"
                 : string.Empty;
 
-            return $"ID: {Id}, Username: {Username}, Role: {Role}, Registration: {Registration}{roleInfo}, Roles as Personel: {PersonelRole}, Permissions: {string.Join(", ", PermissionList)}";
+            return $"ID: {Id}, Username: {Username}, Role: {Role}, Registration: {Registration}{roleInfo}, Roles as Personel: {PersonnelRole}, Permissions: {string.Join(", ", PermissionList)}";
         }
         public Region? assignedRegion = null;
         public void AssignRegion(Region region)
