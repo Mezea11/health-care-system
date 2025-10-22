@@ -1,5 +1,3 @@
-using System;
-
 namespace App
 {
     // Represents a single appointment in the healthcare system

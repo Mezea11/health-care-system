@@ -1,26 +1,28 @@
-
-
 namespace App
 {
-  // Handles saving/loading appointments and personnel shifts
+  // Handles reading and writing of appointments and personnel shifts
   public class ScheduleService
   {
+    // File paths for saved data
     private readonly string _appointmentsFile = "Data/appointments.txt";
     private readonly string _shiftsFile = "Data/shifts.txt";
 
-    // ----------------------
-    // Appointments
-    // ----------------------
+    // 
+    //                          APPOINTMENTS
+    // 
 
-    // Load schedule for a specific user (patient or personnel)
+    // Load all appointments for a specific user (patient or personnel)
     public Schedule LoadSchedule(int userId)
     {
       EnsureDataDirectoryExists();
       var schedule = new Schedule(userId);
 
-      if (!File.Exists(_appointmentsFile)) return schedule;
+      if (!File.Exists(_appointmentsFile))
+        return schedule;
 
       var lines = File.ReadAllLines(_appointmentsFile);
+
+      // Parse each line into an Appointment object
       foreach (var line in lines)
       {
         var appointment = Appointment.FromFileString(line);
@@ -31,7 +33,7 @@ namespace App
       return schedule;
     }
 
-    // Save or update an appointment
+    // Save or update a single appointment
     public void SaveAppointment(Appointment appointment)
     {
       EnsureDataDirectoryExists();
@@ -40,7 +42,7 @@ namespace App
           ? File.ReadAllLines(_appointmentsFile).ToList()
           : new List<string>();
 
-      // Remove existing appointment for same user/date
+      // Remove any old record with same user and date
       appointmentLines.RemoveAll(existingLine =>
       {
         var existingAppointment = Appointment.FromFileString(existingLine);
@@ -49,29 +51,37 @@ namespace App
                      existingAppointment.Date == appointment.Date;
       });
 
+      // Add the updated appointment
       appointmentLines.Add(appointment.ToFileString());
       File.WriteAllLines(_appointmentsFile, appointmentLines);
     }
 
-    // Remove appointment
+    // Remove an appointment by user and date
     public void RemoveAppointment(int userId, DateTime date)
     {
-      if (!File.Exists(_appointmentsFile)) return;
+      if (!File.Exists(_appointmentsFile))
+        return;
 
       var appointmentLines = File.ReadAllLines(_appointmentsFile).ToList();
+
+      // Delete any matching appointment line
       appointmentLines.RemoveAll(line =>
       {
         var appointment = Appointment.FromFileString(line);
-        return appointment != null && appointment.UserId == userId && appointment.Date == date;
+        return appointment != null &&
+                     appointment.UserId == userId &&
+                     appointment.Date == date;
       });
 
       File.WriteAllLines(_appointmentsFile, appointmentLines);
     }
 
-    // Load all appointments
+    // Load all appointments in the system
     public List<Appointment> LoadAllAppointments()
     {
-      if (!File.Exists(_appointmentsFile)) return new List<Appointment>();
+      if (!File.Exists(_appointmentsFile))
+        return new List<Appointment>();
+
       return File.ReadAllLines(_appointmentsFile)
                  .Select(Appointment.FromFileString)
                  .Where(a => a != null)
@@ -79,7 +89,7 @@ namespace App
                  .ToList();
     }
 
-    // Load appointments assigned to a personnel
+    // Load all appointments assigned to one personnel
     public List<Appointment> LoadPersonnelSchedule(int personnelId)
     {
       return LoadAllAppointments()
@@ -88,14 +98,17 @@ namespace App
           .ToList();
     }
 
-    // ----------------------
-    // Shifts
-    // ----------------------
+    // 
+    //                             SHIFTS
+    // 
 
+    // Load every shift from file
     public List<Shift> LoadAllShifts()
     {
       EnsureDataDirectoryExists();
-      if (!File.Exists(_shiftsFile)) return new List<Shift>();
+
+      if (!File.Exists(_shiftsFile))
+        return new List<Shift>();
 
       return File.ReadAllLines(_shiftsFile)
                  .Select(Shift.FromFileString)
@@ -104,6 +117,7 @@ namespace App
                  .ToList();
     }
 
+    // Load all shifts for one personnel
     public List<Shift> LoadShiftsForPersonnel(int personnelId)
     {
       return LoadAllShifts()
@@ -112,40 +126,51 @@ namespace App
           .ToList();
     }
 
+    // Save a new shift to file
     public void SaveShift(Shift shift)
     {
       EnsureDataDirectoryExists();
-      var shiftLines = File.Exists(_shiftsFile) ? File.ReadAllLines(_shiftsFile).ToList() : new List<string>();
+
+      var shiftLines = File.Exists(_shiftsFile)
+          ? File.ReadAllLines(_shiftsFile).ToList()
+          : new List<string>();
+
       shiftLines.Add(shift.ToFileString());
       File.WriteAllLines(_shiftsFile, shiftLines);
     }
 
+    // Find colleagues working during the same shift window
     public List<Shift> GetColleaguesForShift(Shift currentShift)
     {
       return LoadAllShifts()
           .Where(otherShift =>
               otherShift.PersonnelId != currentShift.PersonnelId &&
-              ((otherShift.Start >= currentShift.Start && otherShift.Start < currentShift.End) ||
-               (otherShift.End > currentShift.Start && otherShift.End <= currentShift.End) ||
-               (otherShift.Start <= currentShift.Start && otherShift.End >= currentShift.End)))
+              (
+                  // Overlaps: start inside, end inside, or full overlap
+                  (otherShift.Start >= currentShift.Start && otherShift.Start < currentShift.End) ||
+                  (otherShift.End > currentShift.Start && otherShift.End <= currentShift.End) ||
+                  (otherShift.Start <= currentShift.Start && otherShift.End >= currentShift.End)
+              ))
           .OrderBy(s => s.Start)
           .ToList();
     }
 
+    // Ensure data directory exists before saving files
     private void EnsureDataDirectoryExists()
     {
       if (!Directory.Exists("Data"))
         Directory.CreateDirectory("Data");
     }
 
-    // ----------------------
-    // Shift class
-    // ----------------------
+    // 
+    //                             SHIFT CLASS
+    // 
+
     public class Shift
     {
-      public DateTime Start { get; set; }
-      public DateTime End { get; set; }
-      public int PersonnelId { get; set; }
+      public DateTime Start { get; set; }      // Shift start time
+      public DateTime End { get; set; }        // Shift end time
+      public int PersonnelId { get; set; }     // Personnel assigned to this shift
 
       public Shift() { }
 
@@ -156,16 +181,31 @@ namespace App
         PersonnelId = personnelId;
       }
 
-      public string ToFileString() => $"{Start:yyyy-MM-dd HH:mm};{End:yyyy-MM-dd HH:mm};{PersonnelId}";
+      // Convert shift object to string for saving to file
+      public string ToFileString()
+      {
+        return $"{Start:yyyy-MM-dd HH:mm};{End:yyyy-MM-dd HH:mm};{PersonnelId}";
+      }
 
+      // Parse a line from file into a Shift object
       public static Shift? FromFileString(string line)
       {
-        if (string.IsNullOrWhiteSpace(line)) return null;
+        if (string.IsNullOrWhiteSpace(line))
+          return null;
+
         var parts = line.Split(';');
-        if (parts.Length < 3) return null;
-        if (!DateTime.TryParse(parts[0], out DateTime start)) return null;
-        if (!DateTime.TryParse(parts[1], out DateTime end)) return null;
-        if (!int.TryParse(parts[2], out int personnelId)) return null;
+        if (parts.Length < 3)
+          return null;
+
+        if (!DateTime.TryParse(parts[0], out DateTime start))
+          return null;
+
+        if (!DateTime.TryParse(parts[1], out DateTime end))
+          return null;
+
+        if (!int.TryParse(parts[2], out int personnelId))
+          return null;
+
         return new Shift(start, end, personnelId);
       }
     }
