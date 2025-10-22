@@ -13,7 +13,6 @@ namespace App
         };
 
 
-        
         // Method to allow personnel to approve or deny appointment requests
         // users - list of all users in the system
         // activePersonnel - the currently logged-in personnel performing the action
@@ -228,9 +227,9 @@ namespace App
             var journalService = new JournalService();
             var patientJournalEntries = journalService.GetJournalEntries(selectedPatientId);
 
-            Console.Clear(); // Clear console and show the jounral header
+            Console.Clear(); // Clear console and show the journal header
             Console.WriteLine($"--- Journal for Patient #{selectedPatientId} ---\n");
-            if (patientJournalEntries.Count == 0) // Display the jounral entries or a message if none exist 
+            if (patientJournalEntries.Count == 0) // Display the journal entries or a message if none exist 
             {
                 Console.WriteLine("(No entries yet)");
             }
@@ -245,7 +244,7 @@ namespace App
             if (addEntryChoice == "y")
             {
                 string newEntryText = Utils.GetRequiredInput("Enter new journal text: "); // Get the text for the new journal entry
-                journalService.AddEntry(selectedPatientId, activePersonnel.Username, newEntryText); // Add the new entry to the patient's jounral
+                journalService.AddEntry(selectedPatientId, activePersonnel.Username, newEntryText); // Add the new entry to the patient's journal
                 Utils.DisplaySuccessText("Entry added successfully!"); // Notify the user that the entry was added successfully
             }
 
