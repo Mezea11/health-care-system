@@ -57,11 +57,11 @@ List<Appointment> appointments = new List<Appointment>();
 locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
-// Lista med alla användare 
-// List<User> users = FileHandler.LoadUsersFromJson();
+// List with all users
+// List<User> users = FileHandler.LoadUsersFromcsv();
 List<User> users = FileHandler.LoadFromCsv();
 
-User? activeUser = null;
+User? activeUser = null; // USER May be NUll, and in this case before logging in AU = null
 bool running = true;
 
 Console.Clear();
@@ -84,7 +84,7 @@ void StartMenu(List<User> users)
         // Console.Write("Choice: ");
         // string choice = Console.ReadLine();
 
-        switch (Utils.GetIntegerInput("Pick a number: "))
+        switch (Utils.GetIntegerInput("Pick a number: ")) // Using the GetIntegerInput a lot, which is a WriteLine, Readline, Try parse and alert text all in one.
         {
             case 1:
                 // CREATE LOGIC IN HERE TO REGISTER A NEW USER
@@ -111,7 +111,7 @@ void StartMenu(List<User> users)
                 users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
 
 
-                FileHandler.SaveUsersToCsv(users);
+                FileHandler.SaveUsersToCsv(users); //Save a user in the FileHandler class through the SaveUsersToCsV method.
 
                 break;
 
@@ -167,6 +167,7 @@ void MainMenu()
             // If user as a role as patient has a registratin not yet handled by admin. Will not be able to login. But it will have a active_user as not null
             if (activeUser.GetRegistration() != Registration.Accepted)
             {
+                // DisplayAlert text find in Utils, makes alert text if its not correct input.
                 Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
                 Console.ReadKey();
                 activeUser = null;
@@ -179,7 +180,7 @@ void MainMenu()
             Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
             Console.WriteLine("----------------------------------");
             Console.WriteLine(activeUser.GetRole());
-            switch (activeUser.GetRole())
+            switch (activeUser.GetRole()) // Gives you the correct menu according to the Role you are logged in as.
             {
 
                 // ADMIN MENU
@@ -937,18 +938,18 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             Console.WriteLine("All doctors:  ");
             foreach (User user in doctorsList)
             {
-                Console.WriteLine(user.ToPersonnelDisplay());
+                Console.WriteLine(user.ToPersonnelDisplay()); //Writes out all users that are doctors with help of the method
             }
-            string doctor = Utils.GetRequiredInput("Pick a doctor for your appointment: ");
+            string doctor = Utils.GetRequiredInput("Pick a doctor for your appointment: "); // GetRI Makes us type less lines, and also if input is "" or ??
             string department = Utils.GetRequiredInput("Department / Location: ");
             string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
             string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
 
             // Validate date input
             if (!DateTime.TryParseExact(dateInput, "yyyy-MM-dd HH:mm", null,
-                System.Globalization.DateTimeStyles.None, out DateTime appointmentDate))
+                System.Globalization.DateTimeStyles.None, out DateTime appointmentDate)) //Is case sensetive
             {
-                Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm");
+                Utils.DisplayAlertText("Invalid date format. Please use yyyy-MM-dd HH:mm"); //If not you get this message
                 Console.ReadKey();
                 break;
             }
@@ -989,21 +990,22 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             Console.WriteLine("\n--- Cancel Appointment ---");
 
             Schedule cancelSchedule = scheduleService.LoadSchedule(activeUser.Id);
-            if (cancelSchedule.Appointments.Count == 0)
+            if (cancelSchedule.Appointments.Count == 0) //Loop through all schedules, loads from activeUser, if theres none
             {
-                Utils.DisplayAlertText("You have no appointments to cancel.");
+                Utils.DisplayAlertText("You have no appointments to cancel."); // This shows
                 Console.ReadKey();
                 break;
             }
 
-            cancelSchedule.PrintSchedule();
+            cancelSchedule.PrintSchedule(); // cheking if there is schedule to print
 
             string cancelInput = Utils.GetRequiredInput("\nEnter the exact date and time of the appointment to cancel (yyyy-MM-dd HH:mm): ");
 
-            if (!DateTime.TryParseExact(cancelInput, "yyyy-MM-dd HH:mm", null,
+
+            if (!DateTime.TryParseExact(cancelInput, "yyyy-MM-dd HH:mm", null, //If you enter the exact format you will cancel that appointment
                 System.Globalization.DateTimeStyles.None, out DateTime cancelDate))
             {
-                Utils.DisplayAlertText("Invalid date format.");
+                Utils.DisplayAlertText("Invalid date format.");//This will appear if the format is not correct.
                 Console.ReadKey();
                 break;
             }
@@ -1024,10 +1026,13 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
                 Console.WriteLine(user.ToPersonnelDisplay());
             }
             string doctorName = Utils.GetRequiredInput("Pick the name of the doctor (no prefix): ");
+
+            // Search for a doctor in list, store the result in doctorsList, if no match? doctorobj = null
             User? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
+
             if (doctorObj != null)
             {
-                bool success = activeUser.AssignPersonnel(doctorObj.Id);
+                bool success = activeUser.AssignPersonnel(doctorObj.Id);// Assign Doctor+ID to the active patient.
                 if (success)
                 {
                     Utils.DisplaySuccessText($"Personnel (ID: {doctorObj.Id}) assigned to patient: {activeUser.Username}.");
@@ -1048,6 +1053,7 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
         // ==========================================
         case 6:
             Console.WriteLine("\n--- Your Doctors: ---");
+            //Loop through all doctors that are assigned to the active user.
             foreach (User user in doctorsList.FindAll(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
             {
 
