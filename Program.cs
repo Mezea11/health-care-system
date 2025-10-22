@@ -917,13 +917,16 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             }
             else
             {
-                foreach (var entry in entries)
+                Console.WriteLine("Your Journal Entries: \n");
+                foreach (var entry in entries.OrderBy(entry => entry.CreatedAt))
                 {
                     Console.WriteLine(entry.Format());
                 }
             }
             Console.WriteLine("\nPress any key to return to menu...");
             break;
+
+
 
 
         // ==========================================

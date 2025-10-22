@@ -6,76 +6,67 @@ namespace App
     public class Appointment
     {
         // --- Properties ---
-        public int UserId { get; set; } // The ID of the patient or user who wins this appointment
-        public DateTime Date { get; set; } // The date and time when the appointment is scheduled
-        public string Doctor { get; set; } // The name of the doctor responsible for this appointment
-        public string Department { get; set; }// The department ir medical unit where the appointment will take place
-        public string Type { get; set; } // The type of appointment (e.g., "Checkup", "Follow-up")
-        public string Status { get; set; } = "Pending"; // Default status
-        public int? PersonnelId { get; set; } // Optional link to staff
-        public bool IsApproved { get; set; } = false; //Indicated whether the appointment has been approved by personnel, Default is false (not approved)
+        public int UserId { get; set; }                 // Patient/User ID
+        public DateTime Date { get; set; }             // Appointment date & time
+        public string Doctor { get; set; }             // Responsible doctor
+        public string Department { get; set; }         // Department or unit
+        public string Type { get; set; }               // Appointment type
+        public string Status { get; set; } = "Pending";// Status: Pending/Approved/Cancelled
+        public int? PersonnelId { get; set; }          // Optional: Assigned personnel
+        public bool IsApproved { get; set; } = false;  // Whether personnel approved
 
-        // Constructor to create a new Appointment with all requied details
+        // --- Constructors ---
         public Appointment() { }
 
         public Appointment(int userId, DateTime date, string doctor, string department, string type)
         {
-            UserId = userId; //Assign the appointment to correct user
-            Date = date; // Set the appointment date and time
-            Doctor = doctor; // Assign the doctor responsible
-            Department = department; // Specify the department or unit
-            Type = type; // Specify the type of appointment
-            Status = "Pending"; // Default status is "Pending"
-            IsApproved = false; // Default approval flas is false
+            UserId = userId;
+            Date = date;
+            Doctor = doctor;
+            Department = department;
+            Type = type;
+            Status = "Pending";
+            IsApproved = false;
         }
 
         // --- Methods ---
 
-        // Returns a formatted string for console output
+        // Formatted display for console
         public string Format()
         {
             return $"Date: {Date:yyyy-MM-dd HH:mm} | Doctor: {Doctor,-15} | Dept: {Department,-15} | Type: {Type,-12} | Status: {Status}";
         }
 
-        // Converts appointment to a single-line string for saving to a TXT file
+        // Convert appointment to a line for saving in text file
         public string ToFileString()
         {
             return $"{UserId};{Date:yyyy-MM-dd HH:mm};{Doctor};{Department};{Type};{Status};{(PersonnelId.HasValue ? PersonnelId.Value.ToString() : "")}";
         }
 
-        // Creates an Appointment object from a line of text. Returns null if the line is empty or does not contain enough data
+        // Parse a line from text file into an Appointment object
         public static Appointment? FromFileString(string line)
         {
-          //Check if the line is null, empty or whitespace
             if (string.IsNullOrWhiteSpace(line))
                 return null;
 
-            // Split the line into parts using ';' as separator
-            string[] parts = line.Split(';');
+            var parts = line.Split(';');
+            if (parts.Length < 6) return null;
 
-            //Validate that we have at least the minimum number of fields
-            if (parts.Length < 5)
-                return null;
+            int userId = int.Parse(parts[0]);
+            DateTime date = DateTime.Parse(parts[1]);
+            string doctor = parts[2];
+            string department = parts[3];
+            string type = parts[4];
+            string status = parts[5];
 
-            //Parse required fields
-            int userId = int.Parse(parts[0]); // The user/patient ID
-            DateTime date = DateTime.Parse(parts[1]); // The appointment date and time
-            string doctor = parts[2]; // Doctor's name
-            string department = parts[3]; // Department or medical unit
-            string type = parts[4]; // Type of appointment
+            var appointment = new Appointment(userId, date, doctor, department, type)
+            {
+                Status = status
+            };
 
-            // Create a new Appointment object with parsed values
-            var appointment = new Appointment(userId, date, doctor, department, type);
-
-            // Optinal: Set the appointment status if provided
-            if (parts.Length > 5)
-                appointment.Status = parts[5];
-
-            // Optional: Set the PersonnelId if provieded and valid
             if (parts.Length > 6 && int.TryParse(parts[6], out int personnelId))
                 appointment.PersonnelId = personnelId;
 
-            // Return the created appointment object
             return appointment;
         }
     }
