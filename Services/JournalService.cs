@@ -1,5 +1,3 @@
-
-
 namespace App
 {
   // Handles patient journal entries: loading, adding, and formatting
