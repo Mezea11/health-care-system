@@ -96,7 +96,7 @@ namespace HealthCareSystem.Tests
         {
             var user = new User(9, "ivan", "pass", Role.Admin);
 
-            Assert.False(user.HasPermission(Permissions.AddPersonell));
+            Assert.False(user.HasPermission(Permissions.AddPersonnel));
         }
     }
 }
