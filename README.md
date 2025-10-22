@@ -23,7 +23,7 @@ is stored persistently in **CSV files** within the data/ directory. The focus of
 #### Data Structures (Key Classes)
 The application relies on several key data structures to manage the system's complexity:
 
-User: Stores core user data, including hashed password, Role, PersonellRole, a list of specific Permissions, and assigned locations/personnel IDs.
+User: Stores core user data, including hashed password, Role, PersonelRole, a list of specific Permissions, and assigned locations/personnel IDs.
 
 Location: Represents a physical facility (HospitalName) within a geographical area (Region).
 
@@ -53,7 +53,7 @@ Patient	Requests registration, views personal medical journal, and requests/view
 
 - Ability to Request registration as a patient.
 
-- Ability to Request registration as a admin.
+- Ability to Request registration as an admin.
 
 - Any logged-in user can View their personal Schedule.
 
@@ -67,7 +67,7 @@ Patient	Requests registration, views personal medical journal, and requests/view
 ##### Personnel
 - Appointment Management: Register, Modify, and Approve incoming appointment requests.
 
-- Journal Access: View patient journal entries and Mark entries with different levels of read permissions.
+- Journal Access: View patient journal entries and mark entries with different levels of read permissions.
 
 - Schedule Management: View the schedule of a specific location.
 
@@ -110,12 +110,12 @@ Granular Permissions:
      git clone git@github.com:Mezea11/health-care-system.git
 ```
 2. **Build and Run**:
-   1 Open a terminal in the project root directory or open it in a IDE.
-    2 Run the following commands: (due to some complications we need to tell the build function what file we want to use)
+   1 Open a terminal in the project root directory or open it in an IDE.
+    2 Run the following commands: 
      ```bash
-     # dotnet build to only build the project
+     
     dotnet build 
-    # dotnet run to build and ru the project
+   
     dotnet run
      ```
 
@@ -126,7 +126,7 @@ If the data file (data/users.csv) does not exist, the application will automatic
 | Username | Role | Password|
 | --- | ----------- | ------ |
 | patient | Patient | 123 |
-| personell | Personell | 123 |
+| personnel | Personnel | 123 |
 | admin | Admin | 123 |
 | superadmin | SuperAdmin | 123 |
 
@@ -145,5 +145,19 @@ Using verbosity=detailed will provide a more descriptive output for each test ru
 <!-- 1. Open the project in **Visual Studio** or another C# IDE.
 2. dotnet build
 3. dotnet run -->
+
+##### installing XUnit 
+
+```bash
+# 1. Add the core testing framework (xUnit)
+dotnet add package xunit
+
+# 2. Add the Visual Studio test runner (required to run tests in VS and with 'dotnet test')
+dotnet add package xunit.runner.visualstudio
+
+# 3. Add the Microsoft Test SDK (required for test discovery and execution)
+dotnet add package Microsoft.NET.Test.Sdk
+
+```
 
 ---

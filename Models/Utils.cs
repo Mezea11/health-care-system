@@ -33,7 +33,7 @@ class Utils
         return input;
     }
 
-    public static void DisplaySuccesText(string text, int delay = 50)
+    public static void DisplaySuccessText(string text, int delay = 50)
     {
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.Green;
