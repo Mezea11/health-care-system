@@ -1,22 +1,15 @@
-0|patient|3Hdr3mJO7sCzVhcKsfq/Ugjqy71a7FkRk2Oh+ItbSmU=|3eL3zYWdy96faRPrvk/PNg==|Patient|None||Accepted||6
+0|patient|3Hdr3mJO7sCzVhcKsfq/Ugjqy71a7FkRk2Oh+ItbSmU=|3eL3zYWdy96faRPrvk/PNg==|Patient|None||Accepted||5,8,9
 1|personnel|aIdndq1XdQ5TiPHLmnRgUaiqD6yYqfWbhht7xpY2dwQ=|zofmZaydVnf2oE9JwKmT0w==|Personnel|None||Accepted||
 2|admin|WbbT93m90Rh1UsqykLo0M7wysDuECXL0OJgUjiP6Xc8=|90anuAWEH1NIfXXnYZ2fRg==|Admin|None||Accepted|AddPersonell,AddRegistrations,AddLocation,AddAdmin|
-3|admin|0h5LLfogsLoDJal9VvRGuiVHfQr3hQb1QSPvTsnfD/k=|zIV6nGvjzaMDfxUq1xjsLA==|Admin|None||Pending||
-4|admin1|Tu8ucsUNlPvuMNKwcmYn4mQvQ8h0ITwOTmp2b//Ec1Y=|b9z70nb0daCihb9F3Bq5rw==|Admin|None||Pending|AddPersonell|
-5|admin2|HjPXDLKVMAcxl2fYg9P0fDJZJ4uAN+gjLakRyaRoOqE=|Spa26wcEDJP1BkcA5OhPug==|Admin|None||Pending||
-6|Smith|RjmtnaqN9uV9DmHG2ZEiCAb0o5I9MyHiY6QYdrgVWoE=|X1szdyYaVA075XOXQjgGgA==|Personnel|Doctor|Cardiology|Accepted||
-7|admin_doctor|prXCiF60fWsds4Gn4lazew+pO9F+SuEqiDRi5tmHfqM=|H5Vw6JG2p2M35pzRLUTLOQ==|Personnel|Doctor|General Medicine|Accepted||
-8|Andersson|mMad3WNvjCFRa1IDVZvk4HgMwb3fqWBwr0MzXd2y6pQ=|xO7xeJSaAAAho5YW5OjNEQ==|Personnel|Doctor|Neurology|Accepted||
-9|Snuggles|GKKT5z19Xb+5AWSLA/ssQSEWlzlFPA/wx9DiYZII/k4=|YaIB6w6mZb8NNd6yP4/U9A==|Personnel|Doctor|Metaphysical Wellness|Accepted||
-10|Livingstone|7U3Vey0Z6Z2v4u08gh96pWc8mJiuMWNQwJtUHhuk14U=|QEXbwwFqmmqXp/GbEKhjLg==|Personnel|Doctor|medicine, geography, and exploration|Accepted||
-11|superadmin|bUz6csFm7Nuddi4WxPz6H++eCBuga57y+tTBIQh28zY=|V7SINMlD1xfiiPmVniBaHw==|SuperAdmin|None||Accepted||
-12|patient1|aH0FWB9+OA/HBeZUqdMwuv08ZBkLz1GdcvAf/Qo7SMc=|N86PBtoPDABcolk6Lpcsew==|Patient|None||Accepted||
-14|testadmin|g/3DMX+oWluhJRExiAHo4jOY6rQsQzrT+gVgN5rNDOU=|M2IG07PL6ZsWP9G5u+eejQ==|Admin|None||Pending||
-15|patient1|PVt10zfE5zibTmUhe/yKxXNnJzo90U8p7v6f3PxuLfo=|qBtUrSEIqlxzLbtcVhSAZg==|Patient|None||Pending||
-16|123|a9l9J4FOseyqLXi6SBFH1WHl/yf0x6SfXyigLbswq+0=|1ESqQ3YD9SqBKhhTXz5uSw==|Personnel|Doctor|skåne|Accepted||
-17|Kalle|3s77auZIAetv5A4HXRNOkVeAJUreTGgcB4m3ZcMmt+s=|hC/p9FqGGngS4bHlQZS2NQ==|Patient|None||Accepted||
-18|sven|NmR/+6Iexw6iFHlVb2YjGZR3YBABblbZyiqEvCTXW8k=|gGkyL9x3YW+XRlvLJGPB2g==|Patient|None||Accepted||
-19|ove|VwTWI1K9FFpRr4xEngFwq7TAfRY2N8g/ao9x/I0U3EE=|Tr/OOWymRqdFuJ1+/gLIrA==|Patient|None||Accepted||
-20|pelle|G0U369kL+Ksrvj5ySzLyDNDHWfFhG9ZePQlxO2KLkNs=|HZI9O0IIa6pEITnRSFRctQ==|Patient|None||Accepted||
-21|pop|PN7mpReEiYYgCeN5wTfjtxduPKMMhe3abnh5j7e8NeY=|4Ds/ylNgspxQ35J6YiW3pw==|Patient|None||Accepted||
-22|ulf|s4dIEVQZ0rVwk9OnTUH64LAoNv7rEbqEgdSW09aDR6U=|UGD8CbPu/TT0Z1K+aCzObw==|Patient|None||Accepted||
+3|admin1|Tu8ucsUNlPvuMNKwcmYn4mQvQ8h0ITwOTmp2b//Ec1Y=|b9z70nb0daCihb9F3Bq5rw==|Admin|None||Pending|AddPersonell|
+4|admin2|HjPXDLKVMAcxl2fYg9P0fDJZJ4uAN+gjLakRyaRoOqE=|Spa26wcEDJP1BkcA5OhPug==|Admin|None||Pending||
+5|Smith|RjmtnaqN9uV9DmHG2ZEiCAb0o5I9MyHiY6QYdrgVWoE=|X1szdyYaVA075XOXQjgGgA==|Personnel|Doctor|Cardiology|Accepted||
+6|admin_doctor|prXCiF60fWsds4Gn4lazew+pO9F+SuEqiDRi5tmHfqM=|H5Vw6JG2p2M35pzRLUTLOQ==|Personnel|Doctor|General Medicine|Accepted||
+7|Andersson|mMad3WNvjCFRa1IDVZvk4HgMwb3fqWBwr0MzXd2y6pQ=|xO7xeJSaAAAho5YW5OjNEQ==|Personnel|Doctor|Neurology|Accepted||
+8|Snuggles|GKKT5z19Xb+5AWSLA/ssQSEWlzlFPA/wx9DiYZII/k4=|YaIB6w6mZb8NNd6yP4/U9A==|Personnel|Doctor|Metaphysical Wellness|Accepted||
+9|Livingstone|7U3Vey0Z6Z2v4u08gh96pWc8mJiuMWNQwJtUHhuk14U=|QEXbwwFqmmqXp/GbEKhjLg==|Personnel|Doctor|medicine, geography, and exploration|Accepted||
+10|superadmin|bUz6csFm7Nuddi4WxPz6H++eCBuga57y+tTBIQh28zY=|V7SINMlD1xfiiPmVniBaHw==|SuperAdmin|None||Accepted||
+11|patient1|aH0FWB9+OA/HBeZUqdMwuv08ZBkLz1GdcvAf/Qo7SMc=|N86PBtoPDABcolk6Lpcsew==|Patient|None||Pending||
+12|testadmin|g/3DMX+oWluhJRExiAHo4jOY6rQsQzrT+gVgN5rNDOU=|M2IG07PL6ZsWP9G5u+eejQ==|Admin|None||Pending||
+13|patient1|PVt10zfE5zibTmUhe/yKxXNnJzo90U8p7v6f3PxuLfo=|qBtUrSEIqlxzLbtcVhSAZg==|Patient|None||Pending||
+14|123|a9l9J4FOseyqLXi6SBFH1WHl/yf0x6SfXyigLbswq+0=|1ESqQ3YD9SqBKhhTXz5uSw==|Personnel|Doctor|skåne|Accepted||

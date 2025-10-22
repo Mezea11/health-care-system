@@ -67,7 +67,7 @@ class FileHandler
         var smith = users.FirstOrDefault(u => u.Id == 6);
         if (smith != null)
         {
-            smith.PersonelRole = PersonellRoles.Doctor;
+            smith.PersonnelRole = PersonelRoles.Doctor;
             smith.RoleDetails = "Cardiology";
         }
 
@@ -75,7 +75,7 @@ class FileHandler
         var adminDoctor = users.FirstOrDefault(u => u.Id == 7);
         if (adminDoctor != null)
         {
-            adminDoctor.PersonelRole = PersonellRoles.Doctor;
+            adminDoctor.PersonnelRole = PersonelRoles.Doctor;
             adminDoctor.RoleDetails = "General Medicine";
         }
 
@@ -83,7 +83,7 @@ class FileHandler
         var andersson = users.FirstOrDefault(u => u.Id == 8);
         if (andersson != null)
         {
-            andersson.PersonelRole = PersonellRoles.Doctor;
+            andersson.PersonnelRole = PersonelRoles.Doctor;
             andersson.RoleDetails = "Neurology";
         }
 
@@ -91,7 +91,7 @@ class FileHandler
         var snuggles = users.FirstOrDefault(u => u.Id == 9);
         if (snuggles != null)
         {
-            snuggles.PersonelRole = PersonellRoles.Doctor;
+            snuggles.PersonnelRole = PersonelRoles.Doctor;
             snuggles.RoleDetails = "Metaphysical Wellness";
         }
 
@@ -99,7 +99,7 @@ class FileHandler
         var livingstone = users.FirstOrDefault(u => u.Id == 10);
         if (livingstone != null)
         {
-            livingstone.PersonelRole = PersonellRoles.Doctor;
+            livingstone.PersonnelRole = PersonelRoles.Doctor;
             livingstone.RoleDetails = "medicine, geography, and exploration";
         }
         // spara till data.csv 
@@ -186,7 +186,7 @@ class FileHandler
                     user.PasswordHash = parts[2];
                     user.PasswordSalt = parts[3];
                     user.Role = (Role)Enum.Parse(typeof(Role), parts[4], true);
-                    user.PersonelRole = (PersonellRoles)Enum.Parse(typeof(PersonellRoles), parts[5], true);
+                    user.PersonnelRole = (PersonelRoles)Enum.Parse(typeof(PersonelRoles), parts[5], true);
                     user.RoleDetails = parts[6];
                     user.Registration = (Registration)Enum.Parse(typeof(Registration), parts[7], true);
 
@@ -272,7 +272,7 @@ class FileHandler
                 concreteUser.PasswordHash,
                 concreteUser.PasswordSalt,
                 concreteUser.Role,
-                concreteUser.PersonelRole,
+                concreteUser.PersonnelRole,
                 concreteUser.RoleDetails,
                 concreteUser.Registration,
                 permissionListString,  // seraliserar första listan

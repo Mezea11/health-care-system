@@ -198,7 +198,7 @@ void MainMenu()
                         users.Where(user =>
                         // Filter out users that dont have the role as personel and persoal role as doctor
                         user.GetRole() == Role.Personnel &&
-                        user.PersonelRole == PersonellRoles.Doctor)
+                        user.PersonnelRole == PersonelRoles.Doctor)
                         .ToList(), users); // we add the whole users list because we need it when we save to tje json file
                     break;
 
