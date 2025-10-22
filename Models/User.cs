@@ -1,6 +1,51 @@
 namespace App
 {
-    public class User : IUser
+    public enum Role
+    {
+        None,
+        Patient,
+        Personnel,
+        Admin,
+        SuperAdmin,
+    }
+
+    public enum PersonellRoles
+    {
+        None, // Lägg till detta!
+        Doctor,
+        Nurse,
+        Administrator,
+    }
+
+    public enum Permissions
+    {
+        None,
+        AddRegistrations,
+        AddPersonell,
+        AddAdmin,
+        AddLocation,
+        ViewPatientJournal,
+        ViewAllJournals,
+        ViewPermissions
+    }
+
+    public enum Registration // Enum för början av registrerings processen
+    {
+        Accepted,
+        Pending,
+        Denied,
+    }
+
+    public enum Region
+    {
+        None,
+        Skåne,
+        Norrland,
+        Götaland,
+    }
+
+
+    public class User
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
@@ -42,7 +87,7 @@ namespace App
             return false; // Tilldelning misslyckades (inte en patient eller redan tilldelad)
         }
 
-        public void SetRolePersonell(int handleRole, IUser persObj, string roleDetails)
+        public void SetRolePersonell(int handleRole, User persObj, string roleDetails)
         {
             // Kontrollera om användaren är Personal innan vi ens försöker ändra något
             if (persObj.GetRole() == Role.Personnel)
