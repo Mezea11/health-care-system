@@ -21,7 +21,7 @@ namespace App
     {
         None,
         AddRegistrations,
-        AddPersonell,
+        AddPersonnel,
         AddAdmin,
         AddLocation,
         ViewPatientJournal,
@@ -147,7 +147,7 @@ namespace App
 
         public void setRolePersonell()
         {
-            PermissionList.Remove(Permissions.AddPersonell);
+            PermissionList.Remove(Permissions.AddPersonnel);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }
@@ -203,13 +203,13 @@ namespace App
 
         public void AcceptAddPersonellPermission()
         {
-            if (!PermissionList.Contains(Permissions.AddPersonell))
-                PermissionList.Add(Permissions.AddPersonell);
+            if (!PermissionList.Contains(Permissions.AddPersonnel))
+                PermissionList.Add(Permissions.AddPersonnel);
         }
 
         public void DenyAddPersonellPermission()
         {
-            PermissionList.Remove(Permissions.AddPersonell);
+            PermissionList.Remove(Permissions.AddPersonnel);
             if (PermissionList.Count == 0)
                 PermissionList.Add(Permissions.None);
         }

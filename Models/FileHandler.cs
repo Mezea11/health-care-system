@@ -49,14 +49,14 @@ class FileHandler
         if (mainAdmin != null)
         {
             // Tänk: mainAdmin.PermissionList.Add(Permissions.ManageUsers);
-            mainAdmin.PermissionList.Add(Permissions.AddPersonell);
+            mainAdmin.PermissionList.Add(Permissions.AddPersonnel);
             mainAdmin.PermissionList.Add(Permissions.AddRegistrations);
             mainAdmin.Registration = Registration.Accepted;
         }
 
         // Hitta admin med ID 4
         var secondaryAdmin = users.FirstOrDefault(u => u.Id == 4);
-        secondaryAdmin?.PermissionList.Add(Permissions.AddPersonell);
+        secondaryAdmin?.PermissionList.Add(Permissions.AddPersonnel);
 
         // ----------------------------------------------------------------------
         // 3. LÄKARHANTERING (Använd LINQ (FirstOrDefault) för att hitta och uppdatera specifika användare)

@@ -92,7 +92,7 @@ void StartMenu(List<User> users)
                 Console.Clear();
 
                 // Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
-                string newPass = Utils.GetRequiredInput("Tpe in your password: ");
+                string newPass = Utils.GetRequiredInput("Type in your password: ");
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
@@ -101,7 +101,7 @@ void StartMenu(List<User> users)
                 break;
             case 2:
                 string newAdmin = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
-                Console.Clear();
+                Console.WriteLine();  // do we want to have a writeline or clear here, the handling seems more better. 
 
                 Console.WriteLine("Type in your password"); // PROMPT USER TO INSERT PASSWORD
                 string newAdminPass = Console.ReadLine() ?? "".Trim();
@@ -241,7 +241,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
     Console.WriteLine("8. Logout");
 
 
-    int input = Utils.GetIntegerInput("Chose a number: ");
+    int input = Utils.GetIntegerInput("Pick a number: ");
 
     switch (input)
     {
@@ -260,7 +260,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for adding location? \n"); // Accept or deny giving permission from enum list
+                    string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for adding location? \n"); // Accept or deny giving permission from enum list
                     switch (acceptOrDeny)
                     {
                         case "y":
@@ -310,7 +310,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase)); // refactorerar till en lattlast ://" 
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for handling registration requests?\n");
+                    string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for handling registration requests?\n");
                     switch (acceptOrDeny)
                     {
                         case "y":
@@ -348,16 +348,16 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for handling registration requests?\n");
+                    string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for handling registration requests?\n");
                     switch (acceptOrDeny)
                     {
                         case "y":
-                            adminUser.GrantPermission(Permissions.AddPersonell); // grant permission to add personnel
+                            adminUser.GrantPermission(Permissions.AddPersonnel); // grant permission to add personnel
                             Utils.DisplaySuccessText($"You have accepted the permission to create personnel for admin: {adminName} ");
                             break;
 
                         case "d":
-                            adminUser.RevokePermission(Permissions.AddPersonell);   // deny permission to add personnel
+                            adminUser.RevokePermission(Permissions.AddPersonnel);   // deny permission to add personnel
                             Utils.DisplaySuccessText($"You have denied permission create personnel for user: {adminName} ");
                             break;
                         default:
@@ -388,7 +388,7 @@ static void SuperAdminMenu(List<User> users, List<Location> locations, User acti
                 User? adminUser = users.Find(user => user.Username.Equals(adminName, StringComparison.OrdinalIgnoreCase));
                 if (adminUser != null)
                 {
-                    string acceptOrDeny = Utils.GetRequiredInput($"You chose: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for viewing all users permissions?\n");
+                    string acceptOrDeny = Utils.GetRequiredInput($"You picked: {adminUser.Username}. Do you want accept(y) or deny(d) the permission for viewing all users permissions?\n");
                     switch (acceptOrDeny)
                     {
                         case "y":
@@ -535,9 +535,9 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
     {
         case 1:
             Console.WriteLine("Create account for personnel or admin");
-            if (activeUser.HasPermission(Permissions.AddPersonell)) // if admin has permission
+            if (activeUser.HasPermission(Permissions.AddPersonnel)) // if admin has permission
             {
-                Console.WriteLine("(1). Create account for personnel"); // can then create an account for personnel or...
+                Console.WriteLine("(1). Create account for Personnel"); // can then create an account for personnel or...
             }
             if (activeUser.HasPermission(Permissions.AddAdmin))
             {
@@ -547,7 +547,7 @@ void AdminMenu(List<User> users, List<Location> locations, User activeUser)
             switch (Utils.GetIntegerInput("Choose a number: "))
             {
                 case 1:
-                    if (!activeUser.HasPermission(Permissions.AddPersonell)) // if admin does not have correct permission -> error handling
+                    if (!activeUser.HasPermission(Permissions.AddPersonnel)) // if admin does not have correct permission -> error handling
                     {
                         Utils.DisplayAlertText("You cant do that."); // error handling
                         break;
@@ -852,7 +852,7 @@ void PersonnelMenu(List<User> users, User activeUser, List<Appointment> appointm
                     scheduleService.SaveAppointment(newAppointment);
 
 
-                    Utils.DisplaySuccessText($"Appointment with {users} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+                    Utils.DisplaySuccessText($"Appointment with {patientUser.Username} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
                     Console.ReadKey();
                     break;
 
@@ -925,6 +925,8 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             }
             Console.WriteLine("\nPress any key to return to menu...");
             break;
+
+
 
 
         // ==========================================
