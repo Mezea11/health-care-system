@@ -2,7 +2,6 @@
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
-using System.Xml.Linq;
 /* 
 
 -- SAVE AND MOCK DATA TO TEXT FILES --
@@ -43,7 +42,7 @@ As a logged in user, I need to be able to view my schedule.
 
 
 
-static int GetIndexAddOne(List<User> users) // Method to +1 to ID on every new user that's added
+static int GetIndexAddOne(List<User> users)
 {
     return users.Count + 1;
 }
@@ -51,19 +50,18 @@ static int GetIndexAddOne(List<User> users) // Method to +1 to ID on every new u
 // Main program
 // ============================
 
-List<Location> locations = new List<Location>(); // List for new locations
-List<Appointment> appointments = new List<Appointment>(); // List for new appointments
+List<Location> locations = new List<Location>();
+List<Appointment> appointments = new List<Appointment>();
 /* List<AdminLocation> adminLocations = new List<AdminLocation>();
  */
-locations.Add(new Location("Skåne", "Lunds Universitetssjukhus")); // Hardcoded Locations 
+locations.Add(new Location("Skåne", "Lunds Universitetssjukhus"));
 locations.Add(new Location("Stockholm", "Karolinska institutet"));
 
 // Lista med alla användare 
 // List<User> users = FileHandler.LoadUsersFromJson();
-List<User> users = FileHandler.LoadFromCsv();// Loads the user data for "LOADFROMCSV"
+List<User> users = FileHandler.LoadFromCsv();
 
-
-User? activeUser = null; // IUSER May be NUll, and in this case before logging in AU = null
+User? activeUser = null;
 bool running = true;
 
 Console.Clear();
@@ -74,7 +72,7 @@ StartMenu(users);
 // ============================
 
 // THIS METHOD ALLOWS USER TO EITHER LOGIN OR REGISTER
-void StartMenu(List<User> users) // The start menu is using the List with users
+void StartMenu(List<User> users)
 {
     while (true)
     {
@@ -86,7 +84,7 @@ void StartMenu(List<User> users) // The start menu is using the List with users
         // Console.Write("Choice: ");
         // string choice = Console.ReadLine();
 
-        switch (Utils.GetIntegerInput("Pick a number: ")) // Using the GetIntegerInput a lot, which is a WriteLine, Readline, Try parse and alert text all in one.
+        switch (Utils.GetIntegerInput("Pick a number: "))
         {
             case 1:
                 // CREATE LOGIC IN HERE TO REGISTER A NEW USER
@@ -98,8 +96,8 @@ void StartMenu(List<User> users) // The start menu is using the List with users
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-                users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD ((Get INDExAddOne +1 to UserId whhen user is created))
-                FileHandler.SaveUsersToCsv(users); // Saving the new user & data to File
+                users.Add(new User(Utils.GetIndexAddOne(users), newUser, newPass, Role.Patient));  // CREATE NEW OBJECT (WITH ROLE PATIENT) WITH USERNAME AND PASSWORD
+                FileHandler.SaveUsersToCsv(users);
                 break;
             case 2:
                 string newAdmin = Utils.GetRequiredInput("Type in your username: "); // PROMPT USER TO INSERT USERNAME
@@ -110,10 +108,10 @@ void StartMenu(List<User> users) // The start menu is using the List with users
                 Console.Clear();
 
                 Console.WriteLine("Request Sent.");
-                users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin)); // Create new Admin Object.
+                users.Add(new User(GetIndexAddOne(users), newAdmin, newAdminPass, Role.Admin));
 
 
-                FileHandler.SaveUsersToCsv(users); //Save a user in the FileHandler class through the SaveToUsersCSV method.
+                FileHandler.SaveUsersToCsv(users);
 
                 break;
 
@@ -149,7 +147,7 @@ void MainMenu()
             // TryLogin method invoked
             foreach (User user in users)
             {
-                if (user.TryLogin(username, password)) // Using TryLogin a bit as well, makes less lines for login, does the username and password match any of existing users?
+                if (user.TryLogin(username, password))
                 {
                     activeUser = user;
                     break;
@@ -168,7 +166,7 @@ void MainMenu()
         {
             // If user as a role as patient has a registratin not yet handled by admin. Will not be able to login. But it will have a active_user as not null
             if (activeUser.GetRegistration() != Registration.Accepted)
-            {   // DisplayAlert text find in Utils, makes alert text if its not correct input.
+            {
                 Utils.DisplayAlertText("Your account is still pending. Need to wait for the admin to accept it, Press ENTER to continue");
                 Console.ReadKey();
                 activeUser = null;
@@ -178,10 +176,10 @@ void MainMenu()
             // MENU: LOGGED IN
             // ============================
             Console.Clear();
-            Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})"); // Shows username and the Role you are logged in as.
+            Console.WriteLine($"Logged in as:  {activeUser.Username} ({activeUser.GetRole()})");
             Console.WriteLine("----------------------------------");
             Console.WriteLine(activeUser.GetRole());
-            switch (activeUser.GetRole()) // Gives you the correct menu according to the Role you are logged in as.
+            switch (activeUser.GetRole())
             {
 
                 // ADMIN MENU
@@ -933,12 +931,12 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
         // ==========================================
         case 2:
             Console.WriteLine("\n--- Create New Appointment ---");
-            Console.WriteLine("All docktors:  ");
-            foreach (IUser user in doctorsList)
+            Console.WriteLine("All doctors:  ");
+            foreach (User user in doctorsList)
             {
                 Console.WriteLine(user.ToPersonnelDisplay());
             }
-            string doctor = Utils.GetRequiredInput("Pick a docktor for ypur appointment: ");
+            string doctor = Utils.GetRequiredInput("Pick a doctor for your appointment: ");
             string department = Utils.GetRequiredInput("Department / Location: ");
             string type = Utils.GetRequiredInput("Type of appointment (e.g., checkup, consultation): ");
             string dateInput = Utils.GetRequiredInput("Date and time (format: yyyy-MM-dd HH:mm): ");
@@ -956,8 +954,8 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             Appointment newAppointment = new Appointment(activeUser.Id, appointmentDate, doctor, department, type);
             scheduleService.SaveAppointment(newAppointment);
 
-            Utils.DisplaySuccesText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
-            Console.ReadKey();
+            Utils.DisplaySuccessText($"Appointment with {doctor} on {appointmentDate:yyyy-MM-dd HH:mm} has been booked.");
+            Console.ReadLine();
             break;
 
         // ==========================================
@@ -1018,43 +1016,41 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
         // ==========================================
         case 5:
             Console.WriteLine("\n--- All Doctors to pick from ---");
-            foreach (IUser user in doctorsList)
+            foreach (User user in doctorsList)
             {
                 Console.WriteLine(user.ToPersonnelDisplay());
             }
-            string doctorName = Utils.GetRequiredInput("Pick the name of the doctor you want to have?? ");
-            IUser? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
+            string doctorName = Utils.GetRequiredInput("Pick the name of the doctor (no prefix): ");
+            User? doctorObj = doctorsList.Find(user => user.Username.Equals(doctorName, StringComparison.OrdinalIgnoreCase));
             if (doctorObj != null)
             {
                 bool success = activeUser.AssignPersonnel(doctorObj.Id);
                 if (success)
                 {
-                    Utils.DisplaySuccesText($"Personal (ID: {doctorObj.Id}) tilldelad patient {activeUser.Username}.");
+                    Utils.DisplaySuccessText($"Personnel (ID: {doctorObj.Id}) assigned to patient: {activeUser.Username}.");
                 }
                 else
                 {
-                    Utils.DisplayAlertText("Kunde inte tilldela personal. Patienten har redan detta ID, eller det är fel roll.");
+                    Utils.DisplayAlertText("Couldn't add personnel. The patient already has this ID, or it's the wrong role.");
                 }
             }
             else
             {
-                Utils.DisplayAlertText("Wront spelling or no doctor by that name");
+                Utils.DisplayAlertText("Wrong spelling or no doctor by that name");
             }
             Console.WriteLine("\nPress ENTER to return...");
-            Console.ReadLine();
             break;
         // ==========================================
         // CASE 6 — All doctors list
         // ==========================================
         case 6:
             Console.WriteLine("\n--- Your Doctors: ---");
-            foreach (IUser user in doctorsList.FindAll(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
+            foreach (User user in doctorsList.FindAll(doctor => activeUser.AssignedPersonnelIds.Contains(doctor.Id)))
             {
 
                 Console.WriteLine(user.ToPersonnelDisplay());
             }
             Console.WriteLine("\nPress ENTER to return...");
-            Console.ReadLine();
             break;
 
         /// ==========================================
@@ -1065,13 +1061,12 @@ void PatientMenu(User activeUser, List<User> doctorsList, List<User> users)
             break;
 
         // ==========================================
-        // CASE 7 — Logout
+        // CASE 8 — Logout
         // ==========================================
         case 8:
-            FileHandler.SaveUsersToJson(users);
-            Console.WriteLine("Logging out...");
-            inMenu = false;
-            activeUser = null;
+            FileHandler.SaveUsersToCsv(users);
+            Console.WriteLine("\n1. Write 'logout' to log out.");
+            Console.WriteLine("2. Write 'return' to go back.");
             break;
 
         default:
